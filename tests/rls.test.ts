@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from 'vitest'
-import { serviceClient, userClient } from './helpers/clients'
+import { serviceClient, userClient, adminClient } from './helpers/clients'
 
 let itemId: string
 
@@ -65,5 +65,30 @@ describe('RLS is_admin imutável', () => {
       .update({ display_name: 'Fulano' })
       .eq('id', id)
     expect(error).toBeNull()
+  })
+})
+
+describe('RLS caminho admin', () => {
+  it('admin consegue escrever no catálogo', async () => {
+    const { client } = await adminClient()
+    const { data, error } = await client
+      .from('sources')
+      .insert({ kind: 'card', name: 'AdminBank', sort_order: 1 })
+      .select()
+      .single()
+    expect(error).toBeNull()
+    expect(data!.name).toBe('AdminBank')
+  })
+
+  it('admin lê o profile de outro usuário', async () => {
+    const other = await userClient()
+    const { client } = await adminClient()
+    const { data, error } = await client
+      .from('profiles')
+      .select('id')
+      .eq('id', other.id)
+      .single()
+    expect(error).toBeNull()
+    expect(data!.id).toBe(other.id)
   })
 })

@@ -55,15 +55,19 @@ create policy "profiles select" on profiles for select to authenticated
 create policy "profiles update" on profiles for update to authenticated
   using (id = auth.uid()) with check (id = auth.uid());
 
--- is_admin imutável por não-admin (RLS não filtra coluna; trigger faz)
+-- is_admin imutável por usuários comuns. security invoker para que current_user
+-- reflita o role real do chamador; roles de backend privilegiados e admins podem
+-- alterar (necessário para criar o primeiro admin via service role / SQL).
 create function protect_is_admin()
 returns trigger
 language plpgsql
-security definer
+security invoker
 set search_path = ''
 as $$
 begin
-  if new.is_admin is distinct from old.is_admin and not public.is_admin() then
+  if new.is_admin is distinct from old.is_admin
+     and not public.is_admin()
+     and current_user not in ('service_role', 'postgres', 'supabase_admin') then
     raise exception 'cannot modify is_admin';
   end if;
   return new;

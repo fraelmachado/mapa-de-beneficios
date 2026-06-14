@@ -32,3 +32,12 @@ export async function userClient(): Promise<{ client: SupabaseClient; id: string
   if (signInErr) throw signInErr
   return { client, id: data.user!.id }
 }
+
+// Cria um usuário, promove a admin via service role e devolve client autenticado.
+export async function adminClient(): Promise<{ client: SupabaseClient; id: string }> {
+  const { client, id } = await userClient()
+  const admin = serviceClient()
+  const { error } = await admin.from('profiles').update({ is_admin: true }).eq('id', id)
+  if (error) throw error
+  return { client, id }
+}
