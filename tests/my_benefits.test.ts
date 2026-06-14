@@ -48,4 +48,20 @@ describe('my_benefits', () => {
     const { data } = await b.client.from('my_benefits').select('id')
     expect(data!.map((r) => r.id)).not.toContain(mine.benefitId)
   })
+
+  it('seed: usuário com Itaú Black vê 2 benefícios', async () => {
+    const { client, id } = await userClient()
+    await client
+      .from('user_sources')
+      .insert({ user_id: id, source_item_id: 'aaaaaaa1-0000-0000-0000-000000000001' })
+    const { data, error } = await client
+      .from('my_benefits')
+      .select('id')
+      .in('id', [
+        'd0000001-0000-0000-0000-000000000001',
+        'd0000001-0000-0000-0000-000000000002',
+      ])
+    expect(error).toBeNull()
+    expect(data!.length).toBe(2)
+  })
 })
