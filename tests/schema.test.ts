@@ -48,4 +48,17 @@ describe('catalog schema', () => {
     await db.from('sources').delete().eq('id', src!.id)
     await db.from('benefits').delete().eq('id', ben!.id)
   })
+
+  it('cria profile automaticamente ao criar usuário', async () => {
+    const { userClient } = await import('./helpers/clients')
+    const { id } = await userClient()
+    const db = serviceClient()
+    const { data, error } = await db
+      .from('profiles')
+      .select('id, is_admin')
+      .eq('id', id)
+      .single()
+    expect(error).toBeNull()
+    expect(data!.is_admin).toBe(false)
+  })
 })
