@@ -46,3 +46,407 @@ on conflict (slug) do update set
   sort_order = excluded.sort_order, card_brand = excluded.card_brand, card_level = excluded.card_level,
   product_type = excluded.product_type, source_url = excluded.source_url,
   verification_status = excluded.verification_status;
+
+-- ===== BENEFITS (Task 3 — issuer/partner, caminho direto) =====
+insert into benefits (slug, title, summary, category, scope, benefit_source, redemption_type,
+  requires_activation, requires_eligible_card, requires_certificate,
+  partner_name, limits_description, long_description, source_url, observed_at,
+  verification_status, notes)
+values
+
+  -- ── Nubank Ultravioleta ───────────────────────────────────────────────────
+  (
+    'nubank-ultravioleta-pontos-cashback',
+    'Pontos ou Cashback Ultravioleta',
+    'Cliente escolhe acumular a partir de 2,2 pontos por dólar gasto ou 1,25% de cashback.',
+    'points', 'nacional', 'issuer', 'app',
+    true, false, false,
+    'Nubank', null, null,
+    'https://nubank.com.br/ultravioleta/cartao-black/pontos-cashback', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'nubank-ultravioleta-transferencia-milhas',
+    'Transferência de pontos para LATAM, Azul e Gol',
+    'Pontos Ultravioleta podem ser transferidos para programas de milhas de LATAM, Azul e Gol, conforme regras do Nubank.',
+    'miles', 'nacional', 'mixed', 'points_exchange',
+    true, false, false,
+    'LATAM Pass, Azul, Gol/Smiles', null, null,
+    'https://nubank.com.br/ultravioleta/cartao-black/pontos-cashback', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'nubank-ultravioleta-priority-pass',
+    '4 acessos Priority Pass por ano',
+    'Clientes Ultravioleta têm 4 visitas por ano à rede Priority Pass, com mais de 1.700 salas VIP em mais de 145 países.',
+    'airport', 'nacional', 'partner', 'physical_access',
+    true, false, false,
+    'Priority Pass', '4 visitas por ano, conforme regras do Nubank Ultravioleta.', null,
+    'https://nubank.com.br/ultravioleta/cartao-black/salas-vip', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'nubank-ultravioleta-lounge-gru',
+    'Nubank Ultravioleta Lounge em Guarulhos',
+    'Acesso gratuito e ilimitado ao Nubank Ultravioleta Lounge no Aeroporto Internacional de São Paulo/Guarulhos.',
+    'airport', 'pontual', 'issuer', 'physical_access',
+    true, false, false,
+    'Nubank', 'Entrada permitida até 3 horas antes do voo; verificar regras de acompanhante no regulamento vigente.', null,
+    'https://nubank.com.br/ultravioleta/cartao-black/ultravioleta-lounge', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'nubank-ultravioleta-nu-viagens',
+    'Nu Viagens Ultravioleta',
+    'Benefícios em passagens e hotéis, com acúmulo de 9 pontos por dólar ou 5% de cashback, parcelamento e garantia de melhor preço conforme regras.',
+    'travel', 'nacional', 'issuer', 'app',
+    true, false, false,
+    'Nubank', null, null,
+    'https://nubank.com.br/ultravioleta/nu-viagens', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'nubank-ultravioleta-iof-zero',
+    'Compras internacionais com IOF zero',
+    'Compras internacionais no crédito com IOF zero e spread reduzido informado pelo Nubank Ultravioleta.',
+    'international_purchase', 'nacional', 'issuer', 'automatic',
+    false, true, false,
+    null, null, null,
+    'https://nubank.com.br/ultravioleta', '2026-06-15',
+    'official_confirmed', null
+  ),
+
+  -- ── Inter Loop — por nível de cartão ─────────────────────────────────────
+  (
+    'inter-loop-pontos-gold',
+    'Inter Loop — Gold',
+    'Acúmulo de 1 ponto Loop a cada R$ 10,00 gastos no crédito.',
+    'points', 'nacional', 'issuer', 'points_exchange',
+    true, true, false,
+    null, 'Para Gold, Platinum e Prime, fonte oficial informa necessidade de débito automático da fatura ativo para acumular pontos.', null,
+    'https://inter.co/pra-voce/cartoes/programa-de-pontos/', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'inter-loop-pontos-platinum',
+    'Inter Loop — Platinum',
+    'Acúmulo de 1 ponto Loop a cada R$ 5,00 gastos no crédito.',
+    'points', 'nacional', 'issuer', 'points_exchange',
+    true, true, false,
+    null, null, null,
+    'https://inter.co/pra-voce/cartoes/programa-de-pontos/', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'inter-loop-pontos-prime',
+    'Inter Loop — Prime',
+    'Acúmulo de 1 ponto Loop a cada R$ 2,50 gastos no crédito.',
+    'points', 'nacional', 'issuer', 'points_exchange',
+    true, true, false,
+    null, null, null,
+    'https://inter.co/pra-voce/cartoes/programa-de-pontos/', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'inter-loop-pontos-win',
+    'Inter Loop — Win',
+    'Acúmulo de 1 ponto Loop a cada R$ 2,00 gastos no crédito.',
+    'points', 'nacional', 'issuer', 'points_exchange',
+    true, true, false,
+    null, null, null,
+    'https://inter.co/pra-voce/cartoes/programa-de-pontos/', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'inter-loop-resgate-milhas',
+    'Troca de pontos Inter Loop por milhas',
+    'Pontos Loop podem ser trocados por milhas aéreas. A fonte oficial cita Azul para clientes em geral e Smiles para clientes Prime ou Win.',
+    'miles', 'nacional', 'mixed', 'points_exchange',
+    true, false, false,
+    'Azul, Smiles', null, null,
+    'https://inter.co/pra-voce/cartoes/programa-de-pontos/', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'inter-loop-desconto-fatura',
+    'Desconto na fatura com pontos Loop',
+    'Uso de pontos Loop para obter desconto na fatura do cartão.',
+    'cashback', 'nacional', 'issuer', 'statement_credit',
+    true, false, false,
+    null, null, null,
+    'https://inter.co/recompensas/', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'inter-loop-cashback-inter-shop',
+    'Cashback extra no Inter Shop',
+    'Pontos Loop podem gerar cashback extra em compras no shopping do Inter.',
+    'shopping', 'nacional', 'issuer', 'app',
+    true, false, false,
+    null, null, null,
+    'https://inter.co/recompensas/', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'inter-loop-dolares-global-account',
+    'Troca de pontos por dólares na Global Account',
+    'Pontos Loop podem ser convertidos em dólares na Global Account, conforme regras do Inter.',
+    'account_service', 'nacional', 'issuer', 'points_exchange',
+    true, false, false,
+    null, null, null,
+    'https://inter.co/pra-voce/cartoes/programa-de-pontos/', '2026-06-15',
+    'official_confirmed', null
+  ),
+
+  -- ── Inter Prime ───────────────────────────────────────────────────────────
+  (
+    'inter-prime-salas-vip',
+    'Salas VIP Inter para clientes Prime',
+    'Acesso às Salas VIP Inter em aeroportos informados na página do Duo Gourmet/Inter Prime.',
+    'airport', 'nacional', 'issuer', 'physical_access',
+    true, false, false,
+    'Inter', 'A página do Duo Gourmet informa acesso ilimitado às salas VIP Inter para quem assina plano anual e desbloqueia Inter Prime. Confirmar regras no regulamento Prime.', null,
+    'https://inter.co/pra-voce/duo-gourmet/', '2026-06-15',
+    'official_needs_regulation_check', null
+  ),
+  (
+    'inter-prime-priority-pass',
+    'Priority Pass Inter Prime',
+    'A página Duo Gourmet/Inter Prime informa 6 acessos anuais às salas VIP Priority Pass ao redor do mundo.',
+    'airport', 'nacional', 'partner', 'physical_access',
+    true, false, false,
+    'Priority Pass', '6 acessos anuais informados na página do Duo Gourmet. Confirmar regras de elegibilidade e plano vigente.', null,
+    'https://inter.co/pra-voce/duo-gourmet/', '2026-06-15',
+    'official_needs_regulation_check', null
+  ),
+
+  -- ── Inter Duo Gourmet ─────────────────────────────────────────────────────
+  (
+    'inter-duo-gourmet-2-por-1',
+    'Duo Gourmet — 2 pratos pelo preço de 1',
+    'Benefício de pedir 2 pratos e pagar 1 em restaurantes participantes, sem limite de uso informado na página.',
+    'restaurant', 'nacional', 'partner', 'app',
+    true, false, false,
+    'Duo Gourmet', null, null,
+    'https://inter.co/pra-voce/duo-gourmet/', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'inter-duo-experiencias',
+    'Duo Experiências — lazer, viagem e bem-estar',
+    'Descontos em experiências de viagem, lazer, bem-estar, hotéis, aluguel de carro, passeios, cinemas, teatros e parques, conforme parceiros disponíveis.',
+    'experience', 'nacional', 'partner', 'app',
+    true, false, false,
+    'Duo Gourmet', null, null,
+    'https://inter.co/pra-voce/duo-gourmet/', '2026-06-15',
+    'official_confirmed', null
+  ),
+
+  -- ── Inter Win ─────────────────────────────────────────────────────────────
+  (
+    'inter-win-gestao-patrimonial',
+    'Gestão patrimonial Inter Win',
+    'Atendimento com profissionais dedicados, diagnóstico patrimonial, análise de mercado e estratégias alinhadas a objetivos financeiros.',
+    'investment', 'nacional', 'issuer', 'concierge',
+    true, false, false,
+    null, null, null,
+    'https://inter.co/pra-voce/relacionamento/inter-win/', '2026-06-15',
+    'official_confirmed', null
+  ),
+
+  -- ── XP One ────────────────────────────────────────────────────────────────
+  (
+    'xp-one-pontos-investback',
+    'Pontos XP ou Investback — XP One',
+    'Até 1,8 Pontos XP por dólar ou até 1,1% de Investback com Turbo Benefícios.',
+    'investback', 'nacional', 'issuer', 'app',
+    true, true, false,
+    null, null, null,
+    'https://www.xpi.com.br/produtos/cartao-de-credito/', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'xp-one-sala-vip',
+    'Salas VIP — XP One',
+    'Até 2 acessos por ano a salas VIP, conforme regras do cartão e gasto no cartão.',
+    'airport', 'nacional', 'mixed', 'physical_access',
+    true, false, false,
+    null, 'Validar regra vigente no app/regulamento XP antes de produção.', null,
+    'https://www.xpi.com.br/produtos/cartao-de-credito/', '2026-06-15',
+    'official_needs_regulation_check', null
+  ),
+
+  -- ── XP Infinite ──────────────────────────────────────────────────────────
+  (
+    'xp-infinite-pontos-investback',
+    'Pontos XP ou Investback — XP Infinite',
+    'Até 3 Pontos XP por dólar ou até 1,5% de Investback com Turbo Benefícios.',
+    'investback', 'nacional', 'issuer', 'app',
+    true, true, false,
+    null, null, null,
+    'https://www.xpi.com.br/produtos/cartao-de-credito/', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'xp-infinite-sala-vip',
+    '4 acessos por ano a salas VIP — XP Infinite',
+    'Cartão XP Infinite informa 4 acessos por ano a salas VIP.',
+    'airport', 'nacional', 'mixed', 'physical_access',
+    true, false, false,
+    null, '4 acessos por ano, conforme fonte XP.', null,
+    'https://www.xpi.com.br/produtos/cartao-de-credito/', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'xp-infinite-fast-pass',
+    'Fast Pass GRU/GIG',
+    'Benefício de fila diferenciada nos aeroportos internacionais de Guarulhos e Galeão, conforme comunicação XP/Visa.',
+    'airport', 'pontual', 'mixed', 'physical_access',
+    true, false, false,
+    'Visa', null, null,
+    'https://www.xpi.com.br/produtos/cartao-de-credito/', '2026-06-15',
+    'official_confirmed', null
+  ),
+
+  -- ── XP Legacy ────────────────────────────────────────────────────────────
+  (
+    'xp-legacy-pontos-investback',
+    'Pontos XP ou Investback — XP Legacy',
+    '9,5 Pontos XP por dólar em compras internacionais e 3 Pontos XP por dólar em compras nacionais; ou 5,3% de Investback em compras internacionais e 1,5% em compras nacionais.',
+    'investback', 'nacional', 'issuer', 'app',
+    true, true, false,
+    null, null, null,
+    'https://www.xpi.com.br/produtos/cartao-xp-legacy/', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'xp-legacy-salas-vip-ilimitado',
+    'Salas VIP ilimitadas — XP Legacy',
+    'Acesso ilimitado para o titular a mais de 1.300 salas VIP pelo mundo; até 12 convidados por ano, conforme condições.',
+    'airport', 'nacional', 'mixed', 'physical_access',
+    true, false, false,
+    'Visa / rede parceira', 'Acesso ilimitado para titular; até 12 convidados por ano. Consultar condições.', null,
+    'https://www.xpi.com.br/produtos/cartao-xp-legacy/', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'xp-legacy-meet-greet',
+    'Meet & Greet — XP Legacy',
+    'Atendimento dedicado para embarques e desembarques com agilidade, consultado via Concierge Cartão XP Legacy.',
+    'airport', 'pontual', 'mixed', 'concierge',
+    true, false, false,
+    null, null, null,
+    'https://www.xpi.com.br/produtos/cartao-xp-legacy/', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'xp-legacy-vistos-passaportes',
+    'Consultoria de vistos e passaportes — XP Legacy',
+    'Suporte especializado para emissão, renovação e regularização de documentos de viagem.',
+    'travel', 'nacional', 'partner', 'concierge',
+    true, false, false,
+    null, null, null,
+    'https://www.xpi.com.br/produtos/cartao-xp-legacy/', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'xp-legacy-concierge',
+    'Concierge Cartão XP Legacy',
+    'Concierge com roteiros personalizados, apoio em viagens, hotéis, gastronomia e eventos.',
+    'concierge', 'nacional', 'issuer', 'concierge',
+    true, false, false,
+    null, null, null,
+    'https://www.xpi.com.br/produtos/cartao-xp-legacy/', '2026-06-15',
+    'official_confirmed', null
+  ),
+
+  -- ── XP Experience / Faixas de relacionamento ─────────────────────────────
+  (
+    'xp-experience-signature-assessoria',
+    'Assessoria dedicada XP Signature',
+    'Assessoria dedicada, atendimento presencial/vídeo/telefone, mesa de operações e eventos exclusivos.',
+    'investment', 'nacional', 'issuer', 'concierge',
+    true, false, false,
+    null, null, null,
+    'https://www.xpi.com.br/app/', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'xp-experience-unique-wealth-planning',
+    'Wealth Planning XP Unique',
+    'Bankers CFP, banker offshore, wealth planning, planejamento sucessório, fundos exclusivos e soluções customizadas.',
+    'investment', 'nacional', 'issuer', 'concierge',
+    true, false, false,
+    null, null, null,
+    'https://www.xpi.com.br/app/', '2026-06-15',
+    'official_confirmed', null
+  ),
+
+  -- ── XP Private ───────────────────────────────────────────────────────────
+  (
+    'xp-private-visa-infinite-privilege-lounge',
+    'Visa Infinite Privilege Lounge — XP Private',
+    'Acesso ao Visa Infinite Privilege Lounge no Aeroporto Internacional de Guarulhos para público elegível XP Private.',
+    'airport', 'pontual', 'mixed', 'physical_access',
+    true, false, false,
+    'Visa', null, null,
+    'https://private.xpi.com.br/xp-visa-infinite-privilege/', '2026-06-15',
+    'official_confirmed', null
+  )
+
+on conflict (slug) do update set
+  title                = excluded.title,
+  summary              = excluded.summary,
+  category             = excluded.category,
+  scope                = excluded.scope,
+  benefit_source       = excluded.benefit_source,
+  redemption_type      = excluded.redemption_type,
+  requires_activation  = excluded.requires_activation,
+  requires_eligible_card = excluded.requires_eligible_card,
+  requires_certificate = excluded.requires_certificate,
+  partner_name         = excluded.partner_name,
+  limits_description   = excluded.limits_description,
+  long_description     = excluded.long_description,
+  source_url           = excluded.source_url,
+  observed_at          = excluded.observed_at,
+  verification_status  = excluded.verification_status,
+  notes                = excluded.notes;
+
+-- ===== BENEFIT_SOURCES (Task 3 — links direto emissor/parceiro) =====
+insert into benefit_sources (benefit_id, source_item_id)
+select b.id, si.id from benefits b, source_items si
+where (b.slug, si.slug) in (
+  ('nubank-ultravioleta-priority-pass',          'nubank-ultravioleta-black'),
+  ('nubank-ultravioleta-lounge-gru',             'nubank-ultravioleta-black'),
+  ('nubank-ultravioleta-pontos-cashback',        'nubank-ultravioleta-black'),
+  ('nubank-ultravioleta-transferencia-milhas',   'nubank-ultravioleta-black'),
+  ('nubank-ultravioleta-nu-viagens',             'nubank-ultravioleta-black'),
+  ('nubank-ultravioleta-iof-zero',               'nubank-ultravioleta-black'),
+  ('inter-loop-pontos-gold',                     'inter-gold'),
+  ('inter-loop-pontos-platinum',                 'inter-platinum'),
+  ('inter-loop-pontos-prime',                    'inter-prime'),
+  ('inter-loop-pontos-win',                      'inter-win'),
+  ('inter-loop-resgate-milhas',                  'inter-prime'),
+  ('inter-loop-desconto-fatura',                 'inter-gold'),
+  ('inter-loop-cashback-inter-shop',             'inter-gold'),
+  ('inter-loop-dolares-global-account',          'inter-prime'),
+  ('inter-prime-salas-vip',                      'inter-prime'),
+  ('inter-prime-priority-pass',                  'inter-prime'),
+  ('inter-duo-gourmet-2-por-1',                  'inter-duo-gourmet'),
+  ('inter-duo-experiencias',                     'inter-duo-gourmet'),
+  ('inter-win-gestao-patrimonial',              'inter-win'),
+  ('xp-one-pontos-investback',                   'xp-one'),
+  ('xp-one-sala-vip',                            'xp-one'),
+  ('xp-infinite-pontos-investback',             'xp-infinite'),
+  ('xp-infinite-sala-vip',                       'xp-infinite'),
+  ('xp-infinite-fast-pass',                      'xp-infinite'),
+  ('xp-legacy-pontos-investback',               'xp-legacy'),
+  ('xp-legacy-salas-vip-ilimitado',             'xp-legacy'),
+  ('xp-legacy-meet-greet',                       'xp-legacy'),
+  ('xp-legacy-vistos-passaportes',              'xp-legacy'),
+  ('xp-legacy-concierge',                        'xp-legacy'),
+  ('xp-experience-signature-assessoria',        'xp-signature'),
+  ('xp-experience-unique-wealth-planning',      'xp-unique'),
+  ('xp-private-visa-infinite-privilege-lounge', 'xp-legacy')
+)
+on conflict do nothing;
