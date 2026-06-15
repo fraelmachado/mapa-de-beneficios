@@ -450,3 +450,255 @@ where (b.slug, si.slug) in (
   ('xp-private-visa-infinite-privilege-lounge', 'xp-legacy')
 )
 on conflict do nothing;
+
+-- ===== BENEFITS (Task 4 — card_network, caminho derivado) =====
+insert into benefits (slug, title, summary, category, scope, benefit_source, redemption_type,
+  requires_activation, requires_eligible_card, requires_certificate,
+  partner_name, limits_description, long_description, source_url, observed_at,
+  verification_status, notes)
+values
+
+  -- ── Mastercard Gold ──────────────────────────────────────────────────────
+  (
+    'mastercard-gold-protecao-preco',
+    'Seguro Proteção de Preço Mastercard Gold',
+    'Reembolso da diferença se o usuário encontrar o mesmo item por preço menor após a compra, conforme regras Mastercard Gold.',
+    'shopping', 'nacional', 'card_network', 'insurance_claim',
+    true, true, false,
+    'Mastercard', null, null,
+    'https://www.mastercard.com/br/pt/personal/find-a-card/credit-card/gold-credit-card.html', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'mastercard-gold-compra-protegida',
+    'Seguro Compra Protegida Mastercard Gold',
+    'Reembolso por roubo e/ou danos acidentais na compra de itens cobertos.',
+    'insurance', 'nacional', 'card_network', 'insurance_claim',
+    true, true, false,
+    'Mastercard', null, null,
+    'https://www.mastercard.com/br/pt/personal/find-a-card/credit-card/gold-credit-card.html', '2026-06-15',
+    'official_confirmed', null
+  ),
+
+  -- ── Mastercard Platinum ──────────────────────────────────────────────────
+  (
+    'mastercard-platinum-concierge',
+    'Concierge Mastercard Platinum',
+    'Concierge para organização de viagens, assistência global de emergência, entretenimento, informações e indicações.',
+    'concierge', 'nacional', 'card_network', 'concierge',
+    true, false, false,
+    'Mastercard', null, null,
+    'https://www.mastercard.com/br/pt/personal/find-a-card/credit-card/platinum-credit-card.html', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'mastercard-platinum-masterassist-plus',
+    'MasterAssist Plus',
+    'Reembolso de despesas médicas, convalescença em hotel, custos de viagens emergenciais para parentes e outros itens elegíveis.',
+    'insurance', 'nacional', 'card_network', 'certificate',
+    true, true, true,
+    'Mastercard', null, null,
+    'https://www.mastercard.com/br/pt/personal/find-a-card/credit-card/platinum-credit-card.html', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'mastercard-platinum-masterseguro-automoveis',
+    'MasterSeguro de Automóveis',
+    'Seguro que cobre danos a veículo alugado por colisão, roubo, incêndio acidental e vandalismo.',
+    'insurance', 'nacional', 'card_network', 'insurance_claim',
+    false, true, false,
+    'Mastercard', null, null,
+    'https://www.mastercard.com/br/pt/personal/find-a-card/credit-card/platinum-credit-card.html', '2026-06-15',
+    'official_confirmed', null
+  ),
+
+  -- ── Mastercard Black ─────────────────────────────────────────────────────
+  (
+    'mastercard-black-compra-protegida',
+    'Compra Protegida Mastercard Black',
+    'Reembolso por roubo e/ou danos acidentais em itens cobertos comprados com cartão elegível.',
+    'insurance', 'nacional', 'card_network', 'insurance_claim',
+    true, true, false,
+    'Mastercard', null, null,
+    'https://www.mastercard.com/br/pt/personal/find-a-card/credit-card/black-credit-card.html', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'mastercard-black-garantia-estendida',
+    'Garantia Estendida Original Mastercard Black',
+    'Duplica a garantia original do fabricante/loja por até 1 ano, respeitando limite máximo de cobertura total informado pela Mastercard.',
+    'shopping', 'nacional', 'card_network', 'insurance_claim',
+    true, true, false,
+    'Mastercard', null, null,
+    'https://www.mastercard.com/br/pt/personal/find-a-card/credit-card/black-credit-card/garantia-estendida-original.html', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'mastercard-black-concierge',
+    'Mastercard Concierge Black',
+    'Serviço de concierge para viagens, restaurantes, entretenimento e assistência em experiências.',
+    'concierge', 'nacional', 'card_network', 'concierge',
+    true, false, false,
+    'Mastercard', null, null,
+    'https://www.mastercard.com/br/pt/personal/find-a-card/credit-card/black-credit-card/concierge.html', '2026-06-15',
+    'official_confirmed', null
+  ),
+
+  -- ── Visa Infinite ─────────────────────────────────────────────────────────
+  (
+    'visa-infinite-seguro-emergencia-medica',
+    'Seguro Emergência Médica Internacional Visa Infinite',
+    'Proteção para acidentes ou emergências médicas internacionais em viagens, conforme regras Visa.',
+    'insurance', 'nacional', 'card_network', 'certificate',
+    true, true, true,
+    'Visa', null, null,
+    'https://www.visa.com.br/pague-com-visa/cartoes/beneficios.html', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'visa-infinite-seguro-veiculo-locadora',
+    'Seguro para Veículos de Locadora Visa Infinite',
+    'Proteção gratuita contra roubo e danos ao pagar e reservar a locação de automóvel com cartão Visa elegível.',
+    'insurance', 'nacional', 'card_network', 'insurance_claim',
+    false, true, false,
+    'Visa', null, null,
+    'https://www.visa.com.br/pt_br/shopping/so-com-visa/seguro-para-ve%C3%ADculos-de-locadora/141828', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'visa-infinite-cancelamento-viagem',
+    'Seguro Cancelamento de Viagem Visa Infinite',
+    'Benefício de seguro para cancelamento de viagem, conforme regras Visa Infinite.',
+    'insurance', 'nacional', 'card_network', 'insurance_claim',
+    true, true, false,
+    'Visa', null, null,
+    'https://visabenefitslac.axa-assistance.us/benefits/I_C_BR', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'visa-infinite-bagagem',
+    'Seguro Perda, Roubo ou Atraso de Bagagem Visa Infinite',
+    'Benefícios relacionados a perda, roubo ou atraso de bagagem, conforme regras Visa Infinite.',
+    'insurance', 'nacional', 'card_network', 'insurance_claim',
+    true, true, false,
+    'Visa', null, null,
+    'https://www.visa.com.br/pague-com-visa/cartoes/beneficios.html', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'visa-infinite-fast-pass',
+    'Visa Infinite Fast Pass',
+    'Acesso exclusivo Visa de embarque nos terminais 2 e 3 do Aeroporto de Guarulhos e no RIOgaleão.',
+    'airport', 'pontual', 'card_network', 'physical_access',
+    true, false, false,
+    'Visa', null, null,
+    'https://www.visa.com.br/pague-com-visa/cartoes/beneficios.html', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'visa-infinite-airport-companion',
+    'Visa Airport Companion',
+    'Benefício de acesso a experiências e serviços em aeroportos via Visa Airport Companion, conforme elegibilidade do cartão.',
+    'airport', 'nacional', 'card_network', 'partner_portal',
+    true, false, false,
+    'Visa', null, null,
+    'https://www.visa.com.br/pague-com-visa/cartoes/beneficios.html', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'visa-infinite-protecao-compra',
+    'Proteção de Compra Visa Infinite',
+    'Proteção contra roubo, furto ou danos acidentais em compras feitas com Cartão Visa elegível.',
+    'shopping', 'nacional', 'card_network', 'insurance_claim',
+    true, true, false,
+    'Visa', null, null,
+    'https://www.visa.com.br/pague-com-visa/cartoes/beneficios.html', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'visa-infinite-concierge',
+    'Visa Concierge',
+    'Assistência pessoal 24h para voos, restaurantes, presentes e outras solicitações elegíveis.',
+    'concierge', 'nacional', 'card_network', 'concierge',
+    true, false, false,
+    'Visa', null, null,
+    'https://www.visa.com.br/pague-com-visa/cartoes/cartoes-de-credito/detalhes-visa-infinite.html', '2026-06-15',
+    'official_confirmed', null
+  ),
+
+  -- ── Visa Signature ────────────────────────────────────────────────────────
+  (
+    'visa-signature-airport-companion',
+    'Visa Airport Companion — Signature',
+    'Benefício de aeroportos disponível para cartões Visa Signature elegíveis, conforme regras Visa.',
+    'airport', 'nacional', 'card_network', 'partner_portal',
+    true, false, false,
+    'Visa', null, null,
+    'https://www.visa.com.br/pague-com-visa/cartoes/beneficios.html', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'visa-signature-seguro-emergencia-medica',
+    'Seguro Emergência Médica Internacional Visa Signature',
+    'Seguro de emergência médica internacional para cartões Visa Signature elegíveis, conforme regras Visa.',
+    'insurance', 'nacional', 'card_network', 'certificate',
+    true, true, true,
+    'Visa', null, null,
+    'https://www.visa.com.br/pague-com-visa/cartoes/beneficios.html', '2026-06-15',
+    'official_confirmed', null
+  ),
+  (
+    'visa-signature-protecao-compra',
+    'Proteção de Compra Visa Signature',
+    'Proteção contra roubo, furto ou danos acidentais em compras feitas com Cartão Visa elegível.',
+    'shopping', 'nacional', 'card_network', 'insurance_claim',
+    true, true, false,
+    'Visa', null, null,
+    'https://www.visa.com.br/pague-com-visa/cartoes/beneficios.html', '2026-06-15',
+    'official_confirmed', null
+  )
+
+on conflict (slug) do update set
+  title                = excluded.title,
+  summary              = excluded.summary,
+  category             = excluded.category,
+  scope                = excluded.scope,
+  benefit_source       = excluded.benefit_source,
+  redemption_type      = excluded.redemption_type,
+  requires_activation  = excluded.requires_activation,
+  requires_eligible_card = excluded.requires_eligible_card,
+  requires_certificate = excluded.requires_certificate,
+  partner_name         = excluded.partner_name,
+  limits_description   = excluded.limits_description,
+  long_description     = excluded.long_description,
+  source_url           = excluded.source_url,
+  observed_at          = excluded.observed_at,
+  verification_status  = excluded.verification_status,
+  notes                = excluded.notes;
+
+-- ===== BENEFIT_CARD_TIERS (Task 4 — links bandeira por brand/level) =====
+insert into benefit_card_tiers (benefit_id, card_brand, card_level)
+select b.id, t.card_brand, t.card_level
+from benefits b
+join (values
+  ('mastercard-gold-protecao-preco',           'mastercard','gold'),
+  ('mastercard-gold-compra-protegida',         'mastercard','gold'),
+  ('mastercard-platinum-concierge',            'mastercard','platinum'),
+  ('mastercard-platinum-masterassist-plus',    'mastercard','platinum'),
+  ('mastercard-platinum-masterseguro-automoveis','mastercard','platinum'),
+  ('mastercard-black-compra-protegida',        'mastercard','black'),
+  ('mastercard-black-garantia-estendida',      'mastercard','black'),
+  ('mastercard-black-concierge',               'mastercard','black'),
+  ('visa-infinite-seguro-emergencia-medica',   'visa','infinite'),
+  ('visa-infinite-seguro-veiculo-locadora',    'visa','infinite'),
+  ('visa-infinite-cancelamento-viagem',        'visa','infinite'),
+  ('visa-infinite-bagagem',                    'visa','infinite'),
+  ('visa-infinite-fast-pass',                  'visa','infinite'),
+  ('visa-infinite-airport-companion',          'visa','infinite'),
+  ('visa-infinite-protecao-compra',            'visa','infinite'),
+  ('visa-infinite-concierge',                  'visa','infinite'),
+  ('visa-signature-airport-companion',         'visa','signature'),
+  ('visa-signature-seguro-emergencia-medica',  'visa','signature'),
+  ('visa-signature-protecao-compra',           'visa','signature')
+) as t(slug, card_brand, card_level) on t.slug = b.slug
+on conflict do nothing;
