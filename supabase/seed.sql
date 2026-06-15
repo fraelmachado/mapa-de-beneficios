@@ -704,6 +704,10 @@ join (values
 on conflict do nothing;
 
 -- ===== BENEFIT_LOCATIONS (Task 5 — locais de resgate) =====
+-- benefit_locations não tem chave natural; limpamos as do catálogo antes de reinserir
+-- (idempotência: re-aplicar o seed não duplica locais). Só toca linhas de benefícios do catálogo (com slug).
+delete from benefit_locations where benefit_id in (select id from benefits where slug is not null);
+
 insert into benefit_locations (benefit_id, name, scope, country, region, uf, city, airport_code, terminal, lat, lng, geolocation_status)
 select b.id, t.name, t.scope::location_scope, t.country, t.region, t.uf, t.city,
        t.airport_code, t.terminal, t.lat, t.lng, t.geolocation_status::geolocation_status
