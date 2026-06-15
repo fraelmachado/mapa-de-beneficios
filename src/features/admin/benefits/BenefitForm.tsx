@@ -20,7 +20,7 @@ export function BenefitForm({
 }) {
   const [title, setTitle] = useState(initial?.title ?? '')
   const [summary, setSummary] = useState(initial?.summary ?? '')
-  const [category, setCategory] = useState<BenefitCategory>(initial?.category ?? 'compras')
+  const [category, setCategory] = useState<BenefitCategory>(initial?.category ?? 'shopping')
   const [scope, setScope] = useState<BenefitScope>(initial?.scope ?? 'nacional')
   const [uf, setUf] = useState(initial?.uf ?? '')
   const [steps, setSteps] = useState(initial?.steps ?? '')

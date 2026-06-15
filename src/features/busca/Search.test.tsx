@@ -11,7 +11,7 @@ let result: { data: MyBenefit[] | undefined; isLoading: boolean; error: unknown 
 vi.mock('../benefits/useMyBenefits', () => ({ useMyBenefits: () => result }))
 
 const mk = (over: Partial<MyBenefit>): MyBenefit => ({
-  id: 'x', title: 'T', summary: 'S', category: 'compras', scope: 'nacional', uf: null,
+  id: 'x', title: 'T', summary: 'S', category: 'shopping', scope: 'nacional', uf: null,
   steps: null, partner_name: null, valid_until: null, image_url: null, action_url: null,
   action_label: null, created_at: '', via: [], ...over,
 })

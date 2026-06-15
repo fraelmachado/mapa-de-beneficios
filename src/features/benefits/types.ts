@@ -1,9 +1,7 @@
 export type BenefitCategory =
-  | 'viagem'
-  | 'entretenimento'
-  | 'saude'
-  | 'seguros'
-  | 'compras'
+  | 'travel' | 'insurance' | 'cashback' | 'investback' | 'points' | 'miles'
+  | 'shopping' | 'restaurant' | 'airport' | 'concierge' | 'investment'
+  | 'security' | 'account_service' | 'international_purchase' | 'experience' | 'other'
 
 export interface MyBenefit {
   id: string
@@ -23,9 +21,20 @@ export interface MyBenefit {
 }
 
 export const CATEGORIES: { key: BenefitCategory; label: string; emoji: string }[] = [
-  { key: 'viagem', label: 'Viagem', emoji: '✈️' },
-  { key: 'entretenimento', label: 'Lazer', emoji: '🎬' },
-  { key: 'saude', label: 'Saúde', emoji: '💊' },
-  { key: 'seguros', label: 'Seguros', emoji: '🛡️' },
-  { key: 'compras', label: 'Compras', emoji: '🛍️' },
+  { key: 'travel', label: 'Viagem', emoji: '✈️' },
+  { key: 'airport', label: 'Aeroporto', emoji: '🛫' },
+  { key: 'insurance', label: 'Seguros', emoji: '🛡️' },
+  { key: 'shopping', label: 'Compras', emoji: '🛍️' },
+  { key: 'cashback', label: 'Cashback', emoji: '💸' },
+  { key: 'investback', label: 'Investback', emoji: '📈' },
+  { key: 'points', label: 'Pontos', emoji: '⭐' },
+  { key: 'miles', label: 'Milhas', emoji: '🪙' },
+  { key: 'restaurant', label: 'Restaurantes', emoji: '🍽️' },
+  { key: 'concierge', label: 'Concierge', emoji: '🛎️' },
+  { key: 'investment', label: 'Investimentos', emoji: '🏦' },
+  { key: 'security', label: 'Proteção', emoji: '🔒' },
+  { key: 'account_service', label: 'Conta', emoji: '💳' },
+  { key: 'international_purchase', label: 'Internacional', emoji: '🌎' },
+  { key: 'experience', label: 'Experiências', emoji: '🎬' },
+  { key: 'other', label: 'Outros', emoji: '🎁' },
 ]

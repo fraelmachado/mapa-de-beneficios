@@ -15,7 +15,7 @@ let result: { data: MyBenefit[] | undefined; isLoading: boolean; error: unknown 
 vi.mock('../benefits/useMyBenefits', () => ({ useMyBenefits: () => result }))
 
 const b: MyBenefit = {
-  id: 'b1', title: 'Seguro Viagem', summary: 'Cobertura internacional', category: 'viagem',
+  id: 'b1', title: 'Seguro Viagem', summary: 'Cobertura internacional', category: 'travel',
   scope: 'nacional', uf: null, steps: '1. Emita a apólice\n2. Apresente o bilhete',
   partner_name: 'C6', valid_until: null, image_url: null, action_url: 'https://x.test',
   action_label: 'Emitir', created_at: '', via: ['Carbon'],
