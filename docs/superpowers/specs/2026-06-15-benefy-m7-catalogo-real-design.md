@@ -164,16 +164,28 @@ grant select on my_benefits to authenticated;
 
 ## 5. Seed (`seed.sql` reescrito)
 
-### 5.0 Limpeza do catálogo demo (preâmbulo obrigatório)
-As linhas demo (Itaú/Claro/Livelo e seus benefícios) foram inseridas **sem `slug`** (UUIDs fixos), então **não colidem** com o `ON CONFLICT (slug)` do catálogo real e sobreviveriam ao lado dele. O seed precisa ser **autoritativo**: o catálogo passa a ser exatamente o que está no `seed.sql`. Preâmbulo no topo, em ordem de dependência:
+### 5.0 Limpeza do catálogo demo (preâmbulo escopado)
+As linhas demo (Itaú/Claro/Livelo e seus benefícios) foram inseridas **sem `slug`** (UUIDs fixos), então **não colidem** com o `ON CONFLICT (slug)` do catálogo real e sobreviveriam ao lado dele. O catálogo passa a ser autoritativo, **mas sem `truncate` cego**: remoção **escopada** apenas do que é demo, em ordem de dependência.
 
 ```sql
--- Catálogo é autoritativo: zera o demo antes de inserir o real.
-truncate table benefit_card_tiers, benefit_locations, benefit_sources, benefits restart identity cascade;
-truncate table source_items restart identity cascade;  -- cascata remove user_sources demo
-truncate table sources restart identity cascade;
+-- Remove SÓ o catálogo demo, por identificador. Sem truncate-tudo; sem tocar user_sources direto.
+delete from benefits
+ where id in (
+   'd0000001-0000-0000-0000-000000000001',
+   'd0000001-0000-0000-0000-000000000002',
+   'd0000001-0000-0000-0000-000000000003');           -- cascata: benefit_sources, benefit_locations
+
+delete from sources
+ where id in (
+   '11111111-1111-1111-1111-111111111111',            -- Itaú
+   '22222222-2222-2222-2222-222222222222',            -- Claro
+   '33333333-3333-3333-3333-333333333333');           -- Livelo
+-- cascata: source_items demo -> e, por FK, user_sources que apontavam p/ eles.
 ```
-> `truncate ... cascade` em `source_items` remove `user_sources` de usuários demo/anônimos (aceitável — são seleções de teste). `profiles`/`auth.users` não são tocados. Em produção o efeito é o mesmo: limpa o catálogo demo aplicado no M5 e o substitui pelo real.
+
+> **Decisão (hard replace autorizado):** ao remover os cartões demo, as `user_sources` que apontavam para eles são removidas pela cascata — é intrínseco, pois esses cartões deixam de existir no catálogo e a seleção não tem para onde migrar. `profiles`/`auth.users` ficam intactos.
+>
+> **Salvaguarda de produção:** a aplicação destrutiva em prod **não é rotina de seed**. É um passo único e deliberado, executado **somente com confirmação explícita do usuário** (igual ao fluxo M5 via `/pg/query`). Antes de aplicar, reportar quantas `user_sources` seriam afetadas. Em local/dev roda livremente (sem usuários reais).
 
 ### 5.1 Conteúdo
 Transcrição do catálogo do doc, tudo por `slug` + `ON CONFLICT (slug) DO UPDATE`:
@@ -209,4 +221,5 @@ Transcrição do catálogo do doc, tudo por `slug` + `ON CONFLICT (slug) DO UPDA
 - **Recriar enum `benefit_category`** quebra dependências (view, constante TS). Mitigação: dropar a view antes, recriar depois; atualizar `CATEGORIES`; regenerar types.
 - **`card_brand`/`card_level` inconsistentes** entre seed e `benefit_card_tiers` → benefício não herda. Mitigação: vocabulário controlado documentado no topo do seed (brands: `mastercard`/`visa`; levels: `gold`/`platinum`/`black`/`signature`/`infinite`), e teste de integração cobrindo a herança.
 - **Drift seed local × prod.** Mitigação: mesmo `seed.sql` aplicado nos dois ambientes; slugs garantem idempotência.
-- **Catálogo demo sobrevivente.** Linhas demo sem `slug` não colidem no `ON CONFLICT` e ficariam órfãs no banco. Mitigação: preâmbulo `truncate ... cascade` (seção 5.0) torna o seed autoritativo; teste verifica que pós-seed só existem `sources` reais (Nubank/Inter/XP) e nenhuma demo (Itaú/Claro/Livelo).
+- **Catálogo demo sobrevivente.** Linhas demo sem `slug` não colidem no `ON CONFLICT` e ficariam órfãs no banco. Mitigação: remoção escopada por identificador (seção 5.0); teste verifica que pós-seed só existem `sources` reais (Nubank/Inter/XP) e nenhuma demo (Itaú/Claro/Livelo).
+- **Destruição de `user_sources` em produção.** Remover os cartões demo cascateia para as seleções de usuários reais. Mitigação: hard replace é intrínseco (cartões demo deixam de existir), mas a aplicação em prod é passo único, **autorizado explicitamente**, com contagem de `user_sources` afetadas reportada antes (seção 5.0). Local/dev roda sem restrição.
