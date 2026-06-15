@@ -24,21 +24,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => {
         if (active) setLoading(false)
       })
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
       if (!active) return
       if (s) {
         setSession(s)
         return
       }
-      // Sessão encerrada (ex.: logout do admin) → recria sessão anônima
-      // em vez de cair na tela de erro de conexão.
-      ensureAnonymousSession()
-        .then((ns) => {
-          if (active) setSession(ns)
-        })
-        .catch(() => {
-          if (active) setError(true)
-        })
+      // Recria sessão anônima APENAS em logout explícito; ignora o
+      // INITIAL_SESSION nulo do load (o mount já cria a sessão inicial),
+      // evitando criar sessões anônimas duplicadas.
+      if (event === 'SIGNED_OUT') {
+        ensureAnonymousSession()
+          .then((ns) => {
+            if (active) setSession(ns)
+          })
+          .catch(() => {
+            if (active) setError(true)
+          })
+      }
     })
     return () => {
       active = false

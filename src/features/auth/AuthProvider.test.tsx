@@ -65,4 +65,14 @@ describe('AuthProvider', () => {
     await waitFor(() => expect(screen.getByText('conteúdo')).toBeInTheDocument())
     expect(ensureMock).toHaveBeenCalledTimes(2)
   })
+
+  it('não cria sessão anônima extra no INITIAL_SESSION nulo do load', async () => {
+    ensureMock.mockResolvedValue({ user: { id: 'anon1' } })
+    render(<AuthProvider><div>conteúdo</div></AuthProvider>)
+    await waitFor(() => expect(screen.getByText('conteúdo')).toBeInTheDocument())
+    await act(async () => {
+      authCb?.('INITIAL_SESSION', null)
+    })
+    expect(ensureMock).toHaveBeenCalledTimes(1) // só o do mount, sem extra
+  })
 })
