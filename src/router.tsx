@@ -10,6 +10,7 @@ import { AdminLogin } from './features/admin/AdminLogin'
 import { AdminGuard } from './features/admin/AdminGuard'
 import { AdminLayout } from './features/admin/AdminLayout'
 import { AdminHome } from './features/admin/AdminHome'
+import { AdminSources } from './features/admin/sources/AdminSources'
 
 export const router = createBrowserRouter([
   { path: '/', element: <BootstrapRoute /> },
@@ -29,7 +30,10 @@ export const router = createBrowserRouter([
     children: [
       {
         element: <AdminLayout />,
-        children: [{ path: '/admin', element: <AdminHome /> }],
+        children: [
+          { path: '/admin', element: <AdminHome /> },
+          { path: '/admin/sources', element: <AdminSources /> },
+        ],
       },
     ],
   },
