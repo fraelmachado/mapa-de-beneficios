@@ -3,15 +3,15 @@ import { filterBenefits } from './filterBenefits'
 import type { MyBenefit } from './types'
 
 const base = (over: Partial<MyBenefit>): MyBenefit => ({
-  id: 'x', title: 'T', summary: 'S', category: 'compras', scope: 'nacional',
+  id: 'x', title: 'T', summary: 'S', category: 'shopping', scope: 'nacional',
   uf: null, steps: null, partner_name: null, valid_until: null, image_url: null,
   action_url: null, action_label: null, created_at: '', via: [], ...over,
 })
 
 const list: MyBenefit[] = [
-  base({ id: '1', title: 'Sala VIP', category: 'viagem', partner_name: 'Mastercard' }),
-  base({ id: '2', title: 'Cinema', category: 'entretenimento', partner_name: 'Cinemark' }),
-  base({ id: '3', title: 'Farmácia', category: 'saude' }),
+  base({ id: '1', title: 'Sala VIP', category: 'travel', partner_name: 'Mastercard' }),
+  base({ id: '2', title: 'Cinema', category: 'experience', partner_name: 'Cinemark' }),
+  base({ id: '3', title: 'Farmácia', category: 'insurance' }),
 ]
 
 describe('filterBenefits', () => {
@@ -19,7 +19,7 @@ describe('filterBenefits', () => {
     expect(filterBenefits(list, { category: null, text: '' })).toHaveLength(3)
   })
   it('filtra por categoria', () => {
-    const r = filterBenefits(list, { category: 'viagem', text: '' })
+    const r = filterBenefits(list, { category: 'travel', text: '' })
     expect(r.map((b) => b.id)).toEqual(['1'])
   })
   it('filtra por texto no título (case-insensitive)', () => {
@@ -29,6 +29,6 @@ describe('filterBenefits', () => {
     expect(filterBenefits(list, { category: null, text: 'master' }).map((b) => b.id)).toEqual(['1'])
   })
   it('combina categoria e texto', () => {
-    expect(filterBenefits(list, { category: 'saude', text: 'farm' }).map((b) => b.id)).toEqual(['3'])
+    expect(filterBenefits(list, { category: 'insurance', text: 'farm' }).map((b) => b.id)).toEqual(['3'])
   })
 })

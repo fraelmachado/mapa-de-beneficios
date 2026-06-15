@@ -20,13 +20,13 @@ describe('BenefitForm', () => {
     render(<BenefitForm initial={null} sources={sources} onSubmit={onSubmit} onCancel={() => {}} />)
     fireEvent.change(screen.getByLabelText(/título/i), { target: { value: 'Sala VIP' } })
     fireEvent.change(screen.getByLabelText(/resumo/i), { target: { value: 'Acesso grátis' } })
-    fireEvent.change(screen.getByLabelText(/categoria/i), { target: { value: 'viagem' } })
+    fireEvent.change(screen.getByLabelText(/categoria/i), { target: { value: 'travel' } })
     fireEvent.click(screen.getByRole('button', { name: /mock-upload/i }))
     fireEvent.click(screen.getByRole('checkbox', { name: /black/i }))
     fireEvent.click(screen.getByRole('button', { name: /salvar/i }))
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
-        input: expect.objectContaining({ title: 'Sala VIP', summary: 'Acesso grátis', category: 'viagem', image_url: 'https://cdn.test/banner.png', active: true }),
+        input: expect.objectContaining({ title: 'Sala VIP', summary: 'Acesso grátis', category: 'travel', image_url: 'https://cdn.test/banner.png', active: true }),
         sourceItemIds: ['i1'],
       }),
     )

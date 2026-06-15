@@ -13,7 +13,7 @@ vi.mock('../benefits/useMyBenefits', () => ({
 }))
 
 const mk = (over: Partial<MyBenefit>): MyBenefit => ({
-  id: 'x', title: 'T', summary: 'S', category: 'compras', scope: 'nacional', uf: null,
+  id: 'x', title: 'T', summary: 'S', category: 'shopping', scope: 'nacional', uf: null,
   steps: null, partner_name: null, valid_until: null, image_url: null, action_url: null,
   action_label: null, created_at: '', via: [], ...over,
 })
@@ -27,7 +27,7 @@ beforeEach(() => {
 describe('Painel', () => {
   it('mostra a contagem e o feed', () => {
     result = {
-      data: [mk({ id: '1', title: 'Sala VIP', category: 'viagem' }), mk({ id: '2', title: 'Cinema', category: 'entretenimento' })],
+      data: [mk({ id: '1', title: 'Sala VIP', category: 'travel' }), mk({ id: '2', title: 'Cinema', category: 'experience' })],
       isLoading: false, error: null,
     }
     renderWithProviders(<Painel />)
@@ -38,7 +38,7 @@ describe('Painel', () => {
 
   it('filtra o feed ao escolher uma categoria', () => {
     result = {
-      data: [mk({ id: '1', title: 'Sala VIP', category: 'viagem' }), mk({ id: '2', title: 'Cinema', category: 'entretenimento' })],
+      data: [mk({ id: '1', title: 'Sala VIP', category: 'travel' }), mk({ id: '2', title: 'Cinema', category: 'experience' })],
       isLoading: false, error: null,
     }
     renderWithProviders(<Painel />)

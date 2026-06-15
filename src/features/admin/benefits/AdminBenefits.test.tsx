@@ -32,7 +32,7 @@ beforeEach(() => {
   saveBenefitSources.mockReset(); saveBenefitSources.mockResolvedValue(undefined)
   srcs = []
   benefits = [
-    { id: 'b1', title: 'Sala VIP', summary: 's', category: 'viagem', scope: 'pontual', uf: null, steps: null,
+    { id: 'b1', title: 'Sala VIP', summary: 's', category: 'travel', scope: 'pontual', uf: null, steps: null,
       partner_name: null, valid_until: null, image_url: null, action_url: null, action_label: null, active: true,
       benefit_sources: [], benefit_locations: [] },
   ]

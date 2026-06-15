@@ -24,7 +24,7 @@ describe('catalog schema', () => {
       .insert({
         title: 'Sala VIP',
         summary: 'Acesso gratuito',
-        category: 'viagem',
+        category: 'travel',
         scope: 'pontual',
       })
       .select()

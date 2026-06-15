@@ -34,41 +34,98 @@ export type Database = {
   }
   public: {
     Tables: {
+      benefit_card_tiers: {
+        Row: {
+          benefit_id: string
+          card_brand: string
+          card_level: string
+        }
+        Insert: {
+          benefit_id: string
+          card_brand: string
+          card_level: string
+        }
+        Update: {
+          benefit_id?: string
+          card_brand?: string
+          card_level?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "benefit_card_tiers_benefit_id_fkey"
+            columns: ["benefit_id"]
+            isOneToOne: false
+            referencedRelation: "benefits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "benefit_card_tiers_benefit_id_fkey"
+            columns: ["benefit_id"]
+            isOneToOne: false
+            referencedRelation: "my_benefits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       benefit_locations: {
         Row: {
           active: boolean
           address: string | null
+          airport_code: string | null
           benefit_id: string
           city: string | null
+          country: string | null
+          geolocation_status:
+            | Database["public"]["Enums"]["geolocation_status"]
+            | null
           id: string
-          lat: number
-          lng: number
+          lat: number | null
+          lng: number | null
           name: string
           radius_m: number | null
+          region: string | null
+          scope: Database["public"]["Enums"]["location_scope"] | null
+          terminal: string | null
           uf: string | null
         }
         Insert: {
           active?: boolean
           address?: string | null
+          airport_code?: string | null
           benefit_id: string
           city?: string | null
+          country?: string | null
+          geolocation_status?:
+            | Database["public"]["Enums"]["geolocation_status"]
+            | null
           id?: string
-          lat: number
-          lng: number
+          lat?: number | null
+          lng?: number | null
           name: string
           radius_m?: number | null
+          region?: string | null
+          scope?: Database["public"]["Enums"]["location_scope"] | null
+          terminal?: string | null
           uf?: string | null
         }
         Update: {
           active?: boolean
           address?: string | null
+          airport_code?: string | null
           benefit_id?: string
           city?: string | null
+          country?: string | null
+          geolocation_status?:
+            | Database["public"]["Enums"]["geolocation_status"]
+            | null
           id?: string
-          lat?: number
-          lng?: number
+          lat?: number | null
+          lng?: number | null
           name?: string
           radius_m?: number | null
+          region?: string | null
+          scope?: Database["public"]["Enums"]["location_scope"] | null
+          terminal?: string | null
           uf?: string | null
         }
         Relationships: [
@@ -130,49 +187,107 @@ export type Database = {
           action_label: string | null
           action_url: string | null
           active: boolean
+          benefit_source:
+            | Database["public"]["Enums"]["benefit_source_kind"]
+            | null
           category: Database["public"]["Enums"]["benefit_category"]
           created_at: string
           id: string
           image_url: string | null
+          limits_description: string | null
+          long_description: string | null
+          notes: string | null
+          observed_at: string | null
           partner_name: string | null
+          program: string | null
+          redemption_type: Database["public"]["Enums"]["redemption_type"] | null
+          requires_activation: boolean
+          requires_certificate: boolean
+          requires_eligible_card: boolean
           scope: Database["public"]["Enums"]["benefit_scope"]
+          slug: string | null
+          source_name: string | null
+          source_url: string | null
           steps: string | null
           summary: string
           title: string
           uf: string | null
           valid_until: string | null
+          verification_status:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
         }
         Insert: {
           action_label?: string | null
           action_url?: string | null
           active?: boolean
+          benefit_source?:
+            | Database["public"]["Enums"]["benefit_source_kind"]
+            | null
           category: Database["public"]["Enums"]["benefit_category"]
           created_at?: string
           id?: string
           image_url?: string | null
+          limits_description?: string | null
+          long_description?: string | null
+          notes?: string | null
+          observed_at?: string | null
           partner_name?: string | null
+          program?: string | null
+          redemption_type?:
+            | Database["public"]["Enums"]["redemption_type"]
+            | null
+          requires_activation?: boolean
+          requires_certificate?: boolean
+          requires_eligible_card?: boolean
           scope?: Database["public"]["Enums"]["benefit_scope"]
+          slug?: string | null
+          source_name?: string | null
+          source_url?: string | null
           steps?: string | null
           summary: string
           title: string
           uf?: string | null
           valid_until?: string | null
+          verification_status?:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
         }
         Update: {
           action_label?: string | null
           action_url?: string | null
           active?: boolean
+          benefit_source?:
+            | Database["public"]["Enums"]["benefit_source_kind"]
+            | null
           category?: Database["public"]["Enums"]["benefit_category"]
           created_at?: string
           id?: string
           image_url?: string | null
+          limits_description?: string | null
+          long_description?: string | null
+          notes?: string | null
+          observed_at?: string | null
           partner_name?: string | null
+          program?: string | null
+          redemption_type?:
+            | Database["public"]["Enums"]["redemption_type"]
+            | null
+          requires_activation?: boolean
+          requires_certificate?: boolean
+          requires_eligible_card?: boolean
           scope?: Database["public"]["Enums"]["benefit_scope"]
+          slug?: string | null
+          source_name?: string | null
+          source_url?: string | null
           steps?: string | null
           summary?: string
           title?: string
           uf?: string | null
           valid_until?: string | null
+          verification_status?:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
         }
         Relationships: []
       }
@@ -201,29 +316,68 @@ export type Database = {
         Row: {
           card_brand: string | null
           card_level: string | null
+          cashback_rule: string | null
+          display_name: string | null
+          eligibility_description: string | null
           id: string
           label: string
+          min_income: number | null
+          min_investment: number | null
+          min_monthly_spend: number | null
           pluggy_product: string | null
+          points_rule: string | null
+          product_type: string | null
+          slug: string | null
           sort_order: number
           source_id: string
+          source_url: string | null
+          verification_status:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
         }
         Insert: {
           card_brand?: string | null
           card_level?: string | null
+          cashback_rule?: string | null
+          display_name?: string | null
+          eligibility_description?: string | null
           id?: string
           label: string
+          min_income?: number | null
+          min_investment?: number | null
+          min_monthly_spend?: number | null
           pluggy_product?: string | null
+          points_rule?: string | null
+          product_type?: string | null
+          slug?: string | null
           sort_order?: number
           source_id: string
+          source_url?: string | null
+          verification_status?:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
         }
         Update: {
           card_brand?: string | null
           card_level?: string | null
+          cashback_rule?: string | null
+          display_name?: string | null
+          eligibility_description?: string | null
           id?: string
           label?: string
+          min_income?: number | null
+          min_investment?: number | null
+          min_monthly_spend?: number | null
           pluggy_product?: string | null
+          points_rule?: string | null
+          product_type?: string | null
+          slug?: string | null
           sort_order?: number
           source_id?: string
+          source_url?: string | null
+          verification_status?:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
         }
         Relationships: [
           {
@@ -247,6 +401,7 @@ export type Database = {
           name: string
           pluggy_connector_id: number | null
           primary_color: string | null
+          slug: string | null
           sort_order: number
         }
         Insert: {
@@ -260,6 +415,7 @@ export type Database = {
           name: string
           pluggy_connector_id?: number | null
           primary_color?: string | null
+          slug?: string | null
           sort_order?: number
         }
         Update: {
@@ -273,6 +429,7 @@ export type Database = {
           name?: string
           pluggy_connector_id?: number | null
           primary_color?: string | null
+          slug?: string | null
           sort_order?: number
         }
         Relationships: []
@@ -328,13 +485,57 @@ export type Database = {
     }
     Enums: {
       benefit_category:
-        | "viagem"
-        | "entretenimento"
-        | "saude"
-        | "seguros"
-        | "compras"
+        | "travel"
+        | "insurance"
+        | "cashback"
+        | "investback"
+        | "points"
+        | "miles"
+        | "shopping"
+        | "restaurant"
+        | "airport"
+        | "concierge"
+        | "investment"
+        | "security"
+        | "account_service"
+        | "international_purchase"
+        | "experience"
+        | "other"
       benefit_scope: "nacional" | "regional" | "pontual"
+      benefit_source_kind: "issuer" | "card_network" | "partner" | "mixed"
+      geolocation_status:
+        | "exact"
+        | "approximate"
+        | "needs_geocoding"
+        | "not_applicable"
+      location_scope:
+        | "online"
+        | "physical"
+        | "global_network"
+        | "countrywide"
+        | "airport"
+        | "city"
+        | "regional"
+        | "unknown"
+      redemption_type:
+        | "automatic"
+        | "app"
+        | "coupon"
+        | "partner_portal"
+        | "insurance_claim"
+        | "certificate"
+        | "concierge"
+        | "physical_access"
+        | "points_exchange"
+        | "statement_credit"
+        | "other"
       source_kind: "card" | "carrier" | "loyalty" | "cpf"
+      verification_status:
+        | "official_confirmed"
+        | "official_needs_regulation_check"
+        | "partner_network"
+        | "inferred_from_card_network"
+        | "needs_manual_validation"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -466,14 +667,62 @@ export const Constants = {
   public: {
     Enums: {
       benefit_category: [
-        "viagem",
-        "entretenimento",
-        "saude",
-        "seguros",
-        "compras",
+        "travel",
+        "insurance",
+        "cashback",
+        "investback",
+        "points",
+        "miles",
+        "shopping",
+        "restaurant",
+        "airport",
+        "concierge",
+        "investment",
+        "security",
+        "account_service",
+        "international_purchase",
+        "experience",
+        "other",
       ],
       benefit_scope: ["nacional", "regional", "pontual"],
+      benefit_source_kind: ["issuer", "card_network", "partner", "mixed"],
+      geolocation_status: [
+        "exact",
+        "approximate",
+        "needs_geocoding",
+        "not_applicable",
+      ],
+      location_scope: [
+        "online",
+        "physical",
+        "global_network",
+        "countrywide",
+        "airport",
+        "city",
+        "regional",
+        "unknown",
+      ],
+      redemption_type: [
+        "automatic",
+        "app",
+        "coupon",
+        "partner_portal",
+        "insurance_claim",
+        "certificate",
+        "concierge",
+        "physical_access",
+        "points_exchange",
+        "statement_credit",
+        "other",
+      ],
       source_kind: ["card", "carrier", "loyalty", "cpf"],
+      verification_status: [
+        "official_confirmed",
+        "official_needs_regulation_check",
+        "partner_network",
+        "inferred_from_card_network",
+        "needs_manual_validation",
+      ],
     },
   },
 } as const

@@ -15,7 +15,7 @@ async function seedBenefit(itemLabel: string) {
     .single()
   const { data: ben } = await db
     .from('benefits')
-    .insert({ title: `Benefício ${itemLabel}`, summary: 's', category: 'compras' })
+    .insert({ title: `Benefício ${itemLabel}`, summary: 's', category: 'shopping' })
     .select()
     .single()
   await db.from('benefit_sources').insert({ benefit_id: ben!.id, source_item_id: item!.id })
@@ -49,19 +49,28 @@ describe('my_benefits', () => {
     expect(data!.map((r) => r.id)).not.toContain(mine.benefitId)
   })
 
-  it('seed: usuário com Itaú Black vê 2 benefícios', async () => {
+  it('um item que destrava 2 benefícios retorna os 2', async () => {
+    const db = serviceClient()
+    const stamp = `${Date.now()}`
+    const { data: src } = await db.from('sources')
+      .insert({ kind: 'card', name: `Two-${stamp}`, sort_order: 1, slug: `two-${stamp}` })
+      .select().single()
+    const { data: item } = await db.from('source_items')
+      .insert({ source_id: src!.id, label: 'Black', sort_order: 1, slug: `two-item-${stamp}` })
+      .select().single()
+    const mkBen = async (n: number) => {
+      const { data: ben } = await db.from('benefits')
+        .insert({ title: `B${n}-${stamp}`, summary: 's', category: 'shopping', slug: `two-b${n}-${stamp}` })
+        .select().single()
+      await db.from('benefit_sources').insert({ benefit_id: ben!.id, source_item_id: item!.id })
+      return ben!.id
+    }
+    const ids = [await mkBen(1), await mkBen(2)]
     const { client, id } = await userClient()
-    await client
-      .from('user_sources')
-      .insert({ user_id: id, source_item_id: 'aaaaaaa1-0000-0000-0000-000000000001' })
-    const { data, error } = await client
-      .from('my_benefits')
-      .select('id')
-      .in('id', [
-        'd0000001-0000-0000-0000-000000000001',
-        'd0000001-0000-0000-0000-000000000002',
-      ])
+    await client.from('user_sources').insert({ user_id: id, source_item_id: item!.id })
+    const { data, error } = await client.from('my_benefits').select('id').in('id', ids)
     expect(error).toBeNull()
     expect(data!.length).toBe(2)
+    await db.from('sources').delete().eq('id', src!.id)
   })
 })
