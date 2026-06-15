@@ -6,6 +6,10 @@ import { Painel } from './features/painel/Painel'
 import { Search } from './features/busca/Search'
 import { BenefitDetail } from './features/detalhe/BenefitDetail'
 import { Perfil } from './features/perfil/Perfil'
+import { AdminLogin } from './features/admin/AdminLogin'
+import { AdminGuard } from './features/admin/AdminGuard'
+import { AdminLayout } from './features/admin/AdminLayout'
+import { AdminHome } from './features/admin/AdminHome'
 
 export const router = createBrowserRouter([
   { path: '/', element: <BootstrapRoute /> },
@@ -19,4 +23,14 @@ export const router = createBrowserRouter([
     ],
   },
   { path: '/beneficio/:id', element: <BenefitDetail /> },
+  { path: '/admin/login', element: <AdminLogin /> },
+  {
+    element: <AdminGuard />,
+    children: [
+      {
+        element: <AdminLayout />,
+        children: [{ path: '/admin', element: <AdminHome /> }],
+      },
+    ],
+  },
 ])
