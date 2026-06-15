@@ -3,6 +3,7 @@ import { serviceClient, userClient } from './helpers/clients'
 
 describe('M7 schema', () => {
   it('benefits aceita campos de compliance e categoria nova', async () => {
+    const stamp = `${Date.now()}-${Math.floor(performance.now() * 1000)}`
     const db = serviceClient()
     const { data, error } = await db
       .from('benefits')
@@ -10,7 +11,7 @@ describe('M7 schema', () => {
         title: 'T', summary: 's', category: 'airport',
         benefit_source: 'card_network', redemption_type: 'physical_access',
         verification_status: 'official_confirmed', observed_at: '2026-06-15',
-        requires_activation: true, source_url: 'https://x.test', slug: `t-${Date.now()}`,
+        requires_activation: true, source_url: 'https://x.test', slug: `t-${stamp}`,
       })
       .select()
       .single()
@@ -20,19 +21,20 @@ describe('M7 schema', () => {
   })
 
   it('benefit_card_tiers: leitura autenticada e herança por brand/level', async () => {
+    const stamp = `${Date.now()}-${Math.floor(performance.now() * 1000)}`
     const db = serviceClient()
     const { data: ben } = await db.from('benefits')
       .insert({ title: 'Bandeira', summary: 's', category: 'insurance',
-                benefit_source: 'card_network', slug: `band-${Date.now()}` })
+                benefit_source: 'card_network', slug: `band-${stamp}` })
       .select().single()
     await db.from('benefit_card_tiers')
       .insert({ benefit_id: ben!.id, card_brand: 'visa', card_level: 'infinite' })
     const { data: src } = await db.from('sources')
-      .insert({ kind: 'card', name: `S-${Date.now()}`, sort_order: 1, slug: `s-${Date.now()}` })
+      .insert({ kind: 'card', name: `S-${stamp}`, sort_order: 1, slug: `s-${stamp}` })
       .select().single()
     const { data: item } = await db.from('source_items')
       .insert({ source_id: src!.id, label: 'XP Inf', sort_order: 1,
-                card_brand: 'visa', card_level: 'infinite', slug: `i-${Date.now()}` })
+                card_brand: 'visa', card_level: 'infinite', slug: `i-${stamp}` })
       .select().single()
 
     const { client, id } = await userClient()

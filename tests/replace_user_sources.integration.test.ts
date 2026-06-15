@@ -40,4 +40,20 @@ describe('replace_user_sources RPC', () => {
     expect(count).toBe(0)
     await db.from('sources').delete().eq('id', srcId)
   })
+
+  it('só mexe nas linhas do próprio usuário', async () => {
+    const { a, b, srcId, db } = await twoItems()
+    const alice = await userClient()
+    const bob = await userClient()
+    await alice.client.rpc('replace_user_sources', { item_ids: [a] })
+    await bob.client.rpc('replace_user_sources', { item_ids: [b] })
+    // Alice substitui a dela; a do Bob deve permanecer intacta
+    await alice.client.rpc('replace_user_sources', { item_ids: [b] })
+    const { data: bobRows } = await db
+      .from('user_sources')
+      .select('source_item_id')
+      .eq('user_id', bob.id)
+    expect(bobRows!.map((r) => r.source_item_id)).toEqual([b])
+    await db.from('sources').delete().eq('id', srcId)
+  })
 })
