@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 
 // Quando true, o sign-in anônimo rejeita. A rejeição é criada dentro da
 // implementação base do vi.fn (e não via mockRejectedValue/mockImplementation)
@@ -11,8 +11,17 @@ const ensureMock = vi.fn(() =>
     : Promise.resolve({ user: { id: 'x' } }),
 )
 vi.mock('./auth', () => ({ ensureAnonymousSession: () => ensureMock() }))
+
+let authCb: ((event: string, session: unknown) => void) | undefined
 vi.mock('../../lib/supabase', () => ({
-  supabase: { auth: { onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }) } },
+  supabase: {
+    auth: {
+      onAuthStateChange: (cb: (e: string, s: unknown) => void) => {
+        authCb = cb
+        return { data: { subscription: { unsubscribe: () => {} } } }
+      },
+    },
+  },
 }))
 
 import { AuthProvider } from './AuthProvider'
@@ -20,6 +29,7 @@ import { AuthProvider } from './AuthProvider'
 beforeEach(() => {
   signInShouldFail = false
   ensureMock.mockClear()
+  authCb = undefined
 })
 
 describe('AuthProvider', () => {
@@ -39,5 +49,20 @@ describe('AuthProvider', () => {
     await waitFor(() => expect(screen.getByText(/não foi possível conectar/i)).toBeInTheDocument())
     expect(screen.getByRole('button', { name: /tentar de novo/i })).toBeInTheDocument()
     expect(screen.queryByText('conteúdo')).not.toBeInTheDocument()
+  })
+
+  it('recria sessão anônima após logout (não cai na tela de erro)', async () => {
+    ensureMock.mockResolvedValue({ user: { id: 'anon1' } })
+    render(<AuthProvider><div>conteúdo</div></AuthProvider>)
+    await waitFor(() => expect(screen.getByText('conteúdo')).toBeInTheDocument())
+
+    ensureMock.mockResolvedValue({ user: { id: 'anon2' } })
+    await act(async () => {
+      authCb?.('SIGNED_OUT', null)
+    })
+
+    expect(screen.queryByText(/não foi possível conectar/i)).not.toBeInTheDocument()
+    await waitFor(() => expect(screen.getByText('conteúdo')).toBeInTheDocument())
+    expect(ensureMock).toHaveBeenCalledTimes(2)
   })
 })
