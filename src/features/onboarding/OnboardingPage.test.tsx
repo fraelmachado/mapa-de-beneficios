@@ -23,7 +23,7 @@ vi.mock('./useUserSources', () => ({
   useUserSources: () => existing,
 }))
 
-const grouped: GroupedSources = {
+const fullGrouped: GroupedSources = {
   card: [
     { id: 's1', kind: 'card', name: 'Itaú', logo_url: null, sort_order: 1, source_items: [
       { id: 'i1', label: 'Black', sort_order: 1 },
@@ -41,6 +41,7 @@ const grouped: GroupedSources = {
   ],
   cpf: [],
 } as GroupedSources
+let grouped: GroupedSources
 vi.mock('./useSources', () => ({
   useSources: () => ({ data: grouped, isLoading: false, error: null }),
 }))
@@ -50,6 +51,7 @@ beforeEach(() => {
   saveMutate.mockReset()
   saveMutate.mockResolvedValue(undefined)
   existing = { data: [], isLoading: false, error: null }
+  grouped = fullGrouped
 })
 
 import { OnboardingPage } from './OnboardingPage'
@@ -75,6 +77,22 @@ describe('OnboardingPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /avançar/i }))
     fireEvent.click(screen.getByRole('button', { name: /concluir/i }))
     await waitFor(() => expect(saveMutate).toHaveBeenCalledWith(expect.arrayContaining(['i1', 'i2'])))
+  })
+
+  it('com só cartões no catálogo, mostra 1 passo e conclui direto (sem passos vazios)', async () => {
+    grouped = { card: fullGrouped.card, carrier: [], loyalty: [], cpf: [] } as GroupedSources
+    renderWithProviders(<OnboardingPage />)
+    // não deve existir o passo de operadora nem o de fidelidade
+    expect(screen.queryByText(/qual sua operadora/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/nada por aqui ainda/i)).not.toBeInTheDocument()
+    // único passo é o de cartões e seu CTA é "Concluir"
+    expect(screen.getByText(/quais cartões ou bancos/i)).toBeInTheDocument()
+    fireEvent.click(screen.getByText('Itaú'))
+    fireEvent.click(screen.getByRole('button', { name: /black/i }))
+    expect(screen.queryByRole('button', { name: /avançar/i })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /concluir/i }))
+    await waitFor(() => expect(saveMutate).toHaveBeenCalledWith(expect.arrayContaining(['i1'])))
+    await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/painel'), { timeout: 2500 })
   })
 
   it('mostra erro e não salva quando falha ao carregar as fontes existentes', () => {

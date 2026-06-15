@@ -8,10 +8,10 @@ import { useSession } from '../auth/AuthProvider'
 import { useUserSources } from './useUserSources'
 import type { Source, SourceKind } from './types'
 
-const STEPS: { kinds: SourceKind[]; title: string; cta: string }[] = [
-  { kinds: ['card'], title: 'Quais cartões ou bancos você usa?', cta: 'Avançar' },
-  { kinds: ['carrier'], title: 'Qual sua operadora?', cta: 'Avançar' },
-  { kinds: ['loyalty', 'cpf'], title: 'Programas de fidelidade?', cta: 'Concluir' },
+const STEP_DEFS: { kinds: SourceKind[]; title: string }[] = [
+  { kinds: ['card'], title: 'Quais cartões ou bancos você usa?' },
+  { kinds: ['carrier'], title: 'Qual sua operadora?' },
+  { kinds: ['loyalty', 'cpf'], title: 'Programas de fidelidade?' },
 ]
 
 function SourceBlock({
@@ -79,9 +79,13 @@ export function OnboardingPage() {
   if (error || existingError) return <p className="p-6 text-red-600">Erro ao carregar seus dados.</p>
   if (saving) return <TransitionScreen />
 
-  const current = STEPS[step]
+  // Só mostramos passos cujas kinds têm fontes no catálogo — evita passos
+  // obrigatórios vazios quando o catálogo não cobre operadora/fidelidade.
+  const steps = STEP_DEFS.filter((def) => def.kinds.some((k) => (data?.[k]?.length ?? 0) > 0))
+  if (steps.length === 0) return <p className="p-6">Nenhuma fonte disponível ainda.</p>
+  const current = steps[step]
   const sources: Source[] = current.kinds.flatMap((k) => data?.[k] ?? [])
-  const isLast = step === STEPS.length - 1
+  const isLast = step === steps.length - 1
 
   async function next() {
     if (!isLast) {
@@ -105,7 +109,7 @@ export function OnboardingPage() {
       <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
         <div
           className="h-full bg-slate-800 transition-all"
-          style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
+          style={{ width: `${((step + 1) / steps.length) * 100}%` }}
         />
       </div>
       <h1 className="text-xl font-semibold">{current.title}</h1>
@@ -133,7 +137,7 @@ export function OnboardingPage() {
           className="ml-auto rounded-lg bg-slate-800 px-4 py-2 text-white"
           onClick={next}
         >
-          {current.cta}
+          {isLast ? 'Concluir' : 'Avançar'}
         </button>
       </div>
     </div>
