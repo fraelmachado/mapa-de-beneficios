@@ -467,8 +467,11 @@ export type Database = {
           created_at: string | null
           id: string | null
           image_url: string | null
+          observed_at: string | null
           partner_name: string | null
           scope: Database["public"]["Enums"]["benefit_scope"] | null
+          source_name: string | null
+          source_url: string | null
           steps: string | null
           summary: string | null
           title: string | null

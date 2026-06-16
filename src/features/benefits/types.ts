@@ -17,6 +17,9 @@ export interface MyBenefit {
   action_url: string | null
   action_label: string | null
   created_at: string
+  source_url: string | null
+  source_name: string | null
+  observed_at: string | null
   via: string[]
 }
 

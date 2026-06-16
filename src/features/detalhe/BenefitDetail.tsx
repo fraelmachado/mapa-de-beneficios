@@ -12,10 +12,25 @@ function safeHttpUrl(url: string | null): string | null {
   }
 }
 
+function sourceLabel(name: string | null, url: string): string {
+  if (name) return name
+  try {
+    return new URL(url).host
+  } catch {
+    return url
+  }
+}
+
+function formatDate(d: string | null): string | null {
+  if (!d) return null
+  const parsed = new Date(d + 'T00:00:00')
+  return Number.isNaN(parsed.getTime()) ? null : parsed.toLocaleDateString('pt-BR')
+}
+
 export function BenefitDetail() {
   const { id } = useParams()
   const { session } = useSession()
-  const { benefit, isLoading, error } = useBenefit(session?.user.id, id)
+  const { benefit, related, isLoading, error } = useBenefit(session?.user.id, id)
 
   if (isLoading) return <p className="p-6 text-slate-500">Carregando…</p>
   if (error) return <p className="p-6 text-red-600">Erro ao carregar o benefício.</p>
@@ -30,6 +45,8 @@ export function BenefitDetail() {
 
   const steps = (benefit.steps ?? '').split('\n').map((s) => s.trim()).filter(Boolean)
   const actionUrl = safeHttpUrl(benefit.action_url)
+  const sourceUrl = safeHttpUrl(benefit.source_url)
+  const collectedAt = formatDate(benefit.observed_at)
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-4 p-4">
@@ -62,6 +79,38 @@ export function BenefitDetail() {
         >
           {benefit.action_label ?? 'Resgatar benefício'}
         </a>
+      )}
+
+      {sourceUrl && (
+        <div className="mt-2 border-t border-slate-100 pt-4">
+          <h2 className="mb-1 font-semibold text-slate-900">Fonte</h2>
+          <a
+            href={sourceUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="text-sm text-slate-700 underline"
+          >
+            {sourceLabel(benefit.source_name, sourceUrl)}
+          </a>
+          {collectedAt && (
+            <p className="mt-1 text-xs text-slate-500">Informações coletadas em {collectedAt}</p>
+          )}
+        </div>
+      )}
+
+      {related.length > 0 && (
+        <div className="mt-2">
+          <h2 className="mb-2 font-semibold text-slate-900">Da mesma fonte</h2>
+          <ul className="flex flex-col gap-1 text-sm">
+            {related.map((r) => (
+              <li key={r.id}>
+                <Link to={`/beneficio/${r.id}`} className="text-slate-700 underline">
+                  {r.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   )

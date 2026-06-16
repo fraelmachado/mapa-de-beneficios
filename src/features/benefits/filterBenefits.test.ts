@@ -5,7 +5,7 @@ import type { MyBenefit } from './types'
 const base = (over: Partial<MyBenefit>): MyBenefit => ({
   id: 'x', title: 'T', summary: 'S', category: 'shopping', scope: 'nacional',
   uf: null, steps: null, partner_name: null, valid_until: null, image_url: null,
-  action_url: null, action_label: null, created_at: '', via: [], ...over,
+  action_url: null, action_label: null, created_at: '', source_url: null, source_name: null, observed_at: null, via: [], ...over,
 })
 
 const list: MyBenefit[] = [
