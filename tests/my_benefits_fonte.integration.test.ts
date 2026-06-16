@@ -10,10 +10,11 @@ describe('my_benefits expõe fonte/data', () => {
 
     const { data, error } = await client
       .from('my_benefits')
-      .select('title, source_url, observed_at')
+      .select('title, source_url, source_name, observed_at')
     expect(error).toBeNull()
     const rows = data ?? []
     expect(rows.some((r) => typeof r.source_url === 'string' && r.source_url!.startsWith('http'))).toBe(true)
     expect(rows.some((r) => typeof r.observed_at === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(r.observed_at!))).toBe(true)
+    expect(rows.some((r) => typeof r.source_name === 'string' && r.source_name!.length > 0)).toBe(true)
   })
 })

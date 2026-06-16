@@ -79,4 +79,23 @@ describe('BenefitDetail', () => {
     expect(link).toHaveAttribute('href', '/beneficio/b2')
     expect(screen.queryByRole('link', { name: /mastercard x/i })).not.toBeInTheDocument()
   })
+
+  it('não renderiza fonte com esquema perigoso (javascript:) em source_url', () => {
+    result = {
+      data: [{ ...b, source_url: 'javascript:alert(1)', source_name: 'Mau', observed_at: '2026-06-15' }],
+      isLoading: false, error: null,
+    }
+    renderWithProviders(<BenefitDetail />, { route: '/beneficio/b1' })
+    expect(screen.queryByRole('link', { name: /mau/i })).not.toBeInTheDocument()
+    expect(screen.queryByText(/coletadas em/i)).not.toBeInTheDocument()
+  })
+
+  it('não mostra "Da mesma fonte" quando não há outros benefícios da mesma fonte', () => {
+    result = {
+      data: [{ ...b, id: 'b1', source_url: 'https://only.test/x', source_name: 'Única' }],
+      isLoading: false, error: null,
+    }
+    renderWithProviders(<BenefitDetail />, { route: '/beneficio/b1' })
+    expect(screen.queryByText(/da mesma fonte/i)).not.toBeInTheDocument()
+  })
 })
