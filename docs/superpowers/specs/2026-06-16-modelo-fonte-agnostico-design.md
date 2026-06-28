@@ -41,10 +41,20 @@ Aposentar **Emissor / Bandeira / Parceiro** como eixo principal. Dois níveis:
 
 Exemplo mental: "Priority Pass" aparece como **`🏦 Banco · Nubank`** (onde você tem) com secundária **"Parceiro · Priority Pass"** (quem provê). "Seguro de locadora" aparece como **`🏦 Banco · XP`** com secundária **"Visa Infinite"**.
 
-### Implicação de dados
-A view `my_benefits` precisa projetar, além do que já tem, a **fonte que destravou** o benefício: **nome do provedor** (`sources.name`) e **`source_category`**. Hoje a view expõe `via` (o `source_items.label`) mas não o provedor nem a categoria. P1 adiciona essas projeções (em ambos os caminhos: direto e derivado por brand/level). `benefit_source`/`partner_name` já existem e alimentam a secundária.
+### Implicação de dados — o contrato de `my_benefits` precisa crescer
+A view hoje projeta `via` (`source_items.label`), `source_url`, `source_name`, `observed_at`, `partner_name` — mas **não** projeta `benefit_source` nem nenhum rótulo de bandeira. Logo, **nem a origem primária nem a secundária são sustentáveis hoje**. P1 deve estender a view (nos **dois** caminhos — direto e derivado por brand/level) para projetar:
 
-> Nuance: um benefício pode ser destravado por mais de uma fonte do usuário (ex.: dois cartões). A origem primária então lista as fontes (como `via` já agrega). Decisão de agregação no P1 (provável: agregar provedores distintos, manter `via` por item).
+**Para a origem primária (de onde o usuário tem):**
+- **provedor** = `sources.name` (ex.: "Nubank", "Unimed");
+- **`source_category`** (ex.: `bank_card`, `health`).
+- Como um benefício pode ser destravado por mais de uma fonte, agregar provedores distintos (à semelhança de como `via` já agrega os labels) — array de `{provedor, source_category}`. (Forma exata do agregado: decisão de execução no P1; provável `json_agg` distinto.)
+
+**Para a origem secundária (quem concede):**
+- **`benefit_source`** (`issuer`/`card_network`/`partner`/`mixed`) — **falta projetar; P1 adiciona.**
+- **`partner_name`** — já projetado; usado quando `benefit_source ∈ {partner, mixed}`.
+- **rótulo de bandeira** (ex.: "Visa Infinite") — **não existe no contrato e não é derivável da view atual.** Para benefícios `card_network`, a bandeira que destrava vem do `benefit_card_tiers (card_brand, card_level)` **casado com o `source_item` do usuário** no caminho derivado. P1 deve projetar esse par (ex.: `card_brand`/`card_level` do match, ou um `network_label` já formatado "Visa Infinite"). Sem isso, a secundária de cartão não pode ser renderizada.
+
+> Resumo do gap fechado: P1 = **+`benefit_source`**, **+provedor/`source_category` agregados**, **+rótulo de bandeira (brand/level do match no caminho derivado)**, além de manter `partner_name`. Só assim P2 consegue exibir primária (tipo-de-fonte+provedor) **e** secundária (bandeira/parceiro).
 
 ## 4. Onboarding multi-categoria (estrutura)
 
@@ -75,7 +85,7 @@ A seleção continua persistindo em `user_sources` (referência a `source_items`
 ## 7. Decisões pinadas (resumo para o P1)
 
 1. Adicionar enum **`source_category`** (7 valores da §2) + coluna em `sources`; backfill das fontes atuais para `bank_card`.
-2. `my_benefits` passa a projetar **provedor (`sources.name`) + `source_category`** da fonte que destravou (caminhos direto e derivado).
-3. Origem primária = tipo-de-fonte+provedor; secundária = `benefit_source`/`partner_name`/bandeira (já existentes).
+2. `my_benefits` passa a projetar (caminhos direto **e** derivado): **provedor (`sources.name`) + `source_category`** agregados (primária); **`benefit_source`** (falta hoje); **rótulo de bandeira** = `card_brand`/`card_level` do match no caminho derivado (falta hoje); manter `partner_name` (secundária).
+3. Origem primária = tipo-de-fonte+provedor; secundária = `benefit_source` + (`partner_name` para parceiro | bandeira para `card_network`). **Nenhum dos dois é sustentável pelo contrato atual da view — P1 fecha o gap (ver §3).**
 4. `sources.kind` alinhado/depreciado em favor de `source_category` (decisão de execução no P1).
 5. Sem mudança no mecanismo de `user_sources`/seleção; muda só a coleta (P3) e a exibição (P2).
