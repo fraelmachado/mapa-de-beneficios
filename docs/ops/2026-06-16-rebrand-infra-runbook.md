@@ -119,12 +119,14 @@ Reabrir editores/sessões apontando para o novo caminho. (Quebra qualquer sessã
 
 ## 9. Rollback
 
-**Fonte da verdade do rollback = o snapshot do passo 1.5.** Restaurar cada valor a partir dele, não de memória. Cada passo mantém o recurso antigo no ar até a verificação, então o rollback é sempre possível:
+**Fonte da verdade do rollback = o snapshot do passo 1.5.** Restaurar cada valor a partir dele, não de memória. Quase tudo deste rebrand vive **fora do Git** (env/domínios/build args no Dokploy), então o rollback é majoritariamente de infra — e cada passo mantém o recurso antigo no ar até a verificação.
+
 - Front/API: os domínios sslip antigos continuam funcionando; restaurar o build arg `VITE_SUPABASE_URL` ao valor do snapshot e redeploy volta ao estado anterior.
 - Env do Supabase: restaurar `SITE_URL`/`API_EXTERNAL_URL`/`SUPABASE_PUBLIC_URL`/`ADDITIONAL_REDIRECT_URLS` aos valores do snapshot e redeploy.
-- Git: se necessário, `git reset --hard <SHA do snapshot>` (só com o outro agente ciente — é estado compartilhado).
-- Repo: renomear de volta no GitHub (o GitHub mantém redirecionamento do nome antigo por um tempo, mas atualizar `origin` é o certo).
 - Domínios novos: removê-los do front/Kong reverte o roteamento; os antigos seguem ativos.
+- Repo: renomear de volta no GitHub (mantém redirecionamento temporário do nome antigo; atualizar `origin` é o certo).
+
+> **Git — NUNCA usar `git reset --hard` neste working tree.** É compartilhado com outro agente; um hard reset apagaria o próprio snapshot, trabalho não commitado e os commits do outro agente. Para desfazer um commit de código deste rebrand, usar **`git revert <sha>`** (cria um commit de reversão, preserva histórico e o trabalho alheio). Garantir que o arquivo de snapshot (1.5) esteja **commitado e empurrado** antes da janela, para que sobreviva a qualquer reversão.
 
 ## 10. Checklist final
 
