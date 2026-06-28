@@ -13,7 +13,7 @@ vi.mock('../benefits/useMyBenefits', () => ({ useMyBenefits: () => result }))
 const mk = (over: Partial<MyBenefit>): MyBenefit => ({
   id: 'x', title: 'T', summary: 'S', category: 'shopping', scope: 'nacional', uf: null,
   steps: null, partner_name: null, valid_until: null, image_url: null, action_url: null,
-  action_label: null, created_at: '', source_url: null, source_name: null, observed_at: null, via: [], ...over,
+  action_label: null, created_at: '', source_url: null, source_name: null, observed_at: null, benefit_source: null, origins: [], networks: [], via: [], ...over,
 })
 
 import { Search } from './Search'

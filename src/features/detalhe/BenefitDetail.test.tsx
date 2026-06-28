@@ -18,7 +18,7 @@ const b: MyBenefit = {
   id: 'b1', title: 'Seguro Viagem', summary: 'Cobertura internacional', category: 'travel',
   scope: 'nacional', uf: null, steps: '1. Emita a apólice\n2. Apresente o bilhete',
   partner_name: 'C6', valid_until: null, image_url: null, action_url: 'https://x.test',
-  action_label: 'Emitir', created_at: '', source_url: null, source_name: null, observed_at: null, via: ['Carbon'],
+  action_label: 'Emitir', created_at: '', source_url: null, source_name: null, observed_at: null, benefit_source: null, origins: [], networks: [], via: ['Carbon'],
 }
 
 import { BenefitDetail } from './BenefitDetail'

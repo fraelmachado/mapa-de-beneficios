@@ -14,7 +14,9 @@ export function useMyBenefits(userId: string | undefined) {
         )
         .order('created_at', { ascending: true })
       if (error) throw error
-      return (data ?? []) as MyBenefit[]
+      // database.types.ts tipa origins/networks como Json (view agregada); a forma real
+      // é garantida pela view + testes de integração. Cast via unknown é intencional.
+      return (data ?? []) as unknown as MyBenefit[]
     },
   })
 }
