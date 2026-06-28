@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- **Escopo é só dados.** Nenhuma mudança de UI/onboarding (isso é P2/P3). Não tocar em componentes React de tela; só `src/features/benefits/types.ts` e `src/lib/database.types.ts`.
+- **Escopo é só dados.** Nenhuma mudança de UI/onboarding (isso é P2/P3): não tocar em **componentes React de tela** nem em copy/layout. Os únicos arquivos de front nesta P1 são os do contrato de dados: `src/features/benefits/types.ts` (tipos), `src/features/benefits/useMyBenefits.ts` (o `select` da query, para os campos novos chegarem ao app) e `src/lib/database.types.ts` (gerado).
 - **Migrations aditivas.** Não dropar colunas existentes. `sources.kind` é **mantido** como metadado técnico (legado); `source_category` é a nova dimensão de UI. Não remover `kind` neste P1.
 - **`source_category` enum — exatamente estes 7 valores, em snake_case minúsculo, nesta ordem:** `bank_card`, `carrier`, `health`, `corporate_benefits`, `loyalty`, `retail`, `mall`.
 - **`benefit_source` já existe** como enum `benefit_source_kind` (`issuer`/`card_network`/`partner`/`mixed`) em `benefits` (migration 0009). P1 só passa a **projetá-lo** na view — não recria o enum.
