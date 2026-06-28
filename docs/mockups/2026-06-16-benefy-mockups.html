@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Benefy — Mockups (direção "Passe")</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --paper:#F7F1E7;        /* warm ticket stock */
+    --paper-2:#FBF7EF;
+    --ink:#1A1712;          /* deep warm ink */
+    --ink-soft:#5C544A;
+    --line:#E4D9C6;
+    --accent:#FF5A1F;       /* electric tangerine — discovery */
+    --accent-ink:#C73E0C;
+    --pine:#0E5C4A;         /* trusted secondary */
+    --pine-soft:#E3EFE9;
+    --gold:#B07A1E;
+    --card:#FFFFFF;
+    --radius:18px;
+    --shadow:0 1px 0 #fff inset, 0 18px 40px -24px rgba(26,23,18,.45);
+    --mono:'Spline Sans Mono',ui-monospace,monospace;
+    --display:'Fraunces',Georgia,serif;
+    --body:'Hanken Grotesk',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:var(--body);
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 12% -8%, rgba(255,90,31,.10), transparent 60%),
+      radial-gradient(1000px 500px at 100% 0%, rgba(14,92,74,.10), transparent 55%),
+      var(--paper);
+    -webkit-font-smoothing:antialiased;
+    padding:40px 20px 80px;
+  }
+  /* grain */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.05;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .sheet{max-width:1320px;margin:0 auto;position:relative;z-index:2}
+  .sheet-head{margin:0 auto 44px;max-width:760px;text-align:center}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-ink);
+    display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);background:var(--paper-2);padding:7px 12px;border-radius:999px}
+  .kicker::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(255,90,31,.18)}
+  .sheet-head h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size:clamp(34px,5vw,56px);line-height:1.02;margin:18px 0 10px;letter-spacing:-.02em}
+  .sheet-head h1 em{font-style:italic;color:var(--accent-ink)}
+  .sheet-head p{color:var(--ink-soft);font-size:16px;line-height:1.55;margin:0 auto;max-width:620px}
+  .legend{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px}
+  .legend span{font-family:var(--mono);font-size:11px;letter-spacing:.04em;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 11px;display:inline-flex;align-items:center;gap:7px}
+  .sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+  .grid{display:flex;flex-wrap:wrap;gap:46px 38px;justify-content:center;align-items:flex-start}
+  .frame-wrap{display:flex;flex-direction:column;gap:14px;align-items:center}
+  .frame-label{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  .frame-label b{color:var(--ink);font-weight:600}
+
+  /* phone */
+  .phone{width:380px;height:800px;border-radius:46px;background:var(--ink);padding:11px;
+    box-shadow:0 50px 90px -50px rgba(26,23,18,.7), 0 0 0 2px rgba(26,23,18,.06);position:relative}
+  .screen{width:100%;height:100%;border-radius:36px;overflow:hidden;background:var(--paper);position:relative;display:flex;flex-direction:column}
+  .notch{position:absolute;top:18px;left:50%;transform:translateX(-50%);width:120px;height:28px;background:var(--ink);border-radius:0 0 16px 16px;z-index:30}
+  .statusbar{height:42px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 22px 6px;font-family:var(--mono);font-size:12px;color:var(--ink);flex:none}
+  .scroll{flex:1;overflow:auto;padding:6px 18px 96px}
+  .scroll::-webkit-scrollbar{display:none}
+
+  /* shared bits */
+  .h-app{font-family:var(--display);font-weight:600;letter-spacing:-.02em}
+  .logo{display:flex;align-items:center;gap:9px;font-family:var(--display);font-weight:600;font-size:21px;letter-spacing:-.02em}
+  .logo .mark{width:26px;height:26px;border-radius:8px;background:var(--ink);position:relative;display:grid;place-items:center}
+  .logo .mark::before{content:"";width:11px;height:11px;border:2px solid var(--accent);border-radius:50%}
+  .logo .mark::after{content:"";position:absolute;width:5px;height:5px;border-radius:50%;background:var(--accent)}
+  .muted{color:var(--ink-soft)}
+  .chips{display:flex;gap:8px;overflow:auto;padding:2px 0 4px;margin:0 -2px}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none;border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;font-size:13px;font-weight:500;color:var(--ink-soft);display:inline-flex;gap:7px;align-items:center;white-space:nowrap}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .chip .em{font-size:14px}
+
+  /* PASS card — the signature element */
+  .pass{position:relative;background:var(--card);border:1px solid var(--line);border-radius:16px;margin:14px 0;box-shadow:var(--shadow);overflow:hidden}
+  .pass .stub{position:relative;padding:15px 16px 14px}
+  .pass .perf{position:relative;height:0;border-top:2px dashed var(--line);margin:0 14px}
+  .pass .perf::before,.pass .perf::after{content:"";position:absolute;top:-11px;width:20px;height:20px;border-radius:50%;background:var(--paper)}
+  .pass .perf::before{left:-25px;box-shadow:0 0 0 1px var(--line)}
+  .pass .perf::after{right:-25px;box-shadow:0 0 0 1px var(--line)}
+  .pass .foot{padding:12px 16px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .pass .cat{position:absolute;top:14px;right:14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink);background:rgba(255,90,31,.1);border:1px solid rgba(255,90,31,.25);padding:4px 8px;border-radius:7px}
+  .pass h3{font-family:var(--display);font-weight:600;font-size:19px;line-height:1.12;margin:2px 44px 8px 0;letter-spacing:-.01em}
+  .pass .via{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);display:flex;align-items:center;gap:7px}
+  .pass .via b{color:var(--ink);font-weight:600}
+  .pass .desc{font-size:13.5px;color:var(--ink-soft);line-height:1.5;margin:9px 44px 0 0}
+  .origin{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--pine);background:var(--pine-soft);padding:5px 9px;border-radius:7px}
+  .origin.brand{color:var(--accent-ink);background:rgba(255,90,31,.1)}
+  .go{width:34px;height:34px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;flex:none}
+
+  /* bottom nav */
+  .nav{position:absolute;left:14px;right:14px;bottom:14px;height:64px;background:rgba(26,23,18,.96);backdrop-filter:blur(8px);border-radius:20px;display:flex;align-items:center;justify-content:space-around;z-index:20;box-shadow:0 18px 40px -18px rgba(26,23,18,.8)}
+  .nav a{color:rgba(255,255,255,.5);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-family:var(--mono);letter-spacing:.04em;text-decoration:none}
+  .nav a.on{color:#fff}
+  .nav .ic{width:22px;height:22px;display:grid;place-items:center}
+  .nav a.on .ic{color:var(--accent)}
+
+  .btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:16px;border-radius:14px;background:var(--accent);color:#fff;font-weight:600;font-size:15px;border:none;box-shadow:0 12px 24px -12px rgba(255,90,31,.8)}
+  .btn.ink{background:var(--ink);box-shadow:none}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+
+  svg{display:block}
+  .sec-title{font-family:var(--display);font-weight:600;font-size:15px;margin:18px 0 4px;display:flex;align-items:center;gap:8px}
+  .hr{height:1px;background:var(--line);margin:16px 0;border:0}
+</style>
+</head>
+<body>
+<div class="sheet">
+  <header class="sheet-head">
+    <span class="kicker">Benefy · Mockups · direção "Passe"</span>
+    <h1>Cada benefício é um <em>passe</em> que você nem sabia que tinha.</h1>
+    <p>Radar de vantagens dos cartões, bancos e bandeiras que você já usa. Mobile-first PWA, pt-BR. Cartões em formato de ticket perfurado — salas VIP, seguros, milhas e vouchers ganham forma física.</p>
+    <div class="legend">
+      <span><i class="sw" style="background:#1A1712"></i> Tinta</span>
+      <span><i class="sw" style="background:#FF5A1F"></i> Tangerina (descoberta)</span>
+      <span><i class="sw" style="background:#0E5C4A"></i> Pinho (confiança)</span>
+      <span><i class="sw" style="background:#F7F1E7;border:1px solid #E4D9C6"></i> Papel</span>
+      <span style="font-family:var(--display);font-style:italic">Fraunces</span>
+      <span style="font-family:var(--mono)">Spline Mono</span>
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <!-- ============ 1. ONBOARDING ============ -->
+    <div class="frame-wrap">
+      <div class="frame-label"><b>01</b> · Onboarding</div>
+      <div class="phone"><div class="screen"><div class="notch"></div>
+        <div class="statusbar"><span>9:41</span><span>5G ▟ 100</span></div>
+        <div class="scroll">
+          <div class="logo" style="margin:6px 0 18px"><span class="mark"></span> Benefy</div>
+          <div style="font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--accent-ink)">PASSO 1 DE 2</div>
+          <h2 class="h-app" style="font-size:28px;line-height:1.08;margin:8px 0 6px;letter-spacing:-.02em">Quais cartões<br>você tem hoje?</h2>
+          <p class="muted" style="font-size:14px;margin:0 0 12px">Marque tudo que tiver — a gente revela os benefícios escondidos.</p>
+
+          <div class="sec-title">Nubank</div>
+          <div class="chips" style="flex-wrap:wrap;overflow:visible">
+            <span class="chip">Gold</span>
+            <span class="chip">Platinum</span>
+            <span class="chip on">✓ Ultravioleta</span>
+          </div>
+          <div class="sec-title">Banco Inter</div>
+          <div class="chips" style="flex-wrap:wrap;overflow:visible">
+            <span class="chip">Gold</span><span class="chip">Platinum</span>
+            <span class="chip on">✓ Prime</span><span class="chip">Win</span>
+            <span class="chip">Duo Gourmet</span>
+          </div>
+          <div class="sec-title">XP</div>
+          <div class="chips" style="flex-wrap:wrap;overflow:visible">
+            <span class="chip">XP One</span><span class="chip on">✓ XP Infinite</span>
+            <span class="chip">XP Legacy</span><span class="chip">Signature</span>
+          </div>
+
+          <div style="margin-top:26px"><button class="btn">Revelar meus benefícios <span style="font-family:var(--mono)">→</span></button></div>
+          <p class="muted" style="text-align:center;font-size:12px;margin-top:12px">3 selecionados · sem login necessário</p>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ============ 2. PAINEL ============ -->
+    <div class="frame-wrap">
+      <div class="frame-label"><b>02</b> · Painel</div>
+      <div class="phone"><div class="screen"><div class="notch"></div>
+        <div class="statusbar"><span>9:41</span><span>5G ▟ 100</span></div>
+        <div class="scroll">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin:6px 0 14px">
+            <div class="logo"><span class="mark"></span> Benefy</div>
+            <div style="width:34px;height:34px;border-radius:50%;background:var(--pine);color:#fff;display:grid;place-items:center;font-weight:600;font-family:var(--display)">F</div>
+          </div>
+
+          <!-- radar hero -->
+          <div style="background:var(--ink);color:#fff;border-radius:18px;padding:18px;position:relative;overflow:hidden">
+            <div style="position:absolute;right:-30px;top:-30px;width:160px;height:160px;border-radius:50%;border:1px solid rgba(255,90,31,.35);box-shadow:0 0 0 22px rgba(255,90,31,.06),0 0 0 50px rgba(255,90,31,.04)"></div>
+            <div style="font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:rgba(255,255,255,.6)">RADAR DE VANTAGENS</div>
+            <div style="font-family:var(--display);font-size:40px;font-weight:600;line-height:1;margin:8px 0 2px">23 <span style="font-size:17px;font-weight:500;color:rgba(255,255,255,.7)">benefícios</span></div>
+            <div style="font-size:13px;color:rgba(255,255,255,.7)">desbloqueados pelos seus 3 cartões</div>
+          </div>
+
+          <div class="chips" style="margin-top:14px">
+            <span class="chip on"><span class="em">◆</span> Todos</span>
+            <span class="chip"><span class="em">🛫</span> Aeroporto</span>
+            <span class="chip"><span class="em">🛡️</span> Seguros</span>
+            <span class="chip"><span class="em">✈️</span> Viagem</span>
+            <span class="chip"><span class="em">💸</span> Cashback</span>
+          </div>
+
+          <!-- highlight pass -->
+          <div class="pass" style="border-color:var(--ink)">
+            <div class="stub">
+              <span class="cat">★ destaque</span>
+              <div class="via"><span>via</span> <b>Nubank Ultravioleta</b></div>
+              <h3>4 acessos Priority Pass por ano</h3>
+              <p class="desc">Mais de 1.700 salas VIP em 145 países. Você tem e provavelmente nunca usou.</p>
+            </div>
+            <div class="perf"></div>
+            <div class="foot">
+              <span class="origin">● Emissor · Nubank</span>
+              <div class="go">→</div>
+            </div>
+          </div>
+
+          <!-- pass -->
+          <div class="pass">
+            <div class="stub">
+              <span class="cat">seguros</span>
+              <div class="via"><span>via</span> <b>XP Infinite</b></div>
+              <h3>Seguro para veículos de locadora</h3>
+              <p class="desc">Proteção contra roubo e danos ao alugar carro pagando com o cartão.</p>
+            </div>
+            <div class="perf"></div>
+            <div class="foot"><span class="origin brand">◈ Bandeira · Visa Infinite</span><div class="go">→</div></div>
+          </div>
+
+          <div class="pass">
+            <div class="stub">
+              <span class="cat">compras</span>
+              <div class="via"><span>via</span> <b>Inter Prime</b></div>
+              <h3>Garantia Estendida Mastercard Black</h3>
+              <p class="desc">Dobra a garantia original de fábrica por até 1 ano.</p>
+            </div>
+            <div class="perf"></div>
+            <div class="foot"><span class="origin brand">◈ Bandeira · Mastercard Black</span><div class="go">→</div></div>
+          </div>
+        </div>
+        <nav class="nav">
+          <a class="on"><span class="ic">▦</span> Painel</a>
+          <a><span class="ic">⌕</span> Buscar</a>
+          <a><span class="ic">◷</span> Perfil</a>
+        </nav>
+      </div></div>
+    </div>
+
+    <!-- ============ 3. DETALHE ============ -->
+    <div class="frame-wrap">
+      <div class="frame-label"><b>03</b> · Detalhe (fonte + correlatos)</div>
+      <div class="phone"><div class="screen"><div class="notch"></div>
+        <div class="statusbar"><span>9:41</span><span>5G ▟ 100</span></div>
+        <div class="scroll">
+          <div style="display:flex;align-items:center;gap:10px;margin:6px 0 16px;font-family:var(--mono);font-size:12px;color:var(--ink-soft)">← voltar</div>
+
+          <span class="cat" style="position:static;display:inline-block">seguros</span>
+          <h2 class="h-app" style="font-size:27px;line-height:1.1;margin:12px 0 10px;letter-spacing:-.02em">Seguro para veículos de locadora</h2>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+            <span style="font-family:var(--mono);font-size:11.5px;background:#fff;border:1px solid var(--line);padding:6px 10px;border-radius:999px">via <b>XP Infinite</b></span>
+            <span class="origin brand">◈ Visa Infinite</span>
+          </div>
+          <p style="font-size:14.5px;line-height:1.55;color:var(--ink-soft)">Proteção gratuita contra roubo e danos ao pagar e reservar a locação de automóvel com cartão Visa elegível.</p>
+
+          <div class="sec-title">Como usar</div>
+          <ol style="margin:0;padding-left:18px;font-size:14px;line-height:1.7;color:var(--ink-soft)">
+            <li>Reserve e pague a locação com o XP Infinite.</li>
+            <li>Recuse o seguro do balcão da locadora.</li>
+            <li>Guarde o comprovante para acionar, se precisar.</li>
+          </ol>
+
+          <button class="btn ink" style="margin-top:18px">Ver no portal Visa <span style="font-family:var(--mono)">↗</span></button>
+
+          <!-- FONTE block -->
+          <div style="margin-top:22px;border-top:1px solid var(--line);padding-top:16px">
+            <div style="font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--accent-ink)">FONTE OFICIAL</div>
+            <a style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;text-decoration:none;color:var(--ink)">
+              <span style="display:flex;align-items:center;gap:10px"><span style="width:30px;height:30px;border-radius:8px;background:var(--pine-soft);color:var(--pine);display:grid;place-items:center;font-weight:700;font-family:var(--display)">V</span><b style="font-weight:600">Visa Brasil</b></span>
+              <span style="font-family:var(--mono);font-size:12px;color:var(--ink-soft)">↗</span>
+            </a>
+            <p style="font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);margin:9px 2px 0;display:flex;align-items:center;gap:7px"><span style="width:6px;height:6px;border-radius:50%;background:var(--pine);display:inline-block"></span> Informações coletadas em 15/06/2026</p>
+          </div>
+
+          <!-- DA MESMA FONTE -->
+          <div class="sec-title" style="margin-top:20px">Da mesma fonte <span style="font-family:var(--mono);font-size:11px;color:var(--ink-soft);font-weight:400">· Visa Brasil</span></div>
+          <a style="display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;text-decoration:none;color:var(--ink);margin-bottom:8px">
+            <span style="font-family:var(--display);font-weight:600;font-size:15px">Seguro Emergência Médica Internacional</span><span class="muted">→</span></a>
+          <a style="display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;text-decoration:none;color:var(--ink);margin-bottom:8px">
+            <span style="font-family:var(--display);font-weight:600;font-size:15px">Proteção de Compra Visa Infinite</span><span class="muted">→</span></a>
+          <a style="display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;text-decoration:none;color:var(--ink)">
+            <span style="font-family:var(--display);font-weight:600;font-size:15px">Visa Infinite Fast Pass (GRU · GIG)</span><span class="muted">→</span></a>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ============ 4. BUSCA ============ -->
+    <div class="frame-wrap">
+      <div class="frame-label"><b>04</b> · Buscar</div>
+      <div class="phone"><div class="screen"><div class="notch"></div>
+        <div class="statusbar"><span>9:41</span><span>5G ▟ 100</span></div>
+        <div class="scroll">
+          <h2 class="h-app" style="font-size:26px;margin:8px 0 12px;letter-spacing:-.02em">Buscar benefícios</h2>
+          <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 14px">
+            <span class="muted">⌕</span>
+            <span style="font-family:var(--body);color:var(--ink)">sala vip<span style="color:var(--accent);font-weight:700">|</span></span>
+          </div>
+          <div class="chips" style="margin-top:12px">
+            <span class="chip on"><span class="em">🛫</span> Aeroporto</span>
+            <span class="chip"><span class="em">✈️</span> Viagem</span>
+            <span class="chip"><span class="em">🛎️</span> Concierge</span>
+          </div>
+          <p class="muted" style="font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;margin:16px 0 4px">3 RESULTADOS</p>
+
+          <div class="pass">
+            <div class="stub"><span class="cat">aeroporto</span>
+              <div class="via"><span>via</span> <b>Nubank Ultravioleta</b></div>
+              <h3>Priority Pass · 4 acessos/ano</h3></div>
+            <div class="perf"></div>
+            <div class="foot"><span class="origin">● Parceiro · Priority Pass</span><div class="go">→</div></div>
+          </div>
+          <div class="pass">
+            <div class="stub"><span class="cat">aeroporto</span>
+              <div class="via"><span>via</span> <b>Nubank Ultravioleta</b></div>
+              <h3>Lounge em Guarulhos</h3></div>
+            <div class="perf"></div>
+            <div class="foot"><span class="origin">● Emissor · Nubank</span><div class="go">→</div></div>
+          </div>
+          <div class="pass">
+            <div class="stub"><span class="cat">aeroporto</span>
+              <div class="via"><span>via</span> <b>XP Infinite</b></div>
+              <h3>4 acessos a salas VIP</h3></div>
+            <div class="perf"></div>
+            <div class="foot"><span class="origin brand">◈ Visa Infinite</span><div class="go">→</div></div>
+          </div>
+        </div>
+        <nav class="nav">
+          <a><span class="ic">▦</span> Painel</a>
+          <a class="on"><span class="ic">⌕</span> Buscar</a>
+          <a><span class="ic">◷</span> Perfil</a>
+        </nav>
+      </div></div>
+    </div>
+
+    <!-- ============ 5. PERFIL ============ -->
+    <div class="frame-wrap">
+      <div class="frame-label"><b>05</b> · Perfil (salvar via e-mail)</div>
+      <div class="phone"><div class="screen"><div class="notch"></div>
+        <div class="statusbar"><span>9:41</span><span>5G ▟ 100</span></div>
+        <div class="scroll">
+          <h2 class="h-app" style="font-size:26px;margin:8px 0 14px;letter-spacing:-.02em">Seu perfil</h2>
+
+          <div style="background:var(--ink);color:#fff;border-radius:18px;padding:18px;display:flex;align-items:center;gap:14px">
+            <div style="width:46px;height:46px;border-radius:14px;background:var(--accent);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:20px">F</div>
+            <div><div style="font-family:var(--display);font-weight:600;font-size:18px">Visitante</div>
+            <div style="font-size:12.5px;color:rgba(255,255,255,.65);font-family:var(--mono)">sessão anônima</div></div>
+          </div>
+
+          <!-- save card as ticket -->
+          <div class="pass" style="margin-top:16px">
+            <div class="stub">
+              <span class="cat" style="color:var(--pine);background:var(--pine-soft);border-color:#bfe0d3">grátis</span>
+              <h3 style="margin-right:60px">Salve seus benefícios</h3>
+              <p class="desc" style="margin-right:0">Receba um link mágico no e-mail e acesse seus 23 passes de qualquer aparelho.</p>
+            </div>
+            <div class="perf"></div>
+            <div class="foot" style="display:block;padding-top:14px">
+              <div style="display:flex;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 13px">
+                <span class="muted">✉</span><span style="color:var(--ink-soft);font-size:14px">voce@email.com</span>
+              </div>
+              <button class="btn" style="margin-top:12px">Enviar link mágico</button>
+            </div>
+          </div>
+
+          <hr class="hr">
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <a style="display:flex;justify-content:space-between;padding:14px 2px;text-decoration:none;color:var(--ink);font-size:15px;border-bottom:1px solid var(--line)">Meus cartões <span class="muted">3 →</span></a>
+            <a style="display:flex;justify-content:space-between;padding:14px 2px;text-decoration:none;color:var(--ink);font-size:15px;border-bottom:1px solid var(--line)">Como funciona <span class="muted">→</span></a>
+            <a style="display:flex;justify-content:space-between;padding:14px 2px;text-decoration:none;color:var(--ink);font-size:15px">Privacidade <span class="muted">→</span></a>
+          </div>
+        </div>
+        <nav class="nav">
+          <a><span class="ic">▦</span> Painel</a>
+          <a><span class="ic">⌕</span> Buscar</a>
+          <a class="on"><span class="ic">◷</span> Perfil</a>
+        </nav>
+      </div></div>
+    </div>
+
+  </div>
+
+  <p style="text-align:center;color:var(--ink-soft);font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;margin-top:54px">
+    Benefy · mockup estático · direção "Passe" · 2026-06-16 · tipografia Fraunces + Hanken Grotesk + Spline Sans Mono
+  </p>
+</div>
+</body>
+</html>
