@@ -1,4 +1,4 @@
-# Benefy M2 — App shell + auth anônimo + onboarding Implementation Plan
+# Mapa de Benefícios M2 — App shell + auth anônimo + onboarding Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -10,7 +10,7 @@
 
 **Pré-requisito:** M1 mergeado na `main` (Supabase local com migrations 0001–0004 + seed). Docker/OrbStack rodando. `.env.local` presente.
 
-**Referência:** spec `docs/superpowers/specs/2026-06-13-benefy-mvp-design.md`; M1 plan `docs/superpowers/plans/2026-06-13-benefy-m1-foundation.md`.
+**Referência:** spec `docs/superpowers/specs/2026-06-13-mapa-de-beneficios-mvp-design.md`; M1 plan `docs/superpowers/plans/2026-06-13-mapa-de-beneficios-m1-foundation.md`.
 
 ---
 
@@ -988,7 +988,7 @@ export function BootstrapRoute() {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <p className="text-slate-500">Preparando o Benefy…</p>
+      <p className="text-slate-500">Preparando o Mapa de Benefícios…</p>
     </div>
   )
 }

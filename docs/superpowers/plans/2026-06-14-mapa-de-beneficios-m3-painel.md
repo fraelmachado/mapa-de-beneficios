@@ -1,4 +1,4 @@
-# Benefy M3 — Painel completo (dashboard, detalhe, busca) Implementation Plan
+# Mapa de Benefícios M3 — Painel completo (dashboard, detalhe, busca) Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -10,7 +10,7 @@
 
 **Pré-requisito:** M1+M2+hardening na `main`. Supabase local rodando. `.env.local` presente. `npm run gen:types` disponível.
 
-**Referência:** spec `docs/superpowers/specs/2026-06-13-benefy-mvp-design.md`.
+**Referência:** spec `docs/superpowers/specs/2026-06-13-mapa-de-beneficios-mvp-design.md`.
 
 **Decisões M3:** view `my_benefits` deduplicada (1 linha/benefício, `via` = array); busca client-side; Perfil adiado pro M4; destaque = primeiro do feed.
 

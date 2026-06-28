@@ -1,11 +1,11 @@
-# Benefy M5 — Deploy no Dokploy (design)
+# Mapa de Benefícios M5 — Deploy no Dokploy (design)
 
 **Data:** 2026-06-14
 **Status:** Aprovado para planejamento
 
 ## Visão geral
 
-Colocar o Benefy (M1–M4) no ar num **deploy temporário** no Dokploy self-hosted da
+Colocar o Mapa de Benefícios (M1–M4) no ar num **deploy temporário** no Dokploy self-hosted da
 Rampap, com um **Supabase dedicado** e o front PWA servido estaticamente. Objetivo:
 app navegável de ponta a ponta numa URL pública (domínio temporário), com magic link
 funcionando via Resend. É uma milestone de **infra/ops e outward-facing** — ações
@@ -17,9 +17,9 @@ de executar.
 - Dokploy **v0.29.8**, self-hosted (`isCloud=false`), **um servidor** (local; sem
   servidores remotos registrados).
 - **Provider GitHub já conectado** ("Dokploy-Rampap-30-01-2025") — dá para ligar o
-  repo `fraelmachado/benefy`.
+  repo `fraelmachado/mapa-de-beneficios`.
 - Já existe um Supabase self-hosted ("Rampap") como referência de padrão de compose —
-  **não será reutilizado** (Benefy terá instância dedicada para isolamento de auth/DB).
+  **não será reutilizado** (Mapa de Benefícios terá instância dedicada para isolamento de auth/DB).
 - Host compartilhado e povoado (n8n, Metabase, Flowise, etc.) — atenção a recursos.
 
 ## Decisões fechadas
@@ -30,7 +30,7 @@ de executar.
 | Método Supabase | Compose oficial como serviço "compose" do Dokploy (abordagem A) |
 | Domínio | **Temporário** auto-gerado pelo Dokploy (`traefik.me`/sslip.io), HTTPS via Traefik/Let's Encrypt; troca por domínio próprio no lançamento |
 | E-mail (magic link) | **Resend SMTP** (`smtp.resend.com`), domínio verificado no Resend |
-| Front deploy | GitHub `fraelmachado/benefy`@`main` + **Dockerfile** (nginx) + **auto-deploy por webhook** |
+| Front deploy | GitHub `fraelmachado/mapa-de-beneficios`@`main` + **Dockerfile** (nginx) + **auto-deploy por webhook** |
 | Catálogo prod | Aplicar migrations `0001–0006` + **seed demo** (`seed.sql`) |
 | Admin CRUD | **Não existe ainda** — fica para M6 (curadoria real do catálogo) |
 | Segredos | Apenas no Dokploy (env); nunca no git. `ANON_KEY` no bundle do front é público por design |
@@ -52,7 +52,7 @@ Realtime, Storage, **Kong** (API gateway), Studio, Meta.
 ### 2. `web` (application)
 SPA Vite estático.
 
-- Fonte: GitHub `fraelmachado/benefy`, branch `main`, build por Dockerfile.
+- Fonte: GitHub `fraelmachado/mapa-de-beneficios`, branch `main`, build por Dockerfile.
 - Exposto via Traefik com outro domínio `traefik.me` automático (HTTPS) = o app.
 - Fala com o Supabase **a partir do navegador** → usa a URL pública do Kong embutida
   no build (build-time, Vite).
@@ -104,7 +104,7 @@ Aplicar `supabase/migrations/0001–0006` + `supabase/seed.sql` no Postgres de p
 ## CI/CD
 
 - Usar o provider GitHub já conectado; ligar o app `web` ao repo
-  `fraelmachado/benefy`@`main`, build por Dockerfile.
+  `fraelmachado/mapa-de-beneficios`@`main`, build por Dockerfile.
 - **Auto-deploy por webhook:** push na `main` redeploya o front.
 - **Pré-passo obrigatório:** `git push` — o `main` local está à frente do `origin`
   (M1–M4 ainda não publicados). Garantir que `.env*` continua gitignored.

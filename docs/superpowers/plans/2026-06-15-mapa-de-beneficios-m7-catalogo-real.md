@@ -8,7 +8,7 @@
 
 **Tech Stack:** Supabase (Postgres, RLS, PostgREST), SQL migrations, `seed.sql`, Vitest (testes de integração contra Supabase local), React + TypeScript (apenas labels de categoria).
 
-**Spec:** `docs/superpowers/specs/2026-06-15-benefy-m7-catalogo-real-design.md`
+**Spec:** `docs/superpowers/specs/2026-06-15-mapa-de-beneficios-m7-catalogo-real-design.md`
 **Catálogo-fonte:** `docs/superpowers/prompt_agente_mvp_beneficios_vantagens.md`
 
 ---
@@ -70,7 +70,7 @@ Create `supabase/migrations/0009_catalogo_real.sql`:
 
 ```sql
 -- M7: catálogo real + herança de bandeira. Ver
--- docs/superpowers/specs/2026-06-15-benefy-m7-catalogo-real-design.md
+-- docs/superpowers/specs/2026-06-15-mapa-de-beneficios-m7-catalogo-real-design.md
 
 -- my_benefits depende de benefits.category; precisa cair antes do swap de enum.
 drop view if exists my_benefits;

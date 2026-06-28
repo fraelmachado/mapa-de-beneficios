@@ -1,4 +1,4 @@
-# Benefy M1 — Fundação (backend + schema) Implementation Plan
+# Mapa de Benefícios M1 — Fundação (backend + schema) Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -10,7 +10,7 @@
 
 **Pré-requisito:** Docker Desktop rodando (necessário para `supabase start`). Node 18+.
 
-**Referência:** spec em `docs/superpowers/specs/2026-06-13-benefy-mvp-design.md`.
+**Referência:** spec em `docs/superpowers/specs/2026-06-13-mapa-de-beneficios-mvp-design.md`.
 
 ---
 
@@ -24,7 +24,7 @@ tailwind.config.js / postcss.config.js
 index.html
 src/
   main.tsx                            # bootstrap React (placeholder)
-  App.tsx                             # placeholder "Benefy"
+  App.tsx                             # placeholder "Mapa de Benefícios"
   index.css                           # diretivas Tailwind
   lib/supabase.ts                     # client tipado
   lib/database.types.ts               # tipos gerados do schema
@@ -118,7 +118,7 @@ import '@testing-library/jest-dom'
 Replace `src/App.tsx`:
 ```tsx
 export default function App() {
-  return <h1>Benefy</h1>
+  return <h1>Mapa de Benefícios</h1>
 }
 ```
 
@@ -133,7 +133,7 @@ import App from './App'
 describe('App', () => {
   it('renderiza o nome do produto', () => {
     render(<App />)
-    expect(screen.getByRole('heading', { name: 'Benefy' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Mapa de Benefícios' })).toBeInTheDocument()
   })
 })
 ```

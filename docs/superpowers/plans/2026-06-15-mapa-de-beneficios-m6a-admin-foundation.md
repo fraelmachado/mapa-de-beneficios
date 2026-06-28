@@ -1,4 +1,4 @@
-# Benefy M6a — Fundação do admin Implementation Plan
+# Mapa de Benefícios M6a — Fundação do admin Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -10,7 +10,7 @@
 
 **Pré-requisitos:** M1–M5 + Pluggy (0007) na `main`. Supabase local rodando. `.env.local`. `AuthProvider`/`useSession` já existem; `is_admin()` (security definer) e a RLS de catálogo gateada por admin já existem (M1). Test helpers `tests/helpers/clients.ts` têm `serviceClient`, `userClient`, `adminClient`, `anonClient`.
 
-**Referência:** spec `docs/superpowers/specs/2026-06-15-benefy-m6-admin-design.md`.
+**Referência:** spec `docs/superpowers/specs/2026-06-15-mapa-de-beneficios-m6-admin-design.md`.
 
 ---
 
@@ -263,7 +263,7 @@ export function AdminLogin() {
 
   return (
     <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-4 p-6">
-      <h1 className="text-2xl font-bold text-slate-900">Admin Benefy</h1>
+      <h1 className="text-2xl font-bold text-slate-900">Admin Mapa de Benefícios</h1>
       <form onSubmit={submit} className="flex flex-col gap-3">
         <label className="text-sm font-medium text-slate-700" htmlFor="email">E-mail</label>
         <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
@@ -382,7 +382,7 @@ export function AdminLayout() {
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="flex items-center gap-4 border-b border-slate-200 bg-white px-4 py-3">
-        <Link to="/admin" className="font-bold text-slate-900">Admin Benefy</Link>
+        <Link to="/admin" className="font-bold text-slate-900">Admin Mapa de Benefícios</Link>
         <Link to="/admin/sources" className="text-sm text-slate-600">Fontes</Link>
         <Link to="/admin/benefits" className="text-sm text-slate-600">Benefícios</Link>
         <button
@@ -589,7 +589,7 @@ NOTA: cria credenciais reais — outward-facing. Confirmar e-mail/senha com o us
 
 Create `scripts/bootstrap-admin.md`:
 ```md
-# Bootstrap do 1º admin do Benefy
+# Bootstrap do 1º admin do Mapa de Benefícios
 
 Cria um usuário com e-mail/senha e marca `is_admin=true`. Requer a service role key.
 

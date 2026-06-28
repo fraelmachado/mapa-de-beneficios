@@ -1,11 +1,11 @@
-# Benefy — MVP Design
+# Mapa de Benefícios — MVP Design
 
 **Data:** 2026-06-13
 **Status:** Aprovado para planejamento
 
 ## Visão geral
 
-Benefy é um agregador/buscador de benefícios que o usuário já possui mas pode não
+Mapa de Benefícios é um agregador/buscador de benefícios que o usuário já possui mas pode não
 conhecer: vantagens de cartão de crédito, streamings inclusos na operadora,
 programas de fidelidade e descontos por CPF (seguros, salas VIP, descontos em
 farmácia/cinema, etc.). A dor central: pessoas pagam por coisas a que já têm

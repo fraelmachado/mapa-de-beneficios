@@ -8,7 +8,7 @@
 
 Pluggy é um agregador de Open Finance (Brasil). Permite, com consentimento do
 usuário, descobrir **quais instituições/produtos financeiros a pessoa possui**
-(bancos, cartões, operadoras, programas) — exatamente o insumo que o Benefy hoje
+(bancos, cartões, operadoras, programas) — exatamente o insumo que o Mapa de Benefícios hoje
 coleta de forma **declarativa** (a varredura do onboarding). No futuro, a Pluggy
 substituiria/complementaria a varredura manual, populando automaticamente as fontes
 do usuário. Alinhar o schema agora evita recadastrar/migrar dados depois.
@@ -35,7 +35,7 @@ Representa uma instituição integrável. Campos principais:
 - `credentials` — especificação dos campos de login
 - `health`, `isSandbox`, `isOpenFinance`
 
-**Mapeamento p/ Benefy:** `connector` ≈ nosso **`sources`** (instituição). O `type`
+**Mapeamento p/ Mapa de Benefícios:** `connector` ≈ nosso **`sources`** (instituição). O `type`
 da Pluggy é mais rico que nosso `kind`:
 - `PERSONAL_BANK`/`BUSINESS_BANK` → `kind=card` (bancos emissores de cartão)
 - `TELECOMMUNICATION` → `kind=carrier`
@@ -57,7 +57,7 @@ isso é a seleção manual em `user_sources`.
   (`CHECKING_ACCOUNT` | `SAVINGS_ACCOUNT` | `CREDIT_CARD`)
 - `number`, `name`, `marketingName`, `balance`, `currencyCode`, `owner`, `taxNumber`
 - `bankData` (transferNumber, closingBalance, overdraft…)
-- **`creditData`** (cartões — central pro Benefy):
+- **`creditData`** (cartões — central pro Mapa de Benefícios):
   - `level` — tier do cartão: ex. `BLACK`, `INFINITE`, `SIGNATURE`, `PLATINUM`,
     `GOLD`, `STANDARD`
   - `brand` — bandeira: `VISA`, `MASTERCARD`, `ELO`, `AMEX`, `HIPERCARD`…
@@ -105,4 +105,4 @@ Tabelas novas a criar quando integrarmos (espelhando Item/Account):
   (a seleção manual vira fallback). Auth Pluggy (CLIENT_ID/SECRET) fica em secrets
   do backend; Connect Token gerado por uma edge function/endpoint.
 
-Referência cruzada: [[benefy-project]].
+Referência cruzada: [[mapa-de-beneficios-project]].

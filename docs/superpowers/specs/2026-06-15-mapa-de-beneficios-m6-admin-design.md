@@ -1,4 +1,4 @@
-# Benefy M6 — Painel admin de catálogo (design)
+# Mapa de Benefícios M6 — Painel admin de catálogo (design)
 
 **Data:** 2026-06-15
 **Status:** Aprovado para planejamento

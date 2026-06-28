@@ -1,4 +1,4 @@
-# Benefy M6c — Admin de Benefits Implementation Plan
+# Mapa de Benefícios M6c — Admin de Benefits Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -10,7 +10,7 @@
 
 **Pré-requisitos:** M6a + M6b na `main`. `src/features/benefits/types.ts` exporta `BenefitCategory`. `src/features/admin/sources/useAdminSources.ts` exporta `useAdminSources` (sources com source_items). `ImageUpload` em `src/features/admin/upload/ImageUpload.tsx`. Test helpers `adminClient`/`userClient`.
 
-**Referência:** spec `docs/superpowers/specs/2026-06-15-benefy-m6-admin-design.md`.
+**Referência:** spec `docs/superpowers/specs/2026-06-15-mapa-de-beneficios-m6-admin-design.md`.
 
 ---
 

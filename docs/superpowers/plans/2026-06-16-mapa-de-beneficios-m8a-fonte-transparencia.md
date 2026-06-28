@@ -8,7 +8,7 @@
 
 **Tech Stack:** Supabase (view SQL, RLS security_invoker), Vitest + Testing Library, React + TypeScript.
 
-**Spec:** `docs/superpowers/specs/2026-06-16-benefy-m8a-fonte-transparencia-design.md`
+**Spec:** `docs/superpowers/specs/2026-06-16-mapa-de-beneficios-m8a-fonte-transparencia-design.md`
 
 ---
 

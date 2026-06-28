@@ -1,5 +1,5 @@
 -- M7: catálogo real + herança de bandeira. Ver
--- docs/superpowers/specs/2026-06-15-benefy-m7-catalogo-real-design.md
+-- docs/superpowers/specs/2026-06-15-mapa-de-beneficios-m7-catalogo-real-design.md
 
 -- my_benefits depende de benefits.category; precisa cair antes do swap de enum.
 drop view if exists my_benefits;

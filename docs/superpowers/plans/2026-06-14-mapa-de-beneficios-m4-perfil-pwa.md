@@ -1,4 +1,4 @@
-# Benefy M4 — Perfil + PWA Implementation Plan
+# Mapa de Benefícios M4 — Perfil + PWA Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -10,7 +10,7 @@
 
 **Pré-requisito:** M1+M2+M3 na `main`. Supabase local rodando. `.env.local`. Deploy/SMTP de produção é M5 (não entra aqui; o magic link local cai no Mailpit do Supabase em http://127.0.0.1:54324).
 
-**Referência:** spec `docs/superpowers/specs/2026-06-13-benefy-mvp-design.md`.
+**Referência:** spec `docs/superpowers/specs/2026-06-13-mapa-de-beneficios-mvp-design.md`.
 
 **Decisões M4:** upgrade = magic link (e-mail) só; deploy adiado pro M5; ícone PWA = SVG simples (PNG p/ iOS fica como polish no M5).
 
@@ -523,8 +523,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg'],
       manifest: {
-        name: 'Benefy',
-        short_name: 'Benefy',
+        name: 'Mapa de Benefícios',
+        short_name: 'Mapa de Benefícios',
         description: 'Descubra os benefícios que você já tem.',
         theme_color: '#0f172a',
         background_color: '#ffffff',

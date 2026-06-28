@@ -1,14 +1,14 @@
-# Benefy M5 — Deploy no Dokploy Implementation Plan
+# Mapa de Benefícios M5 — Deploy no Dokploy Implementation Plan
 
 > **For agentic workers:** Este plano é um RUNBOOK de infra/ops. Tasks 1–2 são código/artefato no repo (verificáveis localmente) e podem ir por subagente. Tasks 3–7 são **outward-facing** (criam infra real, fazem deploy, enviam e-mail): execute **inline no loop principal**, confirmando com o usuário em cada passo marcado ⚠️ CONFIRMAR. Muitos valores (IDs do Dokploy, domínios gerados, segredos) são descobertos ao vivo — registre-os conforme aparecem.
 
-**Goal:** Benefy (M1–M4) no ar num deploy temporário: Supabase dedicado + front PWA estático no Dokploy, com magic link via Resend, em domínios `traefik.me`.
+**Goal:** Mapa de Benefícios (M1–M4) no ar num deploy temporário: Supabase dedicado + front PWA estático no Dokploy, com magic link via Resend, em domínios `traefik.me`.
 
 **Architecture:** Projeto Dokploy `benefy` com um compose Supabase oficial (só Kong exposto) e um app `web` (Dockerfile nginx) buildado do GitHub com auto-deploy. Front fala com o Supabase pela URL pública do Kong embutida no build.
 
 **Tech Stack:** Dokploy v0.29.8 (MCP), Docker/OrbStack, Supabase self-hosted (compose oficial), Vite/nginx, Resend SMTP, Supabase CLI.
 
-**Referência:** spec `docs/superpowers/specs/2026-06-14-benefy-m5-deploy-design.md`.
+**Referência:** spec `docs/superpowers/specs/2026-06-14-mapa-de-beneficios-m5-deploy-design.md`.
 
 ---
 
@@ -16,7 +16,7 @@
 
 - M1–M4 + hardenings na `main`, testes verdes, `npm run build` ok.
 - Dokploy MCP conectado; provider GitHub "Dokploy-Rampap" conectado.
-- Repo `github.com/fraelmachado/benefy` existe; `main` local está à frente do `origin` (não publicado).
+- Repo `github.com/fraelmachado/mapa-de-beneficios` existe; `main` local está à frente do `origin` (não publicado).
 - Conta Resend com API key e domínio verificado (confirmar na Task 6).
 
 ---
@@ -114,7 +114,7 @@ Run:
 docker build \
   --build-arg VITE_SUPABASE_URL=https://example.test \
   --build-arg VITE_SUPABASE_ANON_KEY=dummy \
-  -t benefy-web:local .
+  -t mapa-de-beneficios-web:local .
 ```
 Expected: build conclui sem erro (npm ci → vite build → nginx copy).
 
@@ -122,11 +122,11 @@ Expected: build conclui sem erro (npm ci → vite build → nginx copy).
 
 Run:
 ```bash
-docker run -d --rm -p 8099:80 --name benefy-web-test benefy-web:local
+docker run -d --rm -p 8099:80 --name mapa-de-beneficios-web-test mapa-de-beneficios-web:local
 sleep 2
 echo "--- raiz ---"; curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8099/
 echo "--- rota profunda (fallback SPA) ---"; curl -s http://localhost:8099/painel | grep -o "<title>[^<]*</title>" || echo "sem title"
-docker stop benefy-web-test
+docker stop mapa-de-beneficios-web-test
 ```
 Expected: raiz responde `200`; a rota `/painel` retorna o HTML do shell (mesmo `index.html`), provando o fallback.
 
@@ -218,7 +218,7 @@ Outward-facing: cria infra real. Executar inline via Dokploy MCP, confirmando an
 
 - [ ] **Step 1: Criar o projeto `benefy`**
 
-MCP: `mcp__dokploy__project-create` com `{ name: "benefy", description: "Benefy — agregador de benefícios" }`.
+MCP: `mcp__dokploy__project-create` com `{ name: "benefy", description: "Mapa de Benefícios — agregador de benefícios" }`.
 Registrar o `projectId` e o `environmentId` (production) retornados.
 
 - [ ] **Step 2: Obter o docker-compose oficial do Supabase**
@@ -251,7 +251,7 @@ SMTP_HOST=smtp.resend.com
 SMTP_PORT=465
 SMTP_USER=resend
 SMTP_PASS=<RESEND_API_KEY>
-SMTP_SENDER_NAME=Benefy
+SMTP_SENDER_NAME=Mapa de Benefícios
 ```
 (Demais variáveis do compose ficam nos defaults do template oficial.)
 
@@ -325,7 +325,7 @@ Via Resend MCP/skill: confirmar que existe uma API key e um **domínio verificad
 
 - [ ] **Step 2: ⚠️ CONFIRMAR — Criar a aplicação `web`**
 
-MCP: `mcp__dokploy__application-create` no `environmentId`, nome `web`. Depois `application-saveGithubProvider` (githubId `kjbNpJ9sEgsk_qs0pA4Oh`, repo `fraelmachado/benefy`, branch `main`) e `application-saveBuildType` = `dockerfile` (path `Dockerfile`).
+MCP: `mcp__dokploy__application-create` no `environmentId`, nome `web`. Depois `application-saveGithubProvider` (githubId `kjbNpJ9sEgsk_qs0pA4Oh`, repo `fraelmachado/mapa-de-beneficios`, branch `main`) e `application-saveBuildType` = `dockerfile` (path `Dockerfile`).
 
 - [ ] **Step 3: Build args (build-time env do Vite)**
 

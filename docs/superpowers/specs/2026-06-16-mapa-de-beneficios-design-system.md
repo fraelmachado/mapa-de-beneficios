@@ -1,8 +1,8 @@
-# Benefy — Design System (v3 aprovado)
+# Mapa de Benefícios — Design System (v3 aprovado)
 
 **Data:** 2026-06-16
 **Status:** direção visual aprovada pelo usuário
-**Mockup de referência:** `docs/mockups/2026-06-16-benefy-mockups-v3.html` (abrir no navegador)
+**Mockup de referência:** `docs/mockups/2026-06-16-mapa-de-beneficios-mockups-v3.html` (abrir no navegador)
 
 > **IMPORTANTE — o que este doc trava e o que NÃO trava.**
 > Trava a **linguagem visual aprovada**: paleta (cor primária + cores de categoria/origem), o conceito de "passe" e a anatomia dos componentes, raios/sombra/espaçamento e a **escolha da família tipográfica (Onest)**.

@@ -1,4 +1,4 @@
-# Benefy M6b — Admin de Sources Implementation Plan
+# Mapa de Benefícios M6b — Admin de Sources Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -10,7 +10,7 @@
 
 **Pré-requisitos:** M6a na `main` (admin auth/guard/layout/rotas, `ImageUpload`/`uploadAsset`, bucket `assets`). `tests/helpers/clients.ts` tem `adminClient` (cliente autenticado como admin), `userClient`. Tipos do schema em `src/lib/database.types.ts` (com campos Pluggy do 0007).
 
-**Referência:** spec `docs/superpowers/specs/2026-06-15-benefy-m6-admin-design.md`.
+**Referência:** spec `docs/superpowers/specs/2026-06-15-mapa-de-beneficios-m6-admin-design.md`.
 
 ---
 
