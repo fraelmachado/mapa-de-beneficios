@@ -28,6 +28,20 @@
   ```
   (Hoje há ~3 commits locais à frente: design lib, rename UI, rename pacote.)
 - [ ] DNS criado pelo usuário (passo 2) **propagado**.
+- [ ] **Snapshot pré-mudança capturado (passo 1.5) — OBRIGATÓRIO. Não iniciar nenhuma alteração sem ele.**
+
+## 1.5. Snapshot pré-mudança (baseline para rollback) — OBRIGATÓRIO
+
+Antes de tocar em qualquer recurso, registrar o estado atual num arquivo versionado (ex.: `docs/ops/snapshots/<data>-pre-rebrand.md`) — o rollback (§9) depende disso. Capturar:
+
+- [ ] **Git:** `git rev-parse HEAD` (SHA de partida) + `git status -sb`.
+- [ ] **Env do compose supabase** (`_ueWmUNJEKkNbdxSVmcqG`) — valores atuais de `SITE_URL`, `API_EXTERNAL_URL`, `SUPABASE_PUBLIC_URL`, `ADDITIONAL_REDIRECT_URLS` (copiar verbatim via `compose-one`, sem expor `SERVICE_ROLE_KEY`/`ANON_KEY` no doc — só os hosts).
+- [ ] **Build arg do front** (`1BjRuRUM7eitGRBJ29wMi`) — valor atual de `VITE_SUPABASE_URL`.
+- [ ] **Domínios atuais** anexados ao front e ao Kong (hostnames sslip + flags de HTTPS), via `domain-byApplicationId` / `domain-byComposeId`.
+- [ ] **Nomes atuais** do projeto/app/compose no Dokploy.
+- [ ] **Bundle atual** servido (`/assets/index-*.js`) e título, para comparação pós-mudança.
+
+Guardar esse snapshot **antes** de prosseguir. Cada valor revertido no §9 sai daqui — não da memória.
 
 ## 2. DNS (usuário — fora do Claude)
 
@@ -105,10 +119,12 @@ Reabrir editores/sessões apontando para o novo caminho. (Quebra qualquer sessã
 
 ## 9. Rollback
 
-Cada passo mantém o recurso antigo no ar até a verificação:
-- Front/API: os domínios sslip antigos continuam funcionando; reverter o build arg `VITE_SUPABASE_URL` e redeploy volta ao estado anterior.
-- Env do Supabase: reverter `SITE_URL`/`API_EXTERNAL_URL`/redirects para os valores sslip e redeploy.
+**Fonte da verdade do rollback = o snapshot do passo 1.5.** Restaurar cada valor a partir dele, não de memória. Cada passo mantém o recurso antigo no ar até a verificação, então o rollback é sempre possível:
+- Front/API: os domínios sslip antigos continuam funcionando; restaurar o build arg `VITE_SUPABASE_URL` ao valor do snapshot e redeploy volta ao estado anterior.
+- Env do Supabase: restaurar `SITE_URL`/`API_EXTERNAL_URL`/`SUPABASE_PUBLIC_URL`/`ADDITIONAL_REDIRECT_URLS` aos valores do snapshot e redeploy.
+- Git: se necessário, `git reset --hard <SHA do snapshot>` (só com o outro agente ciente — é estado compartilhado).
 - Repo: renomear de volta no GitHub (o GitHub mantém redirecionamento do nome antigo por um tempo, mas atualizar `origin` é o certo).
+- Domínios novos: removê-los do front/Kong reverte o roteamento; os antigos seguem ativos.
 
 ## 10. Checklist final
 
