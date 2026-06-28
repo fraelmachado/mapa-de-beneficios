@@ -3,6 +3,22 @@ export type BenefitCategory =
   | 'shopping' | 'restaurant' | 'airport' | 'concierge' | 'investment'
   | 'security' | 'account_service' | 'international_purchase' | 'experience' | 'other'
 
+export type SourceCategory =
+  | 'bank_card' | 'carrier' | 'health' | 'corporate_benefits'
+  | 'loyalty' | 'retail' | 'mall'
+
+export type BenefitSourceKind = 'issuer' | 'card_network' | 'partner' | 'mixed'
+
+export interface BenefitOrigin {
+  provider: string
+  category: SourceCategory
+}
+
+export interface BenefitNetwork {
+  brand: string
+  level: string
+}
+
 export interface MyBenefit {
   id: string
   title: string
@@ -20,6 +36,9 @@ export interface MyBenefit {
   source_url: string | null
   source_name: string | null
   observed_at: string | null
+  benefit_source: BenefitSourceKind | null
+  origins: BenefitOrigin[]
+  networks: BenefitNetwork[]
   via: string[]
 }
 

@@ -403,6 +403,7 @@ export type Database = {
           primary_color: string | null
           slug: string | null
           sort_order: number
+          source_category: Database["public"]["Enums"]["source_category"]
         }
         Insert: {
           active?: boolean
@@ -417,6 +418,7 @@ export type Database = {
           primary_color?: string | null
           slug?: string | null
           sort_order?: number
+          source_category?: Database["public"]["Enums"]["source_category"]
         }
         Update: {
           active?: boolean
@@ -431,6 +433,7 @@ export type Database = {
           primary_color?: string | null
           slug?: string | null
           sort_order?: number
+          source_category?: Database["public"]["Enums"]["source_category"]
         }
         Relationships: []
       }
@@ -463,11 +466,16 @@ export type Database = {
         Row: {
           action_label: string | null
           action_url: string | null
+          benefit_source:
+            | Database["public"]["Enums"]["benefit_source_kind"]
+            | null
           category: Database["public"]["Enums"]["benefit_category"] | null
           created_at: string | null
           id: string | null
           image_url: string | null
+          networks: Json | null
           observed_at: string | null
+          origins: Json | null
           partner_name: string | null
           scope: Database["public"]["Enums"]["benefit_scope"] | null
           source_name: string | null
@@ -532,6 +540,14 @@ export type Database = {
         | "points_exchange"
         | "statement_credit"
         | "other"
+      source_category:
+        | "bank_card"
+        | "carrier"
+        | "health"
+        | "corporate_benefits"
+        | "loyalty"
+        | "retail"
+        | "mall"
       source_kind: "card" | "carrier" | "loyalty" | "cpf"
       verification_status:
         | "official_confirmed"
@@ -717,6 +733,15 @@ export const Constants = {
         "points_exchange",
         "statement_credit",
         "other",
+      ],
+      source_category: [
+        "bank_card",
+        "carrier",
+        "health",
+        "corporate_benefits",
+        "loyalty",
+        "retail",
+        "mall",
       ],
       source_kind: ["card", "carrier", "loyalty", "cpf"],
       verification_status: [
