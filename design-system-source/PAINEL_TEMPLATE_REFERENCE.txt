@@ -1,0 +1,195 @@
+# Template de referência: Painel (Radar)
+# Shell responsivo, sidebar, tabbar, filtros e dark mode.
+
+/* ---- Painel.dc.html ---- */
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Painel (Radar)" description="Tela principal do app — responsiva: coluna única no mobile, sidebar + grid no desktop" -->
+<helmet>
+<script src="./ds-base.js"></script>
+<style>
+  html,body{height:100%}
+  .app{min-height:100vh;background:var(--bg)}
+  /* sidebar desktop (oculta no mobile) */
+  .side{display:none}
+  /* área principal */
+  .main{max-width:480px;margin:0 auto;padding:var(--s5) var(--s4) 104px}
+  /* tabbar mobile */
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:var(--s2) var(--s4) calc(var(--s2) + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(12px);border-top:1px solid var(--line)}
+  .tabbar .nav{border:0;border-radius:0;background:transparent;padding:0}
+  .passes{display:grid;gap:var(--s3);grid-template-columns:1fr}
+
+  @media (min-width:960px){
+    .app{display:grid;grid-template-columns:256px 1fr;align-items:start}
+    .side{display:flex;flex-direction:column;gap:var(--s2);position:sticky;top:0;height:100vh;padding:var(--s6) var(--s4);border-right:1px solid var(--line);background:var(--surface)}
+    .side .brand{display:flex;align-items:center;gap:var(--s3);font-weight:800;font-size:var(--fz-title);letter-spacing:-.02em;margin-bottom:var(--s5)}
+    .side a{display:flex;align-items:center;gap:var(--s3);padding:11px var(--s3);border-radius:var(--r-sm);color:var(--ink-2);text-decoration:none;font-weight:600;font-size:var(--fz-body);transition:background .18s,color .18s}
+    .side a:hover{background:var(--surface-2);color:var(--ink)}
+    .side a[aria-current="page"]{background:var(--accent-soft);color:var(--accent)}
+    .side a svg{width:20px;height:20px}
+    .main{max-width:1040px;margin:0;padding:var(--s8) var(--s8) var(--s10)}
+    .tabbar{display:none}
+    .passes{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--s4)}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:var(--s4)}
+    .topbar .input{margin:0;max-width:360px;flex:1}
+  }
+</style>
+</helmet>
+
+<div class="app">
+
+  <aside class="side">
+    <div class="brand"><span style="width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--c-airport),var(--c-viagem));display:inline-block"></span> Mapa de Benefícios</div>
+    <a href="#" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> Painel</a>
+    <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg> Buscar</a>
+    <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Meus cartões</a>
+    <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg> Perfil</a>
+    <button class="btn ghost" onClick="{{ toggleTheme }}" style="margin-top:auto;width:auto"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg> Tema</button>
+  </aside>
+
+  <main class="main">
+
+    <div class="topbar">
+      <div>
+        <p class="lbl" style="margin-bottom:2px">Olá, Marina</p>
+        <h1 style="font-size:var(--fz-h1);font-weight:800;letter-spacing:-.03em;margin:0">Seu radar de benefícios</h1>
+      </div>
+      <label class="input" style="margin-top:var(--s4)"><span class="muted" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></span><input type="search" placeholder="buscar benefício…" aria-label="Buscar benefício"/></label>
+    </div>
+
+    <div style="margin:var(--s5) 0 0;border-radius:18px;padding:var(--s5);color:#fff;background:linear-gradient(120deg,var(--c-airport),var(--c-viagem) 58%,var(--c-seguro));position:relative;overflow:hidden">
+      <div style="position:absolute;right:-30px;top:-30px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.13)"></div>
+      <p class="lbl" style="color:rgba(255,255,255,.85);margin-bottom:5px">Seu radar</p>
+      <div style="font-size:var(--fz-display);font-weight:800;letter-spacing:-.04em;line-height:1">23</div>
+      <div style="font-size:13px;opacity:.92;margin-top:4px">benefícios ativos · <b>R$ 4.2k</b> em valor estimado/ano</div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--s4);margin:var(--s6) 0 var(--s3)">
+      <h2 style="font-size:var(--fz-h2);font-weight:700;letter-spacing:-.02em;margin:0">Destaques pra você</h2>
+      <div class="seg" role="tablist" aria-label="Ordenar" style="width:auto">
+        <sc-for list="{{ segs }}" as="s" hint-placeholder-count="2">
+          <button class="{{ s.cls }}" type="button" role="tab" aria-selected="{{ s.selected }}" onClick="{{ s.select }}">{{ s.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div class="chips" role="group" aria-label="Filtrar por categoria" style="margin-bottom:var(--s5);overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px">
+      <sc-for list="{{ chips }}" as="c" hint-placeholder-count="6">
+        <button class="{{ c.cls }}" type="button" aria-pressed="{{ c.pressed }}" onClick="{{ c.select }}"><sc-if value="{{ c.dotCls }}" hint-placeholder-val="{{ true }}"><i class="{{ c.dotCls }}"></i></sc-if> {{ c.label }}</button>
+      </sc-for>
+    </div>
+
+    <div class="passes">
+      <sc-for list="{{ passes }}" as="p" hint-placeholder-count="4">
+        <x-import component-from-global-scope="MapaDeBenefCios_804719.Pass" category="{{ p.category }}" via="{{ p.via }}" title="{{ p.title }}" desc="{{ p.desc }}" tag="{{ p.tag }}" is-new="{{ p.isNew }}" origin-type="{{ p.originType }}" origin-label="{{ p.originLabel }}" href="#" hint-size="100%,150px"></x-import>
+      </sc-for>
+    </div>
+    <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}"><p class="muted" style="text-align:center;padding:var(--s8) 0">Nenhum benefício nesta categoria.</p></sc-if>
+
+  </main>
+
+  <nav class="tabbar" aria-label="Principal">
+    <div class="nav">
+      <a href="#" aria-current="page"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span> Painel</a>
+      <a href="#"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></span> Buscar</a>
+      <a href="#"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span> Perfil</a>
+    </div>
+  </nav>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { activeCat: 'all', sort: 'destaques' };
+
+  cats = [
+    { key: 'all', label: 'Todos' },
+    { key: 'airport', label: 'Aeroporto', color: '--c-airport' },
+    { key: 'seguro', label: 'Seguros', color: '--c-seguro' },
+    { key: 'viagem', label: 'Viagem', color: '--c-viagem' },
+    { key: 'cashback', label: 'Cashback', color: '--c-cashback' },
+    { key: 'compras', label: 'Compras', color: '--c-compras' },
+  ];
+
+  sorts = [
+    { key: 'destaques', label: 'Destaques' },
+    { key: 'categoria', label: 'Categoria' },
+  ];
+
+  all = [
+    { category: 'airport', via: 'Nubank Ultravioleta', title: '4 acessos Priority Pass por ano', desc: '+1.700 salas VIP em 145 países.', isNew: true, originType: 'emissor', originLabel: 'Emissor · Nubank' },
+    { category: 'seguro', via: 'XP Infinite', title: 'Seguro p/ veículos de locadora', desc: 'Cobertura ao pagar a locação com o cartão.', tag: 'Seguros', originType: 'bandeira', originLabel: 'Bandeira · Visa Infinite' },
+    { category: 'viagem', via: 'C6 Carbon', title: 'Seguro-viagem internacional', desc: 'Até US$ 100 mil em despesas médicas.', tag: 'Viagem', originType: 'emissor', originLabel: 'Emissor · C6' },
+    { category: 'compras', via: 'Inter Prime', title: 'Garantia Estendida Mastercard Black', desc: '+1 ano sobre a garantia do fabricante.', tag: 'Compras', originType: 'parceiro', originLabel: 'Parceiro' },
+    { category: 'cashback', via: 'Itaú Personnalité', title: '5% de cashback em viagens', desc: 'Crédito na fatura do mês seguinte.', tag: 'Cashback', originType: 'emissor', originLabel: 'Emissor · Itaú' },
+    { category: 'airport', via: 'Bradesco Aeternum', title: 'GRU Lounge — Terminal 3', desc: '2 acessos por mês para você e convidado.', tag: 'Aeroporto', originType: 'parceiro', originLabel: 'Parceiro · GRU' },
+  ];
+
+  renderVals() {
+    const { activeCat, sort } = this.state;
+
+    const chips = this.cats.map((c) => ({
+      label: c.label,
+      dotCls: c.color ? `cat-${c.key}` : null,
+      cls: c.key === activeCat ? 'chip on' : 'chip',
+      pressed: c.key === activeCat,
+      select: () => this.setState({ activeCat: c.key }),
+    }));
+
+    const segs = this.sorts.map((s) => ({
+      label: s.label,
+      cls: s.key === sort ? 'on' : '',
+      selected: s.key === sort,
+      select: () => this.setState({ sort: s.key }),
+    }));
+
+    let passes = activeCat === 'all' ? this.all.slice() : this.all.filter((p) => p.category === activeCat);
+    if (sort === 'categoria') passes = passes.sort((a, b) => a.category.localeCompare(b.category));
+
+    return {
+      chips,
+      segs,
+      passes,
+      isEmpty: passes.length === 0,
+      toggleTheme: () => {
+        const el = document.documentElement;
+        const next = el.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        el.setAttribute('data-theme', next);
+        try { localStorage.setItem('mb-theme', next); } catch (e) { /* noop */ }
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>
+
+
+/* ---- ds-base.js (carrega styles.css + bundle, define tema inicial) ---- */
+// Loads this design system into the template. In a consuming project, point
+// base at the bound DS folder relative to this file.
+(() => {
+  const base = '../..';
+  for (const p of ["styles.css"]) {
+    const l = document.createElement('link');
+    l.rel = 'stylesheet'; l.href = base + '/' + p;
+    document.head.appendChild(l);
+  }
+  // tema: preferência salva > preferência do sistema
+  try {
+    const saved = localStorage.getItem('mb-theme');
+    const sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', saved || sys);
+  } catch (e) { /* noop */ }
+
+  const s = document.createElement('script');
+  s.src = base + '/_ds_bundle.js';
+  document.head.appendChild(s);
+})();
