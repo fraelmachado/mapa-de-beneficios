@@ -4,6 +4,8 @@ import { useMyBenefits } from '../benefits/useMyBenefits'
 import { filterBenefits } from '../benefits/filterBenefits'
 import { BenefitCard } from '../benefits/BenefitCard'
 import { CategoryChips } from '../benefits/CategoryChips'
+import { Input } from '../../ui/Input'
+import { Skeleton } from '../../ui/Skeleton'
 import type { BenefitCategory } from '../benefits/types'
 
 export function Search() {
@@ -16,22 +18,25 @@ export function Search() {
   const results = filterBenefits(all, { category, text })
 
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-4 p-4 pb-24">
-      <input
+    <div className="mx-auto max-w-md p-4 pb-24" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--s3)' }}>
+      <h1 style={{ fontSize: 'var(--fz-h1)', fontWeight: 700, letterSpacing: '-.03em', margin: '0 0 var(--s2)' }}>
+        Buscar
+      </h1>
+      <Input
         type="search"
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="Digite uma loja, produto ou benefício…"
-        className="w-full rounded-xl border border-slate-300 px-4 py-3 text-base"
+        placeholder="buscar benefício…"
+        icon="⌕"
+        ariaLabel="Buscar benefício"
       />
       <CategoryChips selected={category} onChange={setCategory} />
 
-      {isLoading && <p className="text-slate-500">Carregando…</p>}
-      {error && <p className="text-red-600">Erro ao carregar.</p>}
-      {!isLoading && !error && results.length === 0 && (
-        <p className="text-slate-500">Nada encontrado.</p>
-      )}
-      <div className="flex flex-col gap-3">
+      {isLoading && <Skeleton variant="pass" />}
+      {error && <p className="muted">Erro ao carregar.</p>}
+      {!isLoading && !error && results.length === 0 && <p className="muted">Nada encontrado.</p>}
+
+      <div className="passes">
         {results.map((b) => (
           <BenefitCard key={b.id} benefit={b} />
         ))}

@@ -1,6 +1,11 @@
 import { Link, useParams } from 'react-router-dom'
 import { useSession } from '../auth/AuthProvider'
 import { useBenefit } from '../benefits/useBenefit'
+import { Checklist } from '../../ui/Checklist'
+import { Alert } from '../../ui/Alert'
+import { categoryToDsCat } from '../benefits/toPassProps'
+import { CATEGORIES } from '../benefits/types'
+import type { CSSProperties } from 'react'
 
 function safeHttpUrl(url: string | null): string | null {
   if (!url) return null
@@ -32,13 +37,15 @@ export function BenefitDetail() {
   const { session } = useSession()
   const { benefit, related, isLoading, error } = useBenefit(session?.user.id, id)
 
-  if (isLoading) return <p className="p-6 text-slate-500">Carregando…</p>
+  if (isLoading) return <p className="p-6 muted">Carregando…</p>
   if (error) return <p className="p-6 text-red-600">Erro ao carregar o benefício.</p>
   if (!benefit) {
     return (
-      <div className="p-6">
-        <Link to="/painel" className="text-sm text-slate-500">← Voltar</Link>
-        <p className="mt-4 text-slate-700">Benefício não encontrado.</p>
+      <div className="mx-auto max-w-md p-4">
+        <Link to="/painel" className="muted" style={{ fontSize: 13, fontWeight: 600 }}>
+          ← Voltar
+        </Link>
+        <p style={{ marginTop: 'var(--s4)' }}>Benefício não encontrado.</p>
       </div>
     )
   }
@@ -48,68 +55,104 @@ export function BenefitDetail() {
   const sourceUrl = safeHttpUrl(benefit.source_url)
   const collectedAt = formatDate(benefit.observed_at)
 
+  const dsCat = categoryToDsCat(benefit.category)
+  const catLabel = CATEGORIES.find((c) => c.key === benefit.category)?.label ?? 'Benefício'
+  const tagStyle = { '--cat': `var(--c-${dsCat})` } as CSSProperties
+
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-4 p-4">
-      <Link to="/painel" className="text-sm text-slate-500">← Voltar</Link>
-      <h1 className="text-2xl font-bold text-slate-900">{benefit.title}</h1>
+    <div className="mx-auto max-w-md p-4 pb-24" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--s3)' }}>
+      <Link to="/painel" className="muted" style={{ fontSize: 13, fontWeight: 600 }}>
+        ← Voltar
+      </Link>
+
+      <span className="tag" style={{ ...tagStyle, alignSelf: 'flex-start' }}>
+        {catLabel}
+      </span>
+      <h1 style={{ fontSize: 'var(--fz-h1)', fontWeight: 700, letterSpacing: '-.03em', lineHeight: 1.12, margin: 0 }}>
+        {benefit.title}
+      </h1>
+
       {benefit.via.length > 0 && (
-        <span className="w-fit rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">
-          via {benefit.via.join(', ')}
+        <span className="chip" style={{ alignSelf: 'flex-start' }}>
+          via&nbsp;<b>{benefit.via.join(', ')}</b>
         </span>
       )}
-      <p className="text-slate-700">{benefit.summary}</p>
+
+      {benefit.summary && <p style={{ color: 'var(--ink-2)', margin: 0 }}>{benefit.summary}</p>}
+
+      <Alert>
+        <b>Confirme antes de usar.</b> A cobertura depende do cartão elegível e das regras do
+        programa, que podem mudar. Cheque o regulamento oficial.
+      </Alert>
 
       {steps.length > 0 && (
         <div>
-          <h2 className="mb-2 font-semibold text-slate-900">Como usar</h2>
-          <ol className="flex flex-col gap-1 text-sm text-slate-700">
-            {steps.map((s, i) => (
-              <li key={i}>{s}</li>
-            ))}
-          </ol>
+          <p className="lbl" style={{ margin: '0 0 var(--s2)' }}>
+            Como usar
+          </p>
+          <Checklist items={steps.map((label) => ({ label }))} />
         </div>
       )}
 
       {actionUrl && (
-        <a
-          href={actionUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-2 rounded-lg bg-slate-800 px-4 py-3 text-center font-medium text-white"
-        >
-          {benefit.action_label ?? 'Resgatar benefício'}
+        <a href={actionUrl} target="_blank" rel="noreferrer" className="btn ink" style={{ textDecoration: 'none' }}>
+          {benefit.action_label ?? 'Resgatar benefício'} ↗
         </a>
       )}
 
       {sourceUrl && (
-        <div className="mt-2 border-t border-slate-100 pt-4">
-          <h2 className="mb-1 font-semibold text-slate-900">Fonte</h2>
-          <a
-            href={sourceUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="text-sm text-slate-700 underline"
-          >
-            {sourceLabel(benefit.source_name, sourceUrl)}
+        <div>
+          <p className="lbl" style={{ margin: 'var(--s2) 0 var(--s2)' }}>
+            Fonte oficial
+          </p>
+          <a className="row" href={sourceUrl} target="_blank" rel="noreferrer">
+            <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--s3)' }}>
+              <span
+                aria-hidden="true"
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: 8,
+                  background: 'var(--accent-soft)',
+                  color: 'var(--accent)',
+                  display: 'grid',
+                  placeItems: 'center',
+                  fontWeight: 800,
+                }}
+              >
+                {sourceLabel(benefit.source_name, sourceUrl).charAt(0).toUpperCase()}
+              </span>
+              {sourceLabel(benefit.source_name, sourceUrl)}
+            </span>
+            <span className="muted" aria-hidden="true">
+              ↗
+            </span>
           </a>
           {collectedAt && (
-            <p className="mt-1 text-xs text-slate-500">Informações coletadas em {collectedAt}</p>
+            <p
+              className="muted"
+              style={{ fontSize: 12, fontWeight: 500, margin: '4px 2px 0', display: 'flex', alignItems: 'center', gap: 7 }}
+            >
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--ok)' }} />
+              Informações coletadas em {collectedAt}
+            </p>
           )}
         </div>
       )}
 
       {related.length > 0 && (
-        <div className="mt-2">
-          <h2 className="mb-2 font-semibold text-slate-900">Da mesma fonte</h2>
-          <ul className="flex flex-col gap-1 text-sm">
-            {related.map((r) => (
-              <li key={r.id}>
-                <Link to={`/beneficio/${r.id}`} className="text-slate-700 underline">
-                  {r.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <div>
+          <p className="lbl" style={{ margin: 'var(--s2) 0 var(--s2)' }}>
+            Da mesma fonte
+          </p>
+          {related.map((r) => (
+            <Link key={r.id} className="row" to={`/beneficio/${r.id}`} style={{ color: 'inherit' }}>
+              {r.title}
+              <span className="muted" aria-hidden="true">
+                →
+              </span>
+            </Link>
+          ))}
         </div>
       )}
     </div>

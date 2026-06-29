@@ -25,27 +25,31 @@ function SourceBlock({
 }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className="rounded-lg border border-slate-200 p-3">
+    <div
+      style={{
+        background: 'var(--surface)',
+        border: '1px solid var(--line)',
+        borderRadius: 'var(--r-sm)',
+        padding: 'var(--s3)',
+      }}
+    >
       <button
         type="button"
-        className="w-full text-left font-medium"
+        className="w-full text-left"
+        style={{ fontWeight: 700, background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--ink)' }}
         onClick={() => setOpen((o) => !o)}
       >
         {source.name}
       </button>
       {open && (
-        <div className="mt-2 flex flex-wrap gap-2">
+        <div className="chips" style={{ marginTop: 'var(--s2)' }}>
           {source.source_items.map((it) => (
             <button
               key={it.id}
               type="button"
               onClick={() => onToggle(it.id)}
-              className={
-                'rounded-full border px-3 py-1 text-sm ' +
-                (selected.has(it.id)
-                  ? 'border-slate-800 bg-slate-800 text-white'
-                  : 'border-slate-300 text-slate-700')
-              }
+              className={'chip' + (selected.has(it.id) ? ' on' : '')}
+              aria-pressed={selected.has(it.id)}
             >
               {it.label}
             </button>
@@ -106,27 +110,27 @@ export function OnboardingPage() {
 
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col gap-4 p-6">
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+      <div style={{ height: 6, width: '100%', overflow: 'hidden', borderRadius: 99, background: 'var(--line)' }}>
         <div
-          className="h-full bg-slate-800 transition-all"
-          style={{ width: `${((step + 1) / steps.length) * 100}%` }}
+          style={{ height: '100%', background: 'var(--accent)', transition: 'width .25s', width: `${((step + 1) / steps.length) * 100}%` }}
         />
       </div>
-      <h1 className="text-xl font-semibold">{current.title}</h1>
+      <h1 style={{ fontSize: 'var(--fz-h2)', fontWeight: 700, letterSpacing: '-.02em', margin: 0 }}>{current.title}</h1>
       <div className="flex flex-col gap-2">
         {sources.map((s) => (
           <SourceBlock key={s.id} source={s} selected={selected} onToggle={(id) => dispatch({ type: 'toggle', itemId: id })} />
         ))}
-        {sources.length === 0 && <p className="text-sm text-slate-500">Nada por aqui ainda.</p>}
+        {sources.length === 0 && <p className="muted" style={{ fontSize: 14 }}>Nada por aqui ainda.</p>}
       </div>
       {saveError && (
-        <p className="text-sm text-red-600">Não foi possível salvar. Tente de novo.</p>
+        <p style={{ fontSize: 14, color: 'var(--warn)' }}>Não foi possível salvar. Tente de novo.</p>
       )}
-      <div className="mt-auto flex gap-2">
+      <div className="mt-auto flex gap-2" style={{ alignItems: 'center' }}>
         {step > 0 && (
           <button
             type="button"
-            className="rounded-lg border border-slate-300 px-4 py-2"
+            className="btn ghost"
+            style={{ width: 'auto', marginBottom: 0 }}
             onClick={() => setStep((s) => s - 1)}
           >
             Voltar
@@ -134,7 +138,8 @@ export function OnboardingPage() {
         )}
         <button
           type="button"
-          className="ml-auto rounded-lg bg-slate-800 px-4 py-2 text-white"
+          className="btn"
+          style={{ width: 'auto', marginBottom: 0, marginLeft: 'auto' }}
           onClick={next}
         >
           {isLast ? 'Concluir' : 'Avançar'}
