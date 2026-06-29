@@ -1,0 +1,48 @@
+/* ============================================================
+   Shell responsivo do app (Painel/Buscar/Perfil)
+   Espelha o PAINEL_TEMPLATE_REFERENCE do design-system-source:
+   coluna única + tabbar no mobile; sidebar + grid no desktop.
+   ============================================================ */
+.app { min-height: 100vh; background: var(--bg); }
+
+/* sidebar desktop (oculta no mobile) */
+.side { display: none; }
+
+/* área principal */
+.main { max-width: 480px; margin: 0 auto; padding: var(--s5) var(--s4) 104px; }
+
+/* tabbar mobile */
+.tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  padding: var(--s2) var(--s4) calc(var(--s2) + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(12px); border-top: 1px solid var(--line);
+}
+.tabbar .nav { border: 0; border-radius: 0; background: transparent; padding: 0; }
+
+/* grid de passes */
+.passes { display: grid; gap: var(--s3); grid-template-columns: 1fr; }
+
+@media (min-width: 960px) {
+  .app { display: grid; grid-template-columns: 256px 1fr; align-items: start; }
+  .side {
+    display: flex; flex-direction: column; gap: var(--s2);
+    position: sticky; top: 0; height: 100vh; padding: var(--s6) var(--s4);
+    border-right: 1px solid var(--line); background: var(--surface);
+  }
+  .side .brand {
+    display: flex; align-items: center; gap: var(--s3);
+    font-weight: 800; font-size: var(--fz-title); letter-spacing: -.02em; margin-bottom: var(--s5);
+  }
+  .side a {
+    display: flex; align-items: center; gap: var(--s3); padding: 11px var(--s3);
+    border-radius: var(--r-sm); color: var(--ink-2); text-decoration: none;
+    font-weight: 600; font-size: var(--fz-body); transition: background .18s, color .18s;
+  }
+  .side a:hover { background: var(--surface-2); color: var(--ink); }
+  .side a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); }
+  .side a svg { width: 20px; height: 20px; }
+  .main { max-width: 1040px; margin: 0; padding: var(--s8) var(--s8) var(--s10); }
+  .tabbar { display: none; }
+  .passes { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--s4); }
+}

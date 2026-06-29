@@ -1,4 +1,5 @@
 @import './ui/ds.css';
+@import './ui/layout.css';
 
 @tailwind base;
 @tailwind components;

@@ -1,4 +1,6 @@
 import { CATEGORIES, type BenefitCategory } from './types'
+import { Chip } from '../../ui/Chip'
+import { categoryToDsCat } from './toPassProps'
 
 export function CategoryChips({
   selected,
@@ -8,29 +10,19 @@ export function CategoryChips({
   onChange: (c: BenefitCategory | null) => void
 }) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1">
-      <button
-        type="button"
-        onClick={() => onChange(null)}
-        className={
-          'shrink-0 rounded-full border px-3 py-1 text-sm ' +
-          (selected === null ? 'border-slate-800 bg-slate-800 text-white' : 'border-slate-300 text-slate-700')
-        }
-      >
+    <div className="chips" style={{ overflowX: 'auto', flexWrap: 'nowrap', paddingBottom: 2 }}>
+      <Chip active={selected === null} onClick={() => onChange(null)}>
         Todos
-      </button>
+      </Chip>
       {CATEGORIES.map((c) => (
-        <button
+        <Chip
           key={c.key}
-          type="button"
+          category={categoryToDsCat(c.key)}
+          active={selected === c.key}
           onClick={() => onChange(selected === c.key ? null : c.key)}
-          className={
-            'shrink-0 rounded-full border px-3 py-1 text-sm ' +
-            (selected === c.key ? 'border-slate-800 bg-slate-800 text-white' : 'border-slate-300 text-slate-700')
-          }
         >
-          {c.emoji} {c.label}
-        </button>
+          {c.label}
+        </Chip>
       ))}
     </div>
   )
