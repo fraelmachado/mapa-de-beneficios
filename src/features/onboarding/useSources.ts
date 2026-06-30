@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
-import { groupSourcesByKind } from './groupSources'
+import { groupSourcesByCategory } from './groupSourcesByCategory'
 import type { Source } from './types'
 
 export function useSources() {
@@ -12,7 +12,7 @@ export function useSources() {
         .select('id, kind, name, logo_url, sort_order, source_category, source_items(id, label, sort_order)')
         .eq('active', true)
       if (error) throw error
-      return groupSourcesByKind((data ?? []) as unknown as Source[])
+      return groupSourcesByCategory((data ?? []) as unknown as Source[])
     },
   })
 }
