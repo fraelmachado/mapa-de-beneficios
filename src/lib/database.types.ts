@@ -389,6 +389,30 @@ export type Database = {
           },
         ]
       }
+      source_requests: {
+        Row: {
+          created_at: string
+          id: string
+          source_category: Database["public"]["Enums"]["source_category"]
+          text: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          source_category: Database["public"]["Enums"]["source_category"]
+          text: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          source_category?: Database["public"]["Enums"]["source_category"]
+          text?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       sources: {
         Row: {
           active: boolean
