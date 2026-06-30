@@ -36,6 +36,7 @@
 - `src/features/admin/sources/types.ts` — `SourceRow`/`SourceInput` ganham `source_category`.
 - `src/features/admin/sources/useAdminSources.ts` — SELECT inclui `source_category`.
 - `src/features/admin/sources/SourceForm.tsx` (+ `.test.tsx`) — select de `source_category`.
+- `src/lib/database.types.ts` — regenerado via `npm run gen:types` após a migration `0014` (inclui `source_requests`).
 
 **Remover (código morto após o swap):**
 - `src/features/onboarding/groupSources.ts` + `src/features/onboarding/groupSources.test.ts` (substituídos por `groupSourcesByCategory`; `useSources` deixa de usar `groupSourcesByKind`).
@@ -351,6 +352,12 @@ create table source_requests (
 
 alter table source_requests enable row level security;
 
+-- O RLS faz a aplicação por linha; o grant habilita o role a tocar a tabela
+-- (padrão do repo — ver 0003_rls.sql / 0002_user.sql). Sem o grant, o insert/select
+-- falha com permissão negada mesmo para o dono.
+grant select, insert on source_requests to authenticated;
+grant select, insert, update, delete on source_requests to service_role;
+
 -- usuário autenticado (inclusive anônimo) insere apenas em seu próprio nome
 create policy "source_requests_own_insert" on source_requests
   for insert to authenticated
@@ -372,6 +379,13 @@ create policy "source_requests_admin_select" on source_requests
 Run: `supabase migration up`
 Expected: aplica `0014_source_requests` sem erro (verificar na saída).
 (Se preferir um estado limpo: `supabase db reset` — recria e re-seed; mais lento.)
+
+- [ ] **Step 2b: Regenerar os tipos do banco (inclui `source_requests`)**
+
+O client `supabase` é tipado pelo `src/lib/database.types.ts`; a tabela nova precisa entrar nesse arquivo para o insert tipar sem cast.
+Run: `npm run gen:types`
+Expected: `src/lib/database.types.ts` regenerado, agora contendo `source_requests`.
+Conferir: `grep -n source_requests src/lib/database.types.ts` retorna linhas.
 
 - [ ] **Step 3: Escrever o teste de RLS (falha primeiro se a migration não aplicou)**
 
@@ -428,12 +442,13 @@ import type { SourceCategory } from '../benefits/types'
 export function useSaveSourceRequest() {
   return useMutation({
     mutationFn: async (req: { source_category: SourceCategory; text: string }) => {
-      const { error } = await supabase.from('source_requests').insert(req as never)
+      const { error } = await supabase.from('source_requests').insert(req)
       if (error) throw error
     },
   })
 }
 ```
+> Sem cast `as never`: após `gen:types` (Step 2b) a tabela `source_requests` está no schema tipado, então o insert `{ source_category, text }` type-checa direto. Se o `tsc` reclamar do payload, reconfira que o Step 2b rodou e que `source_requests` aparece em `src/lib/database.types.ts`.
 
 - [ ] **Step 6: Rodar testes + build**
 
@@ -443,8 +458,8 @@ Expected: PASS + build verde.
 - [ ] **Step 7: Commit**
 
 ```bash
-git add supabase/migrations/0014_source_requests.sql src/features/onboarding/useSaveSourceRequest.ts tests/source_requests.integration.test.ts
-git commit -m "feat(p3): tabela source_requests (Outro) + RLS + hook"
+git add supabase/migrations/0014_source_requests.sql src/lib/database.types.ts src/features/onboarding/useSaveSourceRequest.ts tests/source_requests.integration.test.ts
+git commit -m "feat(p3): tabela source_requests (Outro) + RLS + grants + hook tipado"
 ```
 
 ---
@@ -590,6 +605,17 @@ describe('OnboardingPage (wizard híbrido)', () => {
     expect(screen.getByText('Itaú')).toBeInTheDocument()
   })
 
+  it('modo edição: "Não tenho" remove os itens da categoria ao concluir', async () => {
+    existing = { data: ['i1'], isLoading: false }
+    groups = [bankGroup]
+    renderWithProviders(<OnboardingPage />)
+    expect(screen.getByText('Itaú')).toBeInTheDocument() // pré-selecionado → "Tenho"
+    fireEvent.click(screen.getByRole('button', { name: /não tenho/i }))
+    fireEvent.click(screen.getByRole('button', { name: /concluir/i }))
+    await waitFor(() => expect(saveMutate).toHaveBeenCalled())
+    expect(saveMutate.mock.calls[0][0]).not.toContain('i1')
+  })
+
   it('erro ao carregar fontes existentes não salva', () => {
     existing = { data: undefined, isLoading: false, error: new Error('x') } as unknown as typeof existing
     renderWithProviders(<OnboardingPage />)
@@ -701,6 +727,14 @@ export function OnboardingPage() {
 
   function setGate(cat: SourceCategory, g: Gate) {
     setGates((prev) => ({ ...prev, [cat]: g }))
+    // "Não tenho" remove os itens dessa categoria da seleção — senão, no modo
+    // edição, fontes pré-selecionadas continuariam salvas mesmo após o usuário
+    // dizer que não as tem (a UI mentiria e não daria pra remover fontes).
+    if (g === 'no') {
+      const group = steps.find((s) => s.category === cat)
+      const catIds = new Set(group?.sources.flatMap((s) => s.source_items.map((it) => it.id)) ?? [])
+      dispatch({ type: 'set', ids: [...selected].filter((id) => !catIds.has(id)) })
+    }
   }
 
   async function next() {
@@ -959,6 +993,7 @@ Após o P3: seguir [[mapa-de-beneficios-source-agnostic]] — próximos são P4 
 - **Persistência inalterada**: seleção via `replace_user_sources`/`useSaveUserSources` mantida (Task 4); "Outro" é tabela separada que **não** destrava benefício (Task 3).
 - **Follow-up do P1** (admin não setava `source_category`) → Task 2 (campo no `SourceForm`), sem derrubar o default (teste `source_category.integration` intacto).
 - **Gate de build** em toda task (vitest não type-checa). **Dados reais**: `useSources` lê do Supabase; código completo (sem placeholders) acima.
-- **Modo edição** preservado (pré-seleção → gates "yes") → Task 4.
+- **Modo edição** preservado (pré-seleção → gates "yes") → Task 4. **"Não tenho" remove os itens da categoria** da seleção (senão fontes removidas continuariam salvas) → Task 4 (`setGate` + teste de regressão).
+- **Grants explícitos** em `source_requests` (padrão do repo: grant separado do RLS) + **`gen:types`** após a migration (tabela no schema tipado, hook sem `as never`) → Task 3. (Achados da review adversarial Codex.)
 - **Fora de escopo (não nesta plan):** popular categorias não-bancárias e a tela "Discover" → P4; backfill/derrubar default de `source_category` → P4; mock → P5.
 ```
