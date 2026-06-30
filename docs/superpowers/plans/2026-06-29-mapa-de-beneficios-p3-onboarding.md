@@ -392,7 +392,7 @@ Conferir: `grep -n source_requests src/lib/database.types.ts` retorna linhas.
 ```ts
 // tests/source_requests.integration.test.ts
 import { describe, it, expect } from 'vitest'
-import { userClient } from './helpers/clients'
+import { userClient, adminClient } from './helpers/clients'
 
 describe('source_requests RLS', () => {
   it('usuário insere pedido em seu próprio nome (user_id via default)', async () => {
@@ -418,10 +418,39 @@ describe('source_requests RLS', () => {
   it('usuário só enxerga os próprios pedidos', async () => {
     const a = await userClient()
     const b = await userClient()
-    await a.client.from('source_requests').insert({ source_category: 'mall', text: 'Iguatemi' })
+    const ins = await a.client
+      .from('source_requests')
+      .insert({ source_category: 'mall', text: 'Iguatemi' })
+      .select('id')
+      .single()
+    expect(ins.error).toBeNull() // garante que a linha existe antes de checar o isolamento
+    expect(ins.data!.id).toBeTruthy()
     const { data, error } = await b.client.from('source_requests').select('id')
     expect(error).toBeNull()
     expect((data ?? []).length).toBe(0)
+  })
+
+  it('admin lê pedidos de outros usuários (curadoria P4); não-admin não', async () => {
+    const u = await userClient()
+    const seeded = await u.client
+      .from('source_requests')
+      .insert({ source_category: 'corporate_benefits', text: 'Caju' })
+      .select('id')
+      .single()
+    expect(seeded.error).toBeNull()
+    const adm = await adminClient()
+    const { data: admData, error: admErr } = await adm.client
+      .from('source_requests')
+      .select('id')
+      .eq('id', seeded.data!.id)
+    expect(admErr).toBeNull()
+    expect((admData ?? []).length).toBe(1) // admin enxerga o pedido do outro usuário
+    const other = await userClient()
+    const { data: otherData } = await other.client
+      .from('source_requests')
+      .select('id')
+      .eq('id', seeded.data!.id)
+    expect((otherData ?? []).length).toBe(0) // usuário comum não enxerga
   })
 })
 ```
@@ -590,12 +619,23 @@ describe('OnboardingPage (wizard híbrido)', () => {
     await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/painel'), { timeout: 2500 })
   })
 
-  it('mostra só categorias com provedores (1 grupo → conclui direto)', () => {
+  it('mostra só categorias com provedores; Concluir exige responder o gate', () => {
     groups = [bankGroup]
     renderWithProviders(<OnboardingPage />)
     expect(screen.queryByText(/Fidelidade & pontos/)).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /avançar/i })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /concluir/i })).toBeInTheDocument()
+    const concluir = screen.getByRole('button', { name: /concluir/i })
+    expect(concluir).toBeDisabled() // gate ainda não respondido
+    fireEvent.click(screen.getByRole('button', { name: /^tenho$/i }))
+    expect(concluir).toBeEnabled()
+  })
+
+  it('não conclui sem responder o gate (não salva nem navega)', () => {
+    groups = [bankGroup]
+    renderWithProviders(<OnboardingPage />)
+    fireEvent.click(screen.getByRole('button', { name: /concluir/i })) // desabilitado → no-op
+    expect(saveMutate).not.toHaveBeenCalled()
+    expect(navigateMock).not.toHaveBeenCalled()
   })
 
   it('modo edição: categoria com item pré-selecionado já aparece como "Tenho"', () => {
@@ -738,6 +778,7 @@ export function OnboardingPage() {
   }
 
   async function next() {
+    if (gate === undefined) return // exige responder "Tenho/Não tenho" antes de prosseguir
     if (!isLast) {
       setStep((s) => s + 1)
       return
@@ -790,7 +831,9 @@ export function OnboardingPage() {
           </Button>
         )}
         <div style={{ marginLeft: 'auto', width: 'auto' }}>
-          <Button onClick={next}>{isLast ? 'Concluir' : 'Avançar'}</Button>
+          <Button onClick={next} disabled={gate === undefined}>
+            {isLast ? 'Concluir' : 'Avançar'}
+          </Button>
         </div>
       </div>
     </div>
@@ -994,6 +1037,7 @@ Após o P3: seguir [[mapa-de-beneficios-source-agnostic]] — próximos são P4 
 - **Follow-up do P1** (admin não setava `source_category`) → Task 2 (campo no `SourceForm`), sem derrubar o default (teste `source_category.integration` intacto).
 - **Gate de build** em toda task (vitest não type-checa). **Dados reais**: `useSources` lê do Supabase; código completo (sem placeholders) acima.
 - **Modo edição** preservado (pré-seleção → gates "yes") → Task 4. **"Não tenho" remove os itens da categoria** da seleção (senão fontes removidas continuariam salvas) → Task 4 (`setGate` + teste de regressão).
-- **Grants explícitos** em `source_requests` (padrão do repo: grant separado do RLS) + **`gen:types`** após a migration (tabela no schema tipado, hook sem `as never`) → Task 3. (Achados da review adversarial Codex.)
+- **Grants explícitos** em `source_requests` (padrão do repo: grant separado do RLS) + **`gen:types`** após a migration (tabela no schema tipado, hook sem `as never`) → Task 3. (1ª review adversarial Codex.)
+- **Gate obrigatório**: `Avançar/Concluir` desabilitado até responder "Tenho/Não tenho" (+ guard em `next()`); testes de que sem resposta não salva/navega → Task 4. **Teste de RLS endurecido**: afirma o insert de setup + valida leitura do admin (curadoria P4) e bloqueio do não-admin → Task 3. (2ª review adversarial Codex.)
 - **Fora de escopo (não nesta plan):** popular categorias não-bancárias e a tela "Discover" → P4; backfill/derrubar default de `source_category` → P4; mock → P5.
 ```
