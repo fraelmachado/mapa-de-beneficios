@@ -1,5 +1,9 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, afterAll } from 'vitest'
 import { serviceClient, userClient } from './helpers/clients'
+
+// ponytail: track IDs from seedBenefit; afterAll deletes only these rows
+const _cleanupSrcIds: string[] = []
+const _cleanupBenIds: string[] = []
 
 async function seedBenefit(itemLabel: string) {
   const db = serviceClient()
@@ -19,8 +23,16 @@ async function seedBenefit(itemLabel: string) {
     .select()
     .single()
   await db.from('benefit_sources').insert({ benefit_id: ben!.id, source_item_id: item!.id })
+  _cleanupSrcIds.push(src!.id)
+  _cleanupBenIds.push(ben!.id)
   return { itemId: item!.id, benefitId: ben!.id }
 }
+
+afterAll(async () => {
+  const db = serviceClient()
+  if (_cleanupBenIds.length) await db.from('benefits').delete().in('id', _cleanupBenIds)
+  if (_cleanupSrcIds.length) await db.from('sources').delete().in('id', _cleanupSrcIds)
+})
 
 describe('my_benefits', () => {
   it('mostra só benefícios cujas fontes o usuário marcou, com o selo via', async () => {

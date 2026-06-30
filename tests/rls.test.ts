@@ -1,7 +1,9 @@
-import { describe, it, expect, beforeAll } from 'vitest'
+import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { serviceClient, userClient, adminClient } from './helpers/clients'
 
 let itemId: string
+let rlsSrcId: string       // RLSProg — created in beforeAll
+let adminBankId: string    // AdminBank — captured inside test
 
 beforeAll(async () => {
   const db = serviceClient()
@@ -10,12 +12,19 @@ beforeAll(async () => {
     .insert({ kind: 'loyalty', name: 'RLSProg', sort_order: 99 })
     .select()
     .single()
+  rlsSrcId = src!.id
   const { data: item } = await db
     .from('source_items')
     .insert({ source_id: src!.id, label: '—', sort_order: 1 })
     .select()
     .single()
   itemId = item!.id
+})
+
+// ponytail: deletes only tracked IDs — no risk of touching seed rows
+afterAll(async () => {
+  const ids = [rlsSrcId, adminBankId].filter(Boolean)
+  if (ids.length) await serviceClient().from('sources').delete().in('id', ids)
 })
 
 describe('RLS catálogo', () => {
@@ -76,6 +85,7 @@ describe('RLS caminho admin', () => {
       .insert({ kind: 'card', name: 'AdminBank', sort_order: 1 })
       .select()
       .single()
+    adminBankId = data?.id  // captured for afterAll teardown
     expect(error).toBeNull()
     expect(data!.name).toBe('AdminBank')
   })
