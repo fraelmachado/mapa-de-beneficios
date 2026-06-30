@@ -30,4 +30,4 @@ create policy "source_requests_own_select" on source_requests
 -- admin lê todos (curadoria)
 create policy "source_requests_admin_select" on source_requests
   for select to authenticated
-  using (exists (select 1 from profiles p where p.id = auth.uid() and p.is_admin));
+  using (public.is_admin());

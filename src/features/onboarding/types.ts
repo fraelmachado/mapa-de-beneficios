@@ -17,5 +17,3 @@ export interface Source {
   source_items: SourceItem[]
   source_category?: SourceCategory
 }
-
-export type GroupedSources = Record<SourceKind, Source[]>
