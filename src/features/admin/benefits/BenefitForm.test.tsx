@@ -9,7 +9,7 @@ import { BenefitForm } from './BenefitForm'
 import type { SourceRow } from '../sources/types'
 
 const sources: SourceRow[] = [
-  { id: 's1', kind: 'card', name: 'Itaú', logo_url: null, sort_order: 1, active: true,
+  { id: 's1', kind: 'card', source_category: 'bank_card', name: 'Itaú', logo_url: null, sort_order: 1, active: true,
     connector_type: null, pluggy_connector_id: null, institution_url: null, primary_color: null, country: 'BR',
     source_items: [{ id: 'i1', source_id: 's1', label: 'Black', sort_order: 1, card_brand: null, card_level: null, pluggy_product: null }] },
 ]
