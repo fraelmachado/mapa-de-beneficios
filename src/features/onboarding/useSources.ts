@@ -9,7 +9,7 @@ export function useSources() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('sources')
-        .select('id, kind, name, logo_url, sort_order, source_items(id, label, sort_order)')
+        .select('id, kind, name, logo_url, sort_order, source_category, source_items(id, label, sort_order)')
         .eq('active', true)
       if (error) throw error
       return groupSourcesByKind((data ?? []) as unknown as Source[])
