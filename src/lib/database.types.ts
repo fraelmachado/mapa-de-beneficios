@@ -291,6 +291,98 @@ export type Database = {
         }
         Relationships: []
       }
+      discovery_candidates: {
+        Row: {
+          created_at: string
+          entity_type: Database["public"]["Enums"]["discovery_entity_type"]
+          fingerprint: string
+          id: string
+          job_id: string
+          match_status: Database["public"]["Enums"]["discovery_match_status"]
+          matched_id: string | null
+          parent_fingerprint: string | null
+          payload: Json
+          promoted_at: string | null
+          promoted_id: string | null
+          provenance: Json
+          review_status: Database["public"]["Enums"]["discovery_review_status"]
+          reviewed_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          entity_type: Database["public"]["Enums"]["discovery_entity_type"]
+          fingerprint: string
+          id?: string
+          job_id: string
+          match_status?: Database["public"]["Enums"]["discovery_match_status"]
+          matched_id?: string | null
+          parent_fingerprint?: string | null
+          payload?: Json
+          promoted_at?: string | null
+          promoted_id?: string | null
+          provenance?: Json
+          review_status?: Database["public"]["Enums"]["discovery_review_status"]
+          reviewed_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          entity_type?: Database["public"]["Enums"]["discovery_entity_type"]
+          fingerprint?: string
+          id?: string
+          job_id?: string
+          match_status?: Database["public"]["Enums"]["discovery_match_status"]
+          matched_id?: string | null
+          parent_fingerprint?: string | null
+          payload?: Json
+          promoted_at?: string | null
+          promoted_id?: string | null
+          provenance?: Json
+          review_status?: Database["public"]["Enums"]["discovery_review_status"]
+          reviewed_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discovery_candidates_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "discovery_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discovery_jobs: {
+        Row: {
+          brief: string
+          claimed_at: string | null
+          claimed_by: string | null
+          created_at: string
+          created_by: string | null
+          error: string | null
+          id: string
+          status: Database["public"]["Enums"]["discovery_job_status"]
+        }
+        Insert: {
+          brief: string
+          claimed_at?: string | null
+          claimed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          error?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["discovery_job_status"]
+        }
+        Update: {
+          brief?: string
+          claimed_at?: string | null
+          claimed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          error?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["discovery_job_status"]
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -515,6 +607,25 @@ export type Database = {
       }
     }
     Functions: {
+      claim_discovery_job: {
+        Args: { worker: string }
+        Returns: {
+          brief: string
+          claimed_at: string | null
+          claimed_by: string | null
+          created_at: string
+          created_by: string | null
+          error: string | null
+          id: string
+          status: Database["public"]["Enums"]["discovery_job_status"]
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "discovery_jobs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       is_admin: { Args: never; Returns: boolean }
       replace_user_sources: { Args: { item_ids: string[] }; Returns: undefined }
     }
@@ -538,6 +649,10 @@ export type Database = {
         | "other"
       benefit_scope: "nacional" | "regional" | "pontual"
       benefit_source_kind: "issuer" | "card_network" | "partner" | "mixed"
+      discovery_entity_type: "source" | "source_item" | "benefit"
+      discovery_job_status: "pending" | "processing" | "done" | "error"
+      discovery_match_status: "new" | "update" | "duplicate"
+      discovery_review_status: "pending" | "approved" | "rejected"
       geolocation_status:
         | "exact"
         | "approximate"
@@ -729,6 +844,10 @@ export const Constants = {
       ],
       benefit_scope: ["nacional", "regional", "pontual"],
       benefit_source_kind: ["issuer", "card_network", "partner", "mixed"],
+      discovery_entity_type: ["source", "source_item", "benefit"],
+      discovery_job_status: ["pending", "processing", "done", "error"],
+      discovery_match_status: ["new", "update", "duplicate"],
+      discovery_review_status: ["pending", "approved", "rejected"],
       geolocation_status: [
         "exact",
         "approximate",
