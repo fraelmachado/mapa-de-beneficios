@@ -63,19 +63,41 @@ describe('discovery schema', () => {
 
   it('claim_discovery_job reivindica um pending e o segundo claim não repega o mesmo', async () => {
     const db = serviceClient()
-    const brief = `CLAIM-${stamp()}`
-    const job = await db.from('discovery_jobs').insert({ brief }).select('id').single()
+
+    // drena qualquer pending pré-existente para eliminar não-determinismo
+    await db.from('discovery_jobs').update({ status: 'done' }).eq('status', 'pending')
+
+    const jobA = await db.from('discovery_jobs').insert({ brief: `CLAIM-A-${stamp()}` }).select('id').single()
+    const jobB = await db.from('discovery_jobs').insert({ brief: `CLAIM-B-${stamp()}` }).select('id').single()
+    expect(jobA.error).toBeNull()
+    expect(jobB.error).toBeNull()
+    const insertedIds = [jobA.data!.id, jobB.data!.id]
+
+    type ClaimRow = { id: string; status: string; claimed_by: string }
 
     const first = await db.rpc('claim_discovery_job', { worker: 'w1' })
     expect(first.error).toBeNull()
-    const claimed = (first.data ?? []) as { id: string; status: string; claimed_by: string }[]
-    // pode pegar qualquer pending; garanta que pegou um e marcou processing
-    expect(claimed.length).toBe(1)
-    expect(claimed[0].status).toBe('processing')
-    expect(claimed[0].claimed_by).toBe('w1')
+    const firstClaimed = (first.data ?? []) as ClaimRow[]
+    expect(firstClaimed.length).toBe(1)
+    expect(insertedIds).toContain(firstClaimed[0].id)
+    expect(firstClaimed[0].status).toBe('processing')
+    expect(firstClaimed[0].claimed_by).toBe('w1')
 
-    // o job específico que criamos não deve mais estar pending após ser reivindicado por alguém
-    const check = await db.from('discovery_jobs').select('status').eq('id', job.data!.id).single()
-    expect(['pending', 'processing']).toContain(check.data!.status)
+    const second = await db.rpc('claim_discovery_job', { worker: 'w2' })
+    expect(second.error).toBeNull()
+    const secondClaimed = (second.data ?? []) as ClaimRow[]
+    expect(secondClaimed.length).toBe(1)
+    expect(insertedIds).toContain(secondClaimed[0].id)
+    expect(secondClaimed[0].status).toBe('processing')
+    expect(secondClaimed[0].claimed_by).toBe('w2')
+
+    // os dois claims pegaram jobs diferentes, cobrindo exatamente os dois inseridos
+    expect(secondClaimed[0].id).not.toBe(firstClaimed[0].id)
+    expect([firstClaimed[0].id, secondClaimed[0].id].sort()).toEqual([...insertedIds].sort())
+
+    // ambos os pending foram drenados; um terceiro claim não retorna nada
+    const third = await db.rpc('claim_discovery_job', { worker: 'w3' })
+    expect(third.error).toBeNull()
+    expect((third.data ?? []).length).toBe(0)
   })
 })
