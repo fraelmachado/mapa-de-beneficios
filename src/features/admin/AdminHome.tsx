@@ -19,6 +19,12 @@ export function AdminHome() {
             →
           </span>
         </Link>
+        <Link className="row" to="/admin/discovery" style={{ color: 'inherit' }}>
+          Discovery (fila de revisão)
+          <span className="muted" aria-hidden="true">
+            →
+          </span>
+        </Link>
       </div>
     </div>
   )

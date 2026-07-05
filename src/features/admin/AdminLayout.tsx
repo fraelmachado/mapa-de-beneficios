@@ -24,6 +24,9 @@ export function AdminLayout() {
         <Link to="/admin/benefits" className="muted" style={{ fontSize: 13, textDecoration: 'none' }}>
           Benefícios
         </Link>
+        <Link to="/admin/discovery" className="muted" style={{ fontSize: 13, textDecoration: 'none' }}>
+          Discovery
+        </Link>
         <button
           type="button"
           onClick={async () => {

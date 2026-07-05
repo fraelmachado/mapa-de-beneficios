@@ -12,6 +12,7 @@ import { AdminLayout } from './features/admin/AdminLayout'
 import { AdminHome } from './features/admin/AdminHome'
 import { AdminSources } from './features/admin/sources/AdminSources'
 import { AdminBenefits } from './features/admin/benefits/AdminBenefits'
+import { AdminDiscovery } from './features/admin/discovery/AdminDiscovery'
 
 export const router = createBrowserRouter([
   { path: '/', element: <BootstrapRoute /> },
@@ -35,6 +36,7 @@ export const router = createBrowserRouter([
           { path: '/admin', element: <AdminHome /> },
           { path: '/admin/sources', element: <AdminSources /> },
           { path: '/admin/benefits', element: <AdminBenefits /> },
+          { path: '/admin/discovery', element: <AdminDiscovery /> },
         ],
       },
     ],
