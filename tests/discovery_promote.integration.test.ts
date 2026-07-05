@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, afterAll } from 'vitest'
 import { serviceClient, adminClient, userClient } from './helpers/clients'
 
 const stamp = () => `${Date.now()}-${Math.floor(performance.now() * 1000)}`
@@ -30,6 +30,15 @@ async function candId(db: ReturnType<typeof serviceClient>, fp: string) {
   const r = await db.from('discovery_candidates').select('id').eq('fingerprint', fp).single()
   return r.data!.id as string
 }
+
+afterAll(async () => {
+  // ponytail: this test promotes rows into the real catalog tables; slugs all
+  // start with "src-" (never colliding with seed data), so a prefix delete
+  // is enough teardown. benefits/sources cascade-delete their children.
+  const db = serviceClient()
+  await db.from('benefits').delete().like('slug', 'src-%')
+  await db.from('sources').delete().like('slug', 'src-%')
+})
 
 describe('promote_discovery_candidate', () => {
   it('promove árvore de cima pra baixo: source -> item -> benefit com procedência', async () => {
