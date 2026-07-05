@@ -1,0 +1,96 @@
+-- P4: promoção transacional candidato -> catálogo. SECURITY DEFINER + gate is_admin().
+-- Uma função plpgsql roda numa transação; o lock no candidato guarda a corrida
+-- de dois admins; on conflict(slug) torna a promoção idempotente.
+
+create function promote_discovery_candidate(candidate_id uuid)
+returns uuid
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  c            public.discovery_candidates;
+  parent       public.discovery_candidates;
+  parent_id    uuid;
+  new_id       uuid;
+  p            jsonb;
+  prov         jsonb;
+  tier         jsonb;
+begin
+  if not public.is_admin() then
+    raise exception 'not authorized';
+  end if;
+
+  select * into c from public.discovery_candidates where id = candidate_id for update;
+  if not found then
+    raise exception 'candidate not found';
+  end if;
+
+  -- idempotência: já promovido -> devolve o mesmo id
+  if c.promoted_id is not null then
+    return c.promoted_id;
+  end if;
+
+  p := c.payload;
+  prov := c.provenance;
+
+  -- resolve o pai (quando houver) via parent_fingerprint: precisa estar promovido ou casado
+  if c.parent_fingerprint is not null then
+    select * into parent from public.discovery_candidates where fingerprint = c.parent_fingerprint;
+    if found then
+      parent_id := coalesce(parent.promoted_id, parent.matched_id);
+    end if;
+    if parent_id is null then
+      raise exception 'parent % not promoted yet', c.parent_fingerprint;
+    end if;
+  end if;
+
+  if c.entity_type = 'source' then
+    insert into public.sources (slug, name, source_category, kind)
+    values (p->>'slug', p->>'name', (p->>'source_category')::public.source_category,
+            coalesce((p->>'kind')::public.source_kind, 'card'))
+    on conflict (slug) do update set name = excluded.name, source_category = excluded.source_category
+    returning id into new_id;
+
+  elsif c.entity_type = 'source_item' then
+    insert into public.source_items (slug, source_id, label, display_name, card_brand, card_level, product_type,
+                                     source_url, verification_status)
+    values (p->>'slug', parent_id, p->>'label', p->>'display_name', p->>'card_brand', p->>'card_level',
+            p->>'product_type', prov->>'source_url', (prov->>'verification_status')::public.verification_status)
+    on conflict (slug) do update set label = excluded.label
+    returning id into new_id;
+
+  elsif c.entity_type = 'benefit' then
+    insert into public.benefits (slug, title, summary, category, scope, active, redemption_type, benefit_source,
+                                 long_description, program, source_url, source_name, observed_at, verification_status)
+    values (p->>'slug', p->>'title', p->>'summary', (p->>'category')::public.benefit_category,
+            coalesce((p->>'scope')::public.benefit_scope, 'nacional'), false,
+            (p->>'redemption_type')::public.redemption_type, (p->>'benefit_source')::public.benefit_source_kind,
+            p->>'long_description', p->>'program', prov->>'source_url', prov->>'source_name',
+            (prov->>'observed_at')::date, (prov->>'verification_status')::public.verification_status)
+    on conflict (slug) do update set title = excluded.title, summary = excluded.summary
+    returning id into new_id;
+
+    -- liga ao source_item pai
+    insert into public.benefit_sources (benefit_id, source_item_id)
+    values (new_id, parent_id)
+    on conflict do nothing;
+
+    -- herança de bandeira, quando informada
+    for tier in select * from jsonb_array_elements(coalesce(p->'card_tiers', '[]'::jsonb)) loop
+      insert into public.benefit_card_tiers (benefit_id, card_brand, card_level)
+      values (new_id, tier->>'card_brand', tier->>'card_level')
+      on conflict do nothing;
+    end loop;
+  end if;
+
+  update public.discovery_candidates
+     set promoted_id = new_id, promoted_at = now(), review_status = 'approved'
+   where id = candidate_id;
+
+  return new_id;
+end;
+$$;
+
+grant execute on function promote_discovery_candidate(uuid) to authenticated;
+grant execute on function promote_discovery_candidate(uuid) to service_role;

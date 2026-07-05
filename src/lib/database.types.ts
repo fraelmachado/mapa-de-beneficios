@@ -627,6 +627,10 @@ export type Database = {
         }
       }
       is_admin: { Args: never; Returns: boolean }
+      promote_discovery_candidate: {
+        Args: { candidate_id: string }
+        Returns: string
+      }
       replace_user_sources: { Args: { item_ids: string[] }; Returns: undefined }
     }
     Enums: {
