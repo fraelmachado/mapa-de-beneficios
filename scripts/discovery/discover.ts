@@ -1,7 +1,14 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { candidatesTreeSchema } from './candidatesSchema'
+import { createClient } from '@supabase/supabase-js'
+import { mkdtemp, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { config as loadEnv } from 'dotenv'
+import { candidatesTreeSchema, candidatesJsonSchema } from './candidatesSchema'
 import { flattenTree } from './flatten'
 import { loadCatalogSnapshot } from './catalogSnapshot'
+import { runCodex } from './runCodex'
+import { SOURCE_CATEGORY_TAXONOMY } from './taxonomy'
 
 export interface RunJobDeps {
   db: SupabaseClient
@@ -24,28 +31,26 @@ export async function runJob(deps: RunJobDeps): Promise<{ status: 'done' | 'erro
     const parsed = candidatesTreeSchema.safeParse(raw)
     if (parsed.success) {
       const snap = await loadCatalogSnapshot(db)
-      const flat = flattenTree(parsed.data, snap).map((c) => ({ ...c, job_id: job.id, review_status: 'pending' as const }))
+      // review_status NÃO é setado aqui: default 'pending' do DB cobre novas linhas;
+      // rediscovery via upsert (onConflict fingerprint) não deve resetar review já feito.
+      const flat = flattenTree(parsed.data, snap).map((c) => ({ ...c, job_id: job.id }))
       // upsert idempotente por fingerprint
       const up = await db.from('discovery_candidates').upsert(flat as never, { onConflict: 'fingerprint' })
       if (up.error) throw up.error
-      await db.from('discovery_jobs').update({ status: 'done' }).eq('id', job.id)
+      const { error: doneError } = await db.from('discovery_jobs').update({ status: 'done' }).eq('id', job.id)
+      if (doneError) throw doneError
       return { status: 'done', jobId: job.id }
     }
     attemptErrors = JSON.stringify(parsed.error.issues)
   }
 
-  await db.from('discovery_jobs').update({ status: 'error', error: attemptErrors }).eq('id', job.id)
+  const { error: errorUpdateError } = await db
+    .from('discovery_jobs')
+    .update({ status: 'error', error: attemptErrors })
+    .eq('id', job.id)
+  if (errorUpdateError) throw errorUpdateError
   return { status: 'error', jobId: job.id }
 }
-
-import { createClient } from '@supabase/supabase-js'
-import { mkdtemp, writeFile } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
-import { config as loadEnv } from 'dotenv'
-import { candidatesJsonSchema } from './candidatesSchema'
-import { runCodex } from './runCodex'
-import { SOURCE_CATEGORY_TAXONOMY } from './taxonomy'
 
 async function main() {
   loadEnv({ path: '.env.local' })

@@ -80,6 +80,50 @@ describe('runJob', () => {
     expect((cands.data ?? []).length).toBe(0)
   })
 
+  it('re-discovery não reseta review_status já revisado (upsert preserva approved)', async () => {
+    const db = serviceClient()
+    await db.from('discovery_jobs').update({ status: 'done' }).eq('status', 'pending')
+    const name = `Rediscover ${stamp()}`
+
+    const jobA = await db.from('discovery_jobs').insert({ brief: name }).select('id').single()
+    const resA = await runJob({
+      db, worker: 'test', workdir: '/tmp/ignored',
+      runAgent: async () => fixtureTree(name),
+    })
+    expect(resA.status).toBe('done')
+
+    const candsA = await db
+      .from('discovery_candidates')
+      .select('fingerprint')
+      .eq('job_id', jobA.data!.id)
+    const fp = candsA.data![0].fingerprint
+
+    const approved = await db
+      .from('discovery_candidates')
+      .update({ review_status: 'approved' })
+      .eq('fingerprint', fp)
+      .select('review_status')
+      .single()
+    expect(approved.error).toBeNull()
+    expect(approved.data!.review_status).toBe('approved')
+
+    await db.from('discovery_jobs').insert({ brief: name })
+    const resB = await runJob({
+      db, worker: 'test', workdir: '/tmp/ignored',
+      runAgent: async () => fixtureTree(name),
+    })
+    expect(resB.status).toBe('done')
+
+    const after = await db
+      .from('discovery_candidates')
+      .select('review_status, job_id')
+      .eq('fingerprint', fp)
+      .single()
+    expect(after.error).toBeNull()
+    expect(after.data!.review_status).toBe('approved')
+    expect(after.data!.job_id).toBe(resB.jobId)
+  })
+
   it('claim_discovery_job reivindica um pending e o segundo claim não repega o mesmo', async () => {
     const db = serviceClient()
 
