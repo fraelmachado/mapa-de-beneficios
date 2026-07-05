@@ -4,7 +4,7 @@ import { serviceClient, adminClient, userClient } from './helpers/clients'
 const stamp = () => `${Date.now()}-${Math.floor(performance.now() * 1000)}`
 
 async function seedTree(db: ReturnType<typeof serviceClient>, tag: string) {
-  const job = await db.from('discovery_jobs').insert({ brief: `P-${tag}` }).select('id').single()
+  const job = await db.from('discovery_jobs').insert({ brief: `P-${tag}`, status: 'done' }).select('id').single()
   const jobId = job.data!.id
   const srcSlug = `src-${tag}`, itemSlug = `src-${tag}-nacional`, benSlug = `src-${tag}-nacional-farmacia`
   const srcFp = `source|${srcSlug}`, itemFp = `source_item|${srcSlug}|nacional`, benFp = `benefit|${itemSlug}|farmacia`
@@ -38,6 +38,8 @@ afterAll(async () => {
   const db = serviceClient()
   await db.from('benefits').delete().like('slug', 'src-%')
   await db.from('sources').delete().like('slug', 'src-%')
+  // candidates cascade via job_id on delete cascade
+  await db.from('discovery_jobs').delete().like('brief', 'P-%')
 })
 
 describe('promote_discovery_candidate', () => {
