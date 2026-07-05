@@ -35,7 +35,6 @@ function Node({
 export function CandidateTree({
   candidates, onPromote, onReject,
 }: {
-  jobId: string
   candidates: DiscoveryCandidate[]
   onPromote: (id: string) => void
   onReject: (id: string) => void

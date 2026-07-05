@@ -19,7 +19,7 @@ const candidates: DiscoveryCandidate[] = [
 
 describe('CandidateTree', () => {
   it('renderiza a árvore source -> item -> benefit', () => {
-    render(<CandidateTree jobId="j" candidates={candidates} onPromote={vi.fn()} onReject={vi.fn()} />)
+    render(<CandidateTree candidates={candidates} onPromote={vi.fn()} onReject={vi.fn()} />)
     expect(screen.getByText('Unimed')).toBeInTheDocument()
     expect(screen.getByText('Nacional')).toBeInTheDocument()
     expect(screen.getByText('Farmácia')).toBeInTheDocument()
@@ -27,14 +27,14 @@ describe('CandidateTree', () => {
 
   it('Aprovar chama onPromote com o id do candidato', () => {
     const onPromote = vi.fn()
-    render(<CandidateTree jobId="j" candidates={candidates} onPromote={onPromote} onReject={vi.fn()} />)
+    render(<CandidateTree candidates={candidates} onPromote={onPromote} onReject={vi.fn()} />)
     fireEvent.click(screen.getAllByRole('button', { name: /aprovar/i })[0])
     expect(onPromote).toHaveBeenCalledWith('s1')
   })
 
   it('esconde ações de um candidato já aprovado', () => {
     const approved = [base({ id: 's1', payload: { name: 'Unimed' }, review_status: 'approved' })]
-    render(<CandidateTree jobId="j" candidates={approved} onPromote={vi.fn()} onReject={vi.fn()} />)
+    render(<CandidateTree candidates={approved} onPromote={vi.fn()} onReject={vi.fn()} />)
     expect(screen.queryByRole('button', { name: /aprovar/i })).not.toBeInTheDocument()
   })
 })

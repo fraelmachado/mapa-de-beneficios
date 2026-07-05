@@ -9,6 +9,8 @@ const BENEFIT_SCOPE = ['nacional', 'regional', 'pontual'] as const
 const BENEFIT_SOURCE_KIND = ['issuer', 'card_network', 'partner', 'mixed'] as const
 const VERIFICATION_STATUS = ['official_confirmed', 'official_needs_regulation_check', 'partner_network',
   'inferred_from_card_network', 'needs_manual_validation'] as const
+const REDEMPTION_TYPE = ['automatic', 'app', 'coupon', 'partner_portal', 'insurance_claim', 'certificate',
+  'concierge', 'physical_access', 'points_exchange', 'statement_credit', 'other'] as const
 
 const url = z.string().url()
 
@@ -17,14 +19,14 @@ const benefitNode = z.object({
   summary: z.string().min(1),
   category: z.enum(BENEFIT_CATEGORY),
   scope: z.enum(BENEFIT_SCOPE).optional(),
-  redemption_type: z.string().optional(),
+  redemption_type: z.enum(REDEMPTION_TYPE).optional(),
   benefit_source: z.enum(BENEFIT_SOURCE_KIND).optional(),
   long_description: z.string().optional(),
   program: z.string().optional(),
   card_tiers: z.array(z.object({ card_brand: z.string(), card_level: z.string() })).optional(),
   source_url: url,
   source_name: z.string().optional(),
-  observed_at: z.string().optional(), // ISO date
+  observed_at: z.string().date().optional(), // ISO date (YYYY-MM-DD, casts para ::date no DB)
   verification_status: z.enum(VERIFICATION_STATUS).optional(),
 })
 
@@ -99,7 +101,7 @@ export const candidatesJsonSchema = {
                       summary: { type: 'string' },
                       category: { type: 'string', enum: [...BENEFIT_CATEGORY] },
                       scope: { type: 'string', enum: [...BENEFIT_SCOPE] },
-                      redemption_type: { type: 'string' },
+                      redemption_type: { type: 'string', enum: [...REDEMPTION_TYPE] },
                       benefit_source: { type: 'string', enum: [...BENEFIT_SOURCE_KIND] },
                       long_description: { type: 'string' },
                       program: { type: 'string' },
@@ -114,7 +116,7 @@ export const candidatesJsonSchema = {
                       },
                       source_url: { type: 'string' },
                       source_name: { type: 'string' },
-                      observed_at: { type: 'string' },
+                      observed_at: { type: 'string', format: 'date' },
                       verification_status: { type: 'string', enum: [...VERIFICATION_STATUS] },
                     },
                   },

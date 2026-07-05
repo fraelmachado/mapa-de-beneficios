@@ -26,7 +26,7 @@ describe('runJob', () => {
     const job = await db.from('discovery_jobs').insert({ brief: name }).select('id').single()
 
     const res = await runJob({
-      db, worker: 'test', workdir: '/tmp/ignored',
+      db, worker: 'test',
       runAgent: async () => fixtureTree(name),
     })
     expect(res.status).toBe('done')
@@ -54,7 +54,7 @@ describe('runJob', () => {
     await db.from('discovery_jobs').insert({ brief: name }).select('id').single()
     let calls = 0
     const res = await runJob({
-      db, worker: 'test', workdir: '/tmp/ignored',
+      db, worker: 'test',
       runAgent: async () => {
         calls += 1
         return calls === 1 ? { sources: [{ name, source_category: 'NOPE' }] } : fixtureTree(name)
@@ -70,7 +70,7 @@ describe('runJob', () => {
     const name = `Bad ${stamp()}`
     const job = await db.from('discovery_jobs').insert({ brief: name }).select('id').single()
     const res = await runJob({
-      db, worker: 'test', workdir: '/tmp/ignored',
+      db, worker: 'test',
       runAgent: async () => ({ sources: [{ name, source_category: 'NOPE' }] }),
     })
     expect(res.status).toBe('error')
@@ -87,7 +87,7 @@ describe('runJob', () => {
 
     const jobA = await db.from('discovery_jobs').insert({ brief: name }).select('id').single()
     const resA = await runJob({
-      db, worker: 'test', workdir: '/tmp/ignored',
+      db, worker: 'test',
       runAgent: async () => fixtureTree(name),
     })
     expect(resA.status).toBe('done')
@@ -109,7 +109,7 @@ describe('runJob', () => {
 
     await db.from('discovery_jobs').insert({ brief: name })
     const resB = await runJob({
-      db, worker: 'test', workdir: '/tmp/ignored',
+      db, worker: 'test',
       runAgent: async () => fixtureTree(name),
     })
     expect(resB.status).toBe('done')

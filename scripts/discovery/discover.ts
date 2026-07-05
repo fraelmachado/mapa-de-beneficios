@@ -13,7 +13,6 @@ import { SOURCE_CATEGORY_TAXONOMY } from './taxonomy'
 export interface RunJobDeps {
   db: SupabaseClient
   worker: string
-  workdir: string
   runAgent: (job: { id: string; brief: string }, ctx: { attemptErrors: string | null }) => Promise<unknown>
 }
 
@@ -61,7 +60,7 @@ async function main() {
 
   for (;;) {
     const res = await runJob({
-      db, worker, workdir: tmpdir(),
+      db, worker,
       runAgent: async (job, ctx) => {
         // dir de trabalho ISOLADO fora do repo (scratchpad)
         const wd = await mkdtemp(join(tmpdir(), 'discover-'))

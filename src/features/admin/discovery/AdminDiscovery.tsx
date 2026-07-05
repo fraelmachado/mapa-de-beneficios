@@ -53,7 +53,6 @@ export function AdminDiscovery() {
       {selected ? (
         candidates.isLoading ? <p className="muted">Carregando…</p> : (
           <CandidateTree
-            jobId={selected}
             candidates={candidates.data ?? []}
             onPromote={(id) => promote.mutate(id)}
             onReject={(id) => reject.mutate(id)}

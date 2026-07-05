@@ -59,4 +59,23 @@ describe('candidatesTreeSchema', () => {
     expect(candidatesJsonSchema).toHaveProperty('properties.sources')
     expect(candidatesJsonSchema).toHaveProperty('type', 'object')
   })
+
+  it('rejeita redemption_type fora do enum do DB', () => {
+    const bad = structuredClone(validTree)
+    ;(bad.sources[0].items[0].benefits[0] as { redemption_type?: string }).redemption_type = 'not_a_real_type'
+    expect(candidatesTreeSchema.safeParse(bad).success).toBe(false)
+  })
+
+  it('aceita redemption_type e observed_at válidos (castáveis no DB)', () => {
+    const ok = structuredClone(validTree) as { sources: Array<{ items: Array<{ benefits: Array<Record<string, unknown>> }> }> }
+    ok.sources[0].items[0].benefits[0].redemption_type = 'statement_credit'
+    ok.sources[0].items[0].benefits[0].observed_at = '2026-07-01'
+    expect(candidatesTreeSchema.safeParse(ok).success).toBe(true)
+  })
+
+  it('rejeita observed_at que não é ISO date (ex: "julho/2026")', () => {
+    const bad = structuredClone(validTree) as { sources: Array<{ items: Array<{ benefits: Array<Record<string, unknown>> }> }> }
+    bad.sources[0].items[0].benefits[0].observed_at = 'julho/2026'
+    expect(candidatesTreeSchema.safeParse(bad).success).toBe(false)
+  })
 })
