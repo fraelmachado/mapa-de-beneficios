@@ -60,14 +60,14 @@ export type BenefitNode = z.infer<typeof benefitNode>
 export const candidatesJsonSchema = {
   type: 'object',
   additionalProperties: false,
-  required: ['sources'],
+  required: [],
   properties: {
     sources: {
       type: 'array',
       items: {
         type: 'object',
         additionalProperties: false,
-        required: ['name', 'source_category', 'source_url', 'items'],
+        required: ['name', 'source_category', 'source_url'],
         properties: {
           name: { type: 'string' },
           source_category: { type: 'string', enum: [...SOURCE_CATEGORY] },
@@ -79,7 +79,7 @@ export const candidatesJsonSchema = {
             items: {
               type: 'object',
               additionalProperties: false,
-              required: ['label', 'source_url', 'benefits'],
+              required: ['label', 'source_url'],
               properties: {
                 label: { type: 'string' },
                 card_brand: { type: 'string' },

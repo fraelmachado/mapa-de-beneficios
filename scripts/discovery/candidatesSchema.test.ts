@@ -49,6 +49,12 @@ describe('candidatesTreeSchema', () => {
     expect(candidatesTreeSchema.safeParse(bad).success).toBe(false)
   })
 
+  it('aceita source sem items (default para array vazio)', () => {
+    const tree = structuredClone(validTree)
+    delete (tree.sources[0] as { items?: unknown }).items
+    expect(candidatesTreeSchema.safeParse(tree).success).toBe(true)
+  })
+
   it('exporta um JSON Schema com a raiz sources', () => {
     expect(candidatesJsonSchema).toHaveProperty('properties.sources')
     expect(candidatesJsonSchema).toHaveProperty('type', 'object')
