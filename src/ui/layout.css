@@ -1,7 +1,8 @@
 /* ============================================================
-   Shell responsivo do app (Painel/Buscar/Perfil)
-   Espelha o PAINEL_TEMPLATE_REFERENCE do design-system-source:
-   coluna única + tabbar no mobile; sidebar + grid no desktop.
+   Shell responsivo do app (Painel/Buscar/Perfil). Mobile-first:
+   coluna única + tabbar no mobile; desktop = expansão responsiva
+   (sidebar + grid). Referência de design = Claude Design (fonte
+   absoluta) — docs/mockups/design_handoff_mockups/.
    ============================================================ */
 .app { min-height: 100vh; background: var(--bg); }
 
