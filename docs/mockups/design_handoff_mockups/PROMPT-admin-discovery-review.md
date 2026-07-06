@@ -22,13 +22,19 @@ de revisão. Esta tela é onde a curadora (admin) revisa esses candidatos e **ap
 rejeita cada um**; só o que ela aprova entra no catálogo real. A máquina nunca escreve no
 catálogo sem aprovação humana.
 
+**MOBILE-FIRST (regra central do produto):** desenhe a versão **mobile primeiro** — ela é
+a fonte da verdade. A versão **desktop é a expansão responsiva da MESMA tela mobile**
+(a coluna única cresce, a sidebar aparece, as ações reposicionam), **não** um design
+desktop separado. Toda decisão de layout começa no mobile e depois se adapta pra cima.
+
 **Consistência obrigatória (idêntica às telas admin já feitas — ver "Fontes e variantes"
 e "Benefícios"):**
-- Mesmo shell responsivo do Admin: **sidebar** à esquerda (logo no topo; itens de menu
-  **Painel · Fontes · Benefícios · Discovery**, com **Discovery ativo**; usuária no
-  rodapé). Conteúdo à direita começando com o eyebrow **"CATÁLOGO"** + `<h1>`.
-- Responsivo por `@container`, breakpoint **760px**: abaixo = coluna única (sem sidebar,
-  bottom nav); acima = sidebar 256px + conteúdo.
+- **Mobile (padrão):** coluna única, navegação inferior (bottom nav), sem sidebar.
+  Conteúdo começando com o eyebrow **"CATÁLOGO"** + `<h1>`.
+- **Desktop (≥760px, expansão responsiva):** a mesma tela ganha a **sidebar** 256px à
+  esquerda (logo no topo; itens **Painel · Fontes · Benefícios · Discovery**, com
+  **Discovery ativo**; usuária no rodapé) + conteúdo à direita. A bottom nav some.
+- Responsivo por `@container`, breakpoint **760px** — mobile abaixo, desktop acima.
 - Use os componentes/classes do DS (`styles.css` + `_ds_bundle.js`): **Button**
   (primary/ghost), **Chip**, **Row**, **Input**, **Alert**. Tema claro/escuro via
   `[data-theme]`.
