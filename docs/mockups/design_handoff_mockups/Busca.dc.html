@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/mapa-de-benef-cios-80471905-a90c-46a6-a492-cefadd7a0b6b/styles.css">
+  <script src="_ds/mapa-de-benef-cios-80471905-a90c-46a6-a492-cefadd7a0b6b/_ds_bundle.js"></script>
+  <style>
+    html,body{margin:0}
+    @keyframes bq-rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .bq-scroll::-webkit-scrollbar{width:0;height:0}
+  </style>
+</helmet>
+<div data-theme="{{ theme }}" style="position:relative;width:980px;height:1040px;background:#e9e8e3;font-family:var(--font)">
+
+  <!-- title / context panel -->
+  <div style="position:absolute;left:40px;top:96px;width:360px;z-index:2">
+    <a href="Fluxo do App.dc.html" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:14px;font-size:12.5px;font-weight:700;color:var(--ink-2);text-decoration:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="11 6 5 12 11 18"/></svg> Fluxo do app</a>
+    <p style="margin:0 0 6px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">Tela · 06</p>
+    <h1 style="margin:0 0 12px;font-size:34px;font-weight:800;line-height:1.06;letter-spacing:-.03em;color:var(--ink)">Buscar benefícios</h1>
+    <p style="margin:0 0 20px;font-size:14.5px;line-height:1.55;color:var(--ink-2);text-wrap:pretty">Aba do menu inferior, logo após o Painel. Busca ao vivo por todo o catálogo do radar — digite ou filtre por categoria. Quando nada casa, cai no estado vazio (tela 07).</p>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;gap:11px;align-items:flex-start">
+        <span style="flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:8px;background:var(--accent-soft);color:var(--accent)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></span>
+        <div><div style="font-size:13.5px;font-weight:700;color:var(--ink)">Busca ao vivo</div><div style="font-size:12.5px;color:var(--ink-2);line-height:1.45">Filtra por título, cartão e descrição a cada tecla.</div></div>
+      </div>
+      <div style="display:flex;gap:11px;align-items:flex-start">
+        <span style="flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:8px;background:color-mix(in srgb,var(--c-viagem) 16%,transparent);color:var(--c-viagem)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg></span>
+        <div><div style="font-size:13.5px;font-weight:700;color:var(--ink)">Filtro por categoria</div><div style="font-size:12.5px;color:var(--ink-2);line-height:1.45">Chips combinam com o texto digitado.</div></div>
+      </div>
+      <div style="display:flex;gap:11px;align-items:flex-start">
+        <span style="flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:8px;background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="16" x2="12" y2="16"/></svg></span>
+        <div><div style="font-size:13.5px;font-weight:700;color:var(--ink)">Estado vazio integrado</div><div style="font-size:12.5px;color:var(--ink-2);line-height:1.45">Experimente buscar <b style="color:var(--ink)">"pet"</b> pra ver.</div></div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border-radius:999px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);font-size:12.5px;font-weight:600;color:var(--ink-2)"><span style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></span> Protótipo interativo — pode digitar</div>
+  </div>
+
+  <!-- phone -->
+  <div style="position:absolute;left:508px;top:56px;display:flex;flex-direction:column;align-items:center;gap:16px">
+    <div style="display:flex;align-items:center;gap:8px;font:700 12px var(--font);color:#6b6c72">
+      <span style="display:grid;place-items:center;width:22px;height:22px;border-radius:7px;background:#0c0d10;color:#fff;font-size:11px;font-weight:700">06</span>
+      Buscar
+    </div>
+
+    <div style="position:relative;width:390px;height:820px;border-radius:46px;background:#0c0d10;padding:11px;box-shadow:0 40px 80px -30px rgba(12,13,16,.55),0 0 0 1px rgba(255,255,255,.04) inset">
+      <div data-screen-label="Buscar" style="position:relative;width:100%;height:100%;border-radius:36px;overflow:hidden;background:var(--bg);display:flex;flex-direction:column">
+
+        <!-- status bar -->
+        <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:14px 26px 8px;font-size:14px;font-weight:700;color:var(--ink);background:var(--bg);z-index:3">
+          <span>9:41</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <svg width="17" height="11" viewBox="0 0 17 11" fill="var(--ink)"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+            <svg width="16" height="11" viewBox="0 0 16 12" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"><path d="M1 4.2C4.8 1 11.2 1 15 4.2"/><path d="M3.4 6.7C6 4.6 10 4.6 12.6 6.7"/><path d="M6 9.2c1.2-1 3.8-1 5 0"/></svg>
+            <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0.5" y="0.5" width="21" height="11" rx="3" fill="none" stroke="var(--ink)" stroke-opacity=".4"/><rect x="2" y="2" width="16" height="8" rx="1.5" fill="var(--ink)"/><rect x="23" y="4" width="1.6" height="4" rx="1" fill="var(--ink)" fill-opacity=".4"/></svg>
+          </div>
+        </div>
+
+        <!-- sticky header: title + search + chips -->
+        <div style="position:relative;padding:6px 20px 12px;background:var(--bg);z-index:2;border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent)">
+          <h1 style="margin:2px 0 14px;font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--ink)">Buscar</h1>
+
+          <label class="input" style="margin:0;display:flex;align-items:center;gap:9px">
+            <span class="muted" aria-hidden="true" style="display:flex"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></span>
+            <input type="search" placeholder="buscar benefício, cartão…" aria-label="Buscar benefício" value="{{ query }}" onChange="{{ onQuery }}" style="flex:1;border:0;background:transparent;outline:none;font:inherit;font-size:15px;color:var(--ink)"/>
+            <sc-if value="{{ hasQuery }}" hint-placeholder-val="{{ false }}">
+              <button type="button" aria-label="Limpar busca" onClick="{{ clearQuery }}" style="flex:none;display:grid;place-items:center;width:22px;height:22px;border:0;border-radius:50%;background:var(--surface-2);color:var(--ink-2);cursor:pointer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+            </sc-if>
+          </label>
+
+          <div class="chips bq-scroll" role="group" aria-label="Filtrar por categoria" style="margin-top:12px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px">
+            <sc-for list="{{ chips }}" as="c" hint-placeholder-count="6">
+              <button class="{{ c.cls }}" type="button" aria-pressed="{{ c.pressed }}" onClick="{{ c.select }}" style="flex:none"><sc-if value="{{ c.dotCls }}" hint-placeholder-val="{{ true }}"><i class="{{ c.dotCls }}"></i></sc-if> {{ c.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- scroll area: results -->
+        <div class="bq-scroll" style="position:relative;flex:1;overflow-y:auto;padding:14px 20px 18px">
+
+          <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <p style="margin:0;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)">{{ countLabel }}</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ results }}" as="p" hint-placeholder-count="4">
+                <x-import component-from-global-scope="MapaDeBenefCios_804719.Pass" category="{{ p.category }}" via="{{ p.via }}" title="{{ p.title }}" desc="{{ p.desc }}" tag="{{ p.tag }}" is-new="{{ p.isNew }}" origin-type="{{ p.originType }}" origin-label="{{ p.originLabel }}" href="#" hint-size="100%,150px"></x-import>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:44px 16px 10px;animation:bq-rise .3s ease both">
+              <span style="display:grid;place-items:center;width:72px;height:72px;border-radius:22px;background:var(--surface-2);color:var(--muted);margin-bottom:20px"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/><line x1="8" y1="11" x2="14" y2="11"/></svg></span>
+              <h2 style="margin:0 0 8px;font-size:19px;font-weight:800;letter-spacing:-.02em;color:var(--ink)">Nada encontrado</h2>
+              <p style="margin:0 0 22px;font-size:13.5px;line-height:1.5;color:var(--ink-2);max-width:260px">Não achamos benefícios para <b style="color:var(--ink)">"{{ query }}"</b>. Tente outro termo ou remova os filtros.</p>
+              <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Sugestões</p>
+              <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:280px">
+                <sc-for list="{{ suggestions }}" as="s" hint-placeholder-count="4">
+                  <button class="chip" type="button" onClick="{{ s.apply }}" style="flex:none">{{ s.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+        </div>
+
+        <!-- tabbar -->
+        <div style="position:relative;padding:8px 18px 4px;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(12px);border-top:1px solid var(--line);z-index:2">
+          <nav class="nav" style="border:0;border-radius:0;background:transparent;padding:4px 0" aria-label="Principal">
+            <a href="#"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span> Painel</a>
+            <a href="#" aria-current="page"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></span> Buscar</a>
+            <a href="#"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span> Perfil</a>
+          </nav>
+          <div style="display:flex;justify-content:center;padding:6px 0 4px"><span style="width:128px;height:5px;border-radius:999px;background:var(--ink);opacity:.85"></span></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light'|'dark'&quot;}}">
+class Component extends DCLogic {
+  state = { query: '', activeCat: 'all' };
+
+  cats = [
+    { key: 'all', label: 'Todos' },
+    { key: 'viagem', label: 'Viagem', color: '--c-viagem' },
+    { key: 'airport', label: 'Aeroporto', color: '--c-airport' },
+    { key: 'seguro', label: 'Seguros', color: '--c-seguro' },
+    { key: 'cashback', label: 'Cashback', color: '--c-cashback' },
+    { key: 'compras', label: 'Compras', color: '--c-compras' },
+    { key: 'pontos', label: 'Pontos', color: '--c-pontos' },
+  ];
+
+  all = [
+    { category: 'compras', via: 'Inter Prime', title: 'Compra Protegida Mastercard Black', desc: 'Reembolso por roubo e/ou danos acidentais em itens elegíveis.', tag: 'mastercard black', originType: 'bandeira', originLabel: 'Bandeira · Mastercard' },
+    { category: 'airport', via: 'Inter Prime', title: 'Salas VIP Inter para clientes Prime', desc: 'Acesso às Salas VIP Inter em aeroportos informados no Inter Prime.', tag: 'Aeroporto', originType: 'emissor', originLabel: 'Emissor · Inter' },
+    { category: 'viagem', via: 'Inter Prime', title: 'Mastercard Concierge Black', desc: 'Concierge para viagens, restaurantes, entretenimento e assistência.', tag: 'Viagem', originType: 'bandeira', originLabel: 'Bandeira · Mastercard' },
+    { category: 'airport', via: 'Nubank Ultravioleta', title: '4 acessos Priority Pass por ano', desc: '+1.700 salas VIP em 145 países, com convidado.', isNew: true, originType: 'emissor', originLabel: 'Emissor · Nubank' },
+    { category: 'seguro', via: 'XP Infinite', title: 'Seguro para veículos de locadora', desc: 'Cobertura ao pagar a locação com o cartão.', tag: 'Seguros', originType: 'bandeira', originLabel: 'Bandeira · Visa Infinite' },
+    { category: 'viagem', via: 'C6 Carbon', title: 'Seguro-viagem internacional', desc: 'Até US$ 100 mil em despesas médicas no exterior.', tag: 'Viagem', originType: 'emissor', originLabel: 'Emissor · C6' },
+    { category: 'cashback', via: 'Itaú Personnalité', title: '5% de cashback em viagens', desc: 'Crédito na fatura do mês seguinte em gastos de viagem.', tag: 'Cashback', originType: 'emissor', originLabel: 'Emissor · Itaú' },
+    { category: 'compras', via: 'Bradesco Aeternum', title: 'Garantia Estendida Visa Infinite', desc: '+1 ano sobre a garantia original do fabricante.', tag: 'Compras', originType: 'bandeira', originLabel: 'Bandeira · Visa' },
+    { category: 'pontos', via: 'Itaú Personnalité', title: 'Pontos que não expiram', desc: 'Acúmulo sem prazo de validade no programa de pontos.', tag: 'Pontos', originType: 'emissor', originLabel: 'Emissor · Itaú' },
+    { category: 'airport', via: 'Bradesco Aeternum', title: 'GRU Lounge — Terminal 3', desc: '2 acessos por mês para você e um convidado.', tag: 'Aeroporto', originType: 'parceiro', originLabel: 'Parceiro · GRU' },
+  ];
+
+  norm(s) {
+    return (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  renderVals() {
+    const { query, activeCat } = this.state;
+    const q = this.norm(query.trim());
+
+    const chips = this.cats.map((c) => ({
+      label: c.label,
+      dotCls: c.color ? `cat-${c.key}` : null,
+      cls: c.key === activeCat ? 'chip on' : 'chip',
+      pressed: c.key === activeCat,
+      select: () => this.setState({ activeCat: c.key }),
+    }));
+
+    let results = this.all.slice();
+    if (activeCat !== 'all') results = results.filter((p) => p.category === activeCat);
+    if (q) results = results.filter((p) => this.norm(`${p.title} ${p.desc} ${p.via} ${p.tag || ''}`).includes(q));
+
+    const suggestions = ['Salas VIP', 'Seguro viagem', 'Cashback', 'Concierge'].map((label) => ({
+      label,
+      apply: () => this.setState({ query: label, activeCat: 'all' }),
+    }));
+
+    const n = results.length;
+
+    return {
+      theme: this.props.theme || 'light',
+      query,
+      hasQuery: query.length > 0,
+      onQuery: (e) => this.setState({ query: e.target.value }),
+      clearQuery: () => this.setState({ query: '' }),
+      chips,
+      results,
+      hasResults: n > 0,
+      isEmpty: n === 0,
+      countLabel: n === 1 ? '1 resultado' : `${n} resultados`,
+      suggestions,
+    };
+  }
+}
+</script>
+</body>
+</html>

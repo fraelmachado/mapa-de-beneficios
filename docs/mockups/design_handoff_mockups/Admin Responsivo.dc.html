@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/mapa-de-benef-cios-80471905-a90c-46a6-a492-cefadd7a0b6b/styles.css">
+  <script src="_ds/mapa-de-benef-cios-80471905-a90c-46a6-a492-cefadd7a0b6b/_ds_bundle.js"></script>
+  <style>html,body{margin:0}</style>
+</helmet>
+<div data-theme="{{ theme }}" style="width:1880px;background:#e9e8e3;font-family:var(--font);padding:56px 60px 80px;box-sizing:border-box">
+
+  <div style="max-width:880px;margin-bottom:34px">
+    <p style="margin:0 0 6px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">Mapa de Benefícios · Admin</p>
+    <h1 style="margin:0 0 12px;font-size:38px;font-weight:800;line-height:1.05;letter-spacing:-.03em;color:var(--ink)">Admin responsivo</h1>
+    <p style="margin:0;font-size:15px;line-height:1.55;color:var(--ink-2);text-wrap:pretty">Um <b style="color:var(--ink)">único componente</b> (<code style="font-family:ui-monospace,monospace;font-size:13px;background:var(--surface-2);padding:2px 6px;border-radius:6px">Admin App</code>) renderizado nas duas larguras. Mobile-first: a base é a coluna única com bottom nav e bottom sheet; ao passar de <b style="color:var(--ink)">760px</b> ela expande para sidebar + tabelas + modal centralizado. É o mesmo código, sem telas duplicadas — os dois quadros abaixo são a mesma peça, só que em contêineres de largura diferente. Interaja em qualquer um: login, navegação, busca e cadastro funcionam.</p>
+  </div>
+
+  <div style="display:flex;gap:64px;align-items:flex-start">
+
+    <!-- MOBILE -->
+    <div style="flex:none;display:flex;flex-direction:column;align-items:center;gap:14px">
+      <div style="display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:700;color:var(--ink-2)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2.5"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
+        Mobile · <span style="color:var(--muted);font-weight:600">390px · &lt; 760px</span>
+      </div>
+      <div style="position:relative;width:390px;height:820px;border-radius:46px;background:#0c0d10;padding:11px;box-shadow:0 40px 80px -30px rgba(12,13,16,.55),0 0 0 1px rgba(255,255,255,.04) inset">
+        <div style="position:relative;width:100%;height:100%;border-radius:36px;overflow:hidden;background:var(--bg)">
+          <dc-import name="Admin App" theme="{{ theme }}" style="display:block;width:100%;height:100%" hint-size="100%,100%"></dc-import>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESKTOP -->
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:14px">
+      <div style="display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:700;color:var(--ink-2)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--c-seguro)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Desktop · <span style="color:var(--muted);font-weight:600">1280px · ≥ 760px</span>
+      </div>
+      <x-import component-from-global-scope="ChromeWindow" from="./browser-window.jsx" dc-props="{{ win }}" hint-size="1280px,820px">
+        <div style="width:100%;height:100%"><dc-import name="Admin App" theme="{{ theme }}" style="display:block;width:100%;height:100%" hint-size="100%,100%"></dc-import></div>
+      </x-import>
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light'|'dark'&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const theme = this.props.theme || 'light';
+    return {
+      theme,
+      win: { url: 'admin.mapadebeneficios.com.br/painel', tabs: [{ title: 'Admin — Mapa de Benefícios' }], width: 1280, height: 820 },
+    };
+  }
+}
+</script>
+</body>
+</html>

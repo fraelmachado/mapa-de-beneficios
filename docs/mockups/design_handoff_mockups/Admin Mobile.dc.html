@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/mapa-de-benef-cios-80471905-a90c-46a6-a492-cefadd7a0b6b/styles.css">
+  <script src="_ds/mapa-de-benef-cios-80471905-a90c-46a6-a492-cefadd7a0b6b/_ds_bundle.js"></script>
+  <style>
+    html,body{margin:0}
+    @keyframes am-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes am-sheet{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    @keyframes am-fade{from{opacity:0}to{opacity:1}}
+    @keyframes am-toast{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
+    .am-scroll::-webkit-scrollbar{width:0;height:0}
+  </style>
+</helmet>
+<div data-theme="{{ theme }}" style="position:relative;width:520px;min-height:958px;background:#e9e8e3;font-family:var(--font);display:flex;align-items:flex-start;justify-content:center;padding:46px 0 44px;box-sizing:border-box">
+  <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:16px">
+    <div style="display:flex;align-items:center;gap:8px;font:700 12px var(--font);color:#6b6c72">
+      <span style="display:grid;place-items:center;width:22px;height:22px;border-radius:7px;background:#0c0d10;color:#fff;font-size:11px;font-weight:700">A</span>
+      Admin · mobile
+    </div>
+
+    <div style="position:relative;width:390px;height:820px;border-radius:46px;background:#0c0d10;padding:11px;box-shadow:0 40px 80px -30px rgba(12,13,16,.55),0 0 0 1px rgba(255,255,255,.04) inset">
+      <div data-screen-label="Admin Mobile" style="position:relative;width:100%;height:100%;border-radius:36px;overflow:hidden;background:var(--bg);display:flex;flex-direction:column">
+
+        <!-- status bar -->
+        <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:14px 26px 8px;font-size:14px;font-weight:700;color:var(--ink);background:var(--bg);z-index:5">
+          <span>9:41</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <svg width="17" height="11" viewBox="0 0 17 11" fill="var(--ink)"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+            <svg width="16" height="11" viewBox="0 0 16 12" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"><path d="M1 4.2C4.8 1 11.2 1 15 4.2"/><path d="M3.4 6.7C6 4.6 10 4.6 12.6 6.7"/><path d="M6 9.2c1.2-1 3.8-1 5 0"/></svg>
+            <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0.5" y="0.5" width="21" height="11" rx="3" fill="none" stroke="var(--ink)" stroke-opacity=".4"/><rect x="2" y="2" width="16" height="8" rx="1.5" fill="var(--ink)"/><rect x="23" y="4" width="1.6" height="4" rx="1" fill="var(--ink)" fill-opacity=".4"/></svg>
+          </div>
+        </div>
+
+        <!-- ============ LOGIN ============ -->
+        <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:24px 26px;background:radial-gradient(500px 300px at 50% 0%, color-mix(in srgb,var(--accent) 10%,var(--bg)), var(--bg))">
+            <div style="display:flex;align-items:center;gap:11px;margin-bottom:24px">
+              <span style="display:grid;place-items:center;width:44px;height:44px;border-radius:13px;background:var(--accent)"><svg width="24" height="24" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.5"><circle cx="8" cy="8" r="6.4"/><circle cx="8" cy="8" r="3"/><circle cx="8" cy="8" r="1" fill="#fff"/></svg></span>
+              <div><div style="font-size:16px;font-weight:800;letter-spacing:-.02em;color:var(--ink);white-space:nowrap">Mapa de Benefícios</div><div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Painel Admin</div></div>
+            </div>
+            <h1 style="margin:0 0 4px;font-size:24px;font-weight:800;letter-spacing:-.03em;color:var(--ink)">Entrar</h1>
+            <p style="margin:0 0 22px;font-size:13.5px;color:var(--ink-2)">Acesse a curadoria do catálogo.</p>
+            <p style="margin:0 0 7px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">E-mail</p>
+            <label class="input" style="margin:0 0 14px;display:flex;align-items:center;gap:9px"><span class="muted" style="display:flex"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 6.5 12 12.5 20.5 6.5"/></svg></span><input type="email" value="{{ loginEmail }}" onChange="{{ onLoginEmail }}" placeholder="voce@empresa.com" style="flex:1;border:0;background:transparent;outline:none;font:inherit;font-size:15px;color:var(--ink)"/></label>
+            <p style="margin:0 0 7px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Senha</p>
+            <label class="input" style="margin:0 0 22px;display:flex;align-items:center;gap:9px"><span class="muted" style="display:flex"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span><input type="password" value="{{ loginSenha }}" onChange="{{ onLoginSenha }}" placeholder="••••••••" style="flex:1;border:0;background:transparent;outline:none;font:inherit;font-size:15px;color:var(--ink)"/></label>
+            <button class="btn" type="button" onClick="{{ doLogin }}" style="font-size:15px;padding:15px">Entrar</button>
+            <p style="margin:16px 0 0;font-size:11.5px;color:var(--muted);text-align:center">Instalável como app · acesso restrito à curadoria</p>
+          </div>
+        </sc-if>
+
+        <!-- ============ APP ============ -->
+        <sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+
+            <!-- header -->
+            <div style="flex:none;padding:6px 20px 14px;background:var(--bg)">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                <div style="flex:1;min-width:0"><p style="margin:0 0 1px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap">{{ headerEyebrow }}</p><h1 style="margin:0;font-size:24px;font-weight:800;letter-spacing:-.03em;color:var(--ink)">{{ headerTitle }}</h1></div>
+                <sc-if value="{{ showAdd }}" hint-placeholder-val="{{ false }}">
+                  <button type="button" onClick="{{ addAction }}" aria-label="Adicionar" style="flex:none;display:grid;place-items:center;width:42px;height:42px;border:0;border-radius:13px;background:var(--ink);color:var(--surface);cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+                </sc-if>
+              </div>
+            </div>
+
+            <!-- scroll content -->
+            <div class="am-scroll" style="flex:1;overflow-y:auto;padding:2px 20px 22px;min-height:0">
+
+              <!-- PAINEL -->
+              <sc-if value="{{ isPainel }}" hint-placeholder-val="{{ false }}">
+                <div style="animation:am-in .3s ease both">
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:18px">
+                    <div style="background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:15px"><div style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)">Fontes</div><div style="font-size:28px;font-weight:800;letter-spacing:-.03em;color:var(--ink);margin-top:3px">{{ countFontes }}</div></div>
+                    <div style="background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:15px"><div style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)">Benefícios</div><div style="font-size:28px;font-weight:800;letter-spacing:-.03em;color:var(--ink);margin-top:3px">{{ countBeneficios }}</div></div>
+                    <div style="background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:15px"><div style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)">Categorias</div><div style="font-size:28px;font-weight:800;letter-spacing:-.03em;color:var(--ink);margin-top:3px">6</div></div>
+                    <div style="background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:15px"><div style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)">Novos</div><div style="font-size:28px;font-weight:800;letter-spacing:-.03em;color:var(--c-pontos);margin-top:3px">{{ countNovos }}</div></div>
+                  </div>
+                  <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Áreas de trabalho</p>
+                  <div style="display:flex;flex-direction:column;gap:11px">
+                    <div role="button" tabindex="0" onClick="{{ goFontes }}" style="position:relative;display:flex;align-items:center;gap:13px;padding:16px;border-radius:15px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);cursor:pointer">
+                      <span style="flex:none;display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:color-mix(in srgb,var(--c-seguro) 15%,var(--surface));color:var(--c-seguro)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/><path d="M9 21v-6h6v6"/></svg></span>
+                      <span style="flex:1;min-width:0"><span style="display:block;font-size:15.5px;font-weight:800;letter-spacing:-.01em;color:var(--ink)">Fontes e variantes</span><span style="display:block;font-size:12.5px;color:var(--ink-2);margin-top:1px">Emissores, bandeiras e parceiros</span></span>
+                      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>
+                    </div>
+                    <div role="button" tabindex="0" onClick="{{ goBeneficios }}" style="position:relative;display:flex;align-items:center;gap:13px;padding:16px;border-radius:15px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);cursor:pointer">
+                      <span style="flex:none;display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:color-mix(in srgb,var(--accent) 15%,var(--surface));color:var(--accent)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/></svg></span>
+                      <span style="flex:1;min-width:0"><span style="display:block;font-size:15.5px;font-weight:800;letter-spacing:-.01em;color:var(--ink)">Benefícios</span><span style="display:block;font-size:12.5px;color:var(--ink-2);margin-top:1px">Cadastro, categorias e destaque</span></span>
+                      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>
+                    </div>
+                  </div>
+                </div>
+              </sc-if>
+
+              <!-- FONTES -->
+              <sc-if value="{{ isFontes }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:10px;animation:am-in .3s ease both">
+                  <sc-for list="{{ fontes }}" as="f" hint-placeholder-count="6">
+                    <div style="display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:14px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)">
+                      <span style="flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--surface-2);color:var(--ink);font-size:13px;font-weight:800">{{ f.initials }}</span>
+                      <div style="flex:1;min-width:0" onClick="{{ f.edit }}"><div style="font-size:15px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.name }}</div><div style="display:flex;align-items:center;gap:7px;margin-top:3px"><span class="pill {{ f.pillClass }}">{{ f.typeLabel }}</span><span style="font-size:12px;color:var(--muted)">{{ f.benefits }} benefícios</span></div></div>
+                      <button type="button" onClick="{{ f.remove }}" aria-label="Remover" style="flex:none;display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:10px;background:transparent;color:var(--warn);cursor:pointer"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <!-- BENEFÍCIOS -->
+              <sc-if value="{{ isBeneficios }}" hint-placeholder-val="{{ false }}">
+                <div style="animation:am-in .3s ease both">
+                  <label class="input" style="margin:0 0 12px;display:flex;align-items:center;gap:9px"><span class="muted" style="display:flex"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></span><input type="search" value="{{ benQuery }}" onChange="{{ onBenQuery }}" placeholder="buscar benefício…" style="flex:1;border:0;background:transparent;outline:none;font:inherit;font-size:14.5px;color:var(--ink)"/></label>
+                  <div class="chips am-scroll" style="flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;margin-bottom:14px">
+                    <sc-for list="{{ catChips }}" as="c" hint-placeholder-count="7">
+                      <button type="button" class="{{ c.cls }}" onClick="{{ c.select }}" style="flex:none"><sc-if value="{{ c.dot }}" hint-placeholder-val="{{ false }}"><i class="{{ c.dot }}"></i></sc-if> {{ c.label }}</button>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:10px">
+                    <sc-for list="{{ beneficios }}" as="b" hint-placeholder-count="6">
+                      <div style="display:flex;align-items:flex-start;gap:10px;padding:14px;border-radius:14px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)">
+                        <div style="flex:1;min-width:0" onClick="{{ b.edit }}">
+                          <div style="margin-bottom:6px;font-size:14.5px;font-weight:700;color:var(--ink);line-height:1.3">{{ b.title }} <sc-if value="{{ b.isNew }}" hint-placeholder-val="{{ false }}"><span class="new" style="vertical-align:middle">novo</span></sc-if></div>
+                          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap"><span class="tag" style="{{ b.catStyle }}">{{ b.catLabel }}</span><span class="pill {{ b.pillClass }}">{{ b.originLabel }}</span></div>
+                          <div style="font-size:12px;color:var(--muted);margin-top:5px">{{ b.fonte }}</div>
+                        </div>
+                        <button type="button" onClick="{{ b.remove }}" aria-label="Remover" style="flex:none;display:grid;place-items:center;width:34px;height:34px;border:0;border-radius:10px;background:transparent;color:var(--warn);cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+                      </div>
+                    </sc-for>
+                    <sc-if value="{{ benEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:34px 12px;text-align:center;color:var(--muted);font-size:13.5px">Nenhum benefício para os filtros atuais.</div></sc-if>
+                  </div>
+                </div>
+              </sc-if>
+
+            </div>
+
+            <!-- bottom tab bar -->
+            <div style="flex:none;padding:8px 18px 4px;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(12px);border-top:1px solid var(--line);z-index:5">
+              <nav class="nav" style="border:0;border-radius:0;background:transparent;padding:4px 0" aria-label="Admin">
+                <a href="#" onClick="{{ goPainel }}" aria-current="{{ curPainel }}"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span> Painel</a>
+                <a href="#" onClick="{{ goFontes }}" aria-current="{{ curFontes }}"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/><path d="M9 21v-6h6v6"/></svg></span> Fontes</a>
+                <a href="#" onClick="{{ goBeneficios }}" aria-current="{{ curBen }}"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/></svg></span> Benefícios</a>
+              </nav>
+              <div style="display:flex;justify-content:center;padding:6px 0 4px"><span style="width:128px;height:5px;border-radius:999px;background:var(--ink);opacity:.85"></span></div>
+            </div>
+
+          </div>
+        </sc-if>
+
+        <!-- ============ BOTTOM SHEET ============ -->
+        <sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ closeModal }}" style="position:absolute;inset:0;background:rgba(10,11,14,.44);z-index:40;display:flex;flex-direction:column;justify-content:flex-end;animation:am-fade .2s ease both">
+            <div onClick="{{ stop }}" class="am-scroll" style="max-height:84%;overflow-y:auto;background:var(--surface);border-radius:26px 26px 0 0;padding:10px 22px 26px;animation:am-sheet .28s cubic-bezier(.22,1,.36,1) both">
+              <div style="display:flex;justify-content:center;padding:6px 0 14px"><span style="width:44px;height:5px;border-radius:999px;background:var(--line)"></span></div>
+
+              <!-- remove -->
+              <sc-if value="{{ isRemove }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><span style="flex:none;display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:color-mix(in srgb,var(--warn) 15%,var(--surface));color:var(--warn)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></span><h2 style="margin:0;font-size:19px;font-weight:800;letter-spacing:-.02em;color:var(--ink)">Remover item?</h2></div>
+                <p style="margin:0 0 20px;font-size:14px;line-height:1.55;color:var(--ink-2)">Remover <b style="color:var(--ink)">{{ removeName }}</b>? Essa ação não pode ser desfeita.</p>
+                <button type="button" onClick="{{ confirmRemove }}" class="btn" style="background:var(--warn);color:#fff;box-shadow:none;margin-bottom:10px">Remover</button>
+                <button type="button" onClick="{{ closeModal }}" class="btn ghost">Cancelar</button>
+              </sc-if>
+
+              <!-- fonte form -->
+              <sc-if value="{{ isFonteForm }}" hint-placeholder-val="{{ false }}">
+                <h2 style="margin:0 0 18px;font-size:20px;font-weight:800;letter-spacing:-.02em;color:var(--ink)">{{ modalTitle }}</h2>
+                <p style="margin:0 0 7px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Nome da fonte</p>
+                <label class="input" style="margin:0 0 16px"><input type="text" value="{{ form.name }}" onChange="{{ field.name }}" placeholder="Ex.: Nubank" style="width:100%;border:0;background:transparent;outline:none;font:inherit;font-size:15px;color:var(--ink)"/></label>
+                <p style="margin:0 0 7px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Tipo</p>
+                <select value="{{ form.type }}" onChange="{{ field.type }}" style="width:100%;margin-bottom:22px;padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font:inherit;font-size:15px;color:var(--ink)"><option>Emissor</option><option>Bandeira</option><option>Parceiro</option></select>
+                <button type="button" onClick="{{ saveModal }}" class="btn ink" style="margin-bottom:10px">Salvar</button>
+                <button type="button" onClick="{{ closeModal }}" class="btn ghost">Cancelar</button>
+              </sc-if>
+
+              <!-- beneficio form -->
+              <sc-if value="{{ isBenForm }}" hint-placeholder-val="{{ false }}">
+                <h2 style="margin:0 0 18px;font-size:20px;font-weight:800;letter-spacing:-.02em;color:var(--ink)">{{ modalTitle }}</h2>
+                <p style="margin:0 0 7px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Título</p>
+                <label class="input" style="margin:0 0 14px"><input type="text" value="{{ form.title }}" onChange="{{ field.title }}" placeholder="Ex.: 4 acessos Priority Pass" style="width:100%;border:0;background:transparent;outline:none;font:inherit;font-size:15px;color:var(--ink)"/></label>
+                <div style="display:flex;gap:12px;margin-bottom:14px">
+                  <div style="flex:1"><p style="margin:0 0 7px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Categoria</p><select value="{{ form.category }}" onChange="{{ field.category }}" style="width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font:inherit;font-size:14px;color:var(--ink)"><option>Aeroporto</option><option>Seguros</option><option>Viagem</option><option>Cashback</option><option>Compras</option><option>Pontos</option></select></div>
+                  <div style="flex:1"><p style="margin:0 0 7px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Origem</p><select value="{{ form.origem }}" onChange="{{ field.origem }}" style="width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font:inherit;font-size:14px;color:var(--ink)"><option>Emissor</option><option>Bandeira</option><option>Parceiro</option></select></div>
+                </div>
+                <p style="margin:0 0 7px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Fonte</p>
+                <label class="input" style="margin:0 0 14px"><input type="text" value="{{ form.fonte }}" onChange="{{ field.fonte }}" placeholder="Ex.: Nubank Ultravioleta" style="width:100%;border:0;background:transparent;outline:none;font:inherit;font-size:15px;color:var(--ink)"/></label>
+                <label style="display:flex;align-items:center;gap:10px;margin-bottom:22px;cursor:pointer;font-size:14px;font-weight:600;color:var(--ink)"><input type="checkbox" checked="{{ form.novo }}" onChange="{{ field.novo }}" style="width:18px;height:18px;accent-color:var(--accent)"/> Marcar como novidade</label>
+                <button type="button" onClick="{{ saveModal }}" class="btn ink" style="margin-bottom:10px">Salvar benefício</button>
+                <button type="button" onClick="{{ closeModal }}" class="btn ghost">Cancelar</button>
+              </sc-if>
+
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- toast -->
+        <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:50%;bottom:96px;transform:translateX(-50%);z-index:80;display:flex;align-items:center;gap:9px;padding:11px 16px;border-radius:13px;background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);animation:am-toast .25s ease both;white-space:nowrap"><span style="display:grid;place-items:center;width:19px;height:19px;border-radius:50%;background:var(--ok);color:#fff"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>{{ toast }}</div>
+        </sc-if>
+
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light'|'dark'&quot;}}">
+class Component extends DCLogic {
+  state = {
+    screen: 'login',
+    loginEmail: 'marina@mapadebeneficios.com.br',
+    loginSenha: 'demo1234',
+    benQuery: '',
+    benCat: 'all',
+    modal: null,
+    form: {},
+    toast: null,
+    fontes: [
+      { id: 1, name: 'Nubank', type: 'Emissor', benefits: 6 },
+      { id: 2, name: 'Banco Inter', type: 'Emissor', benefits: 3 },
+      { id: 3, name: 'Itaú', type: 'Emissor', benefits: 4 },
+      { id: 4, name: 'C6 Bank', type: 'Emissor', benefits: 3 },
+      { id: 5, name: 'XP', type: 'Emissor', benefits: 2 },
+      { id: 6, name: 'Bradesco', type: 'Emissor', benefits: 2 },
+      { id: 7, name: 'Mastercard', type: 'Bandeira', benefits: 4 },
+      { id: 8, name: 'Visa', type: 'Bandeira', benefits: 3 },
+      { id: 9, name: 'GRU Airport', type: 'Parceiro', benefits: 1 },
+    ],
+    beneficios: [
+      { id: 1, title: 'Pontos ou Cashback Ultravioleta', category: 'Pontos', origem: 'Emissor', fonte: 'Nubank Ultravioleta', novo: false },
+      { id: 2, title: 'Transferência de pontos p/ LATAM, Azul e Gol', category: 'Pontos', origem: 'Emissor', fonte: 'Nubank Ultravioleta', novo: false },
+      { id: 3, title: '4 acessos Priority Pass por ano', category: 'Aeroporto', origem: 'Emissor', fonte: 'Nubank Ultravioleta', novo: true },
+      { id: 4, title: 'Nubank Ultravioleta Lounge em Guarulhos', category: 'Aeroporto', origem: 'Parceiro', fonte: 'GRU Airport', novo: false },
+      { id: 5, title: 'Nu Viagens Ultravioleta', category: 'Viagem', origem: 'Emissor', fonte: 'Nubank Ultravioleta', novo: false },
+      { id: 6, title: 'Compras internacionais com IOF zero', category: 'Compras', origem: 'Emissor', fonte: 'Nubank Ultravioleta', novo: false },
+      { id: 7, title: 'Salas VIP Inter para clientes Prime', category: 'Aeroporto', origem: 'Emissor', fonte: 'Inter Prime', novo: false },
+      { id: 8, title: 'Compra Protegida Mastercard Black', category: 'Compras', origem: 'Bandeira', fonte: 'Mastercard Black', novo: false },
+      { id: 9, title: 'Mastercard Concierge Black', category: 'Viagem', origem: 'Bandeira', fonte: 'Mastercard Black', novo: false },
+      { id: 10, title: 'Seguro para veículos de locadora', category: 'Seguros', origem: 'Bandeira', fonte: 'Visa Infinite', novo: false },
+      { id: 11, title: 'Seguro-viagem internacional', category: 'Seguros', origem: 'Emissor', fonte: 'C6 Carbon', novo: true },
+      { id: 12, title: '5% de cashback em viagens', category: 'Cashback', origem: 'Emissor', fonte: 'Itaú Personnalité', novo: false },
+    ],
+  };
+
+  CATS = { Aeroporto: 'airport', Seguros: 'seguro', Viagem: 'viagem', Cashback: 'cashback', Compras: 'compras', Pontos: 'pontos' };
+  norm(s) { return (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+  initials(n) { return n.split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase(); }
+  pillClass(t) { return t === 'Bandeira' ? 'brand' : t === 'Parceiro' ? 'part' : 'iss'; }
+  toastMsg(m) { this.setState({ toast: m }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2400); }
+
+  renderVals() {
+    const s = this.state;
+    const screen = s.screen;
+    const isApp = screen !== 'login';
+
+    const fontes = s.fontes.map((f) => ({ ...f, initials: this.initials(f.name), typeLabel: f.type, pillClass: this.pillClass(f.type), edit: () => this.openFonte(f), remove: () => this.askRemove('fonte', f) }));
+
+    const q = this.norm(s.benQuery.trim());
+    let bens = s.beneficios;
+    if (s.benCat !== 'all') bens = bens.filter((b) => this.CATS[b.category] === s.benCat);
+    if (q) bens = bens.filter((b) => this.norm(`${b.title} ${b.fonte} ${b.category}`).includes(q));
+    const beneficios = bens.map((b) => ({ ...b, catLabel: b.category, catStyle: `--cat:var(--c-${this.CATS[b.category] || 'accent'})`, pillClass: this.pillClass(b.origem), originLabel: b.origem, isNew: !!b.novo, edit: () => this.openBen(b), remove: () => this.askRemove('beneficio', b) }));
+
+    const chipDefs = [['all', 'Todas', null], ...Object.entries(this.CATS).map(([label, key]) => [key, label, `cat-${key}`])];
+    const catChips = chipDefs.map(([key, label, dot]) => ({ label, dot, cls: s.benCat === key ? 'chip on' : 'chip', select: () => this.setState({ benCat: key }) }));
+
+    const modal = s.modal;
+    const kind = modal && modal.kind;
+    const titles = { painel: ['Bem-vinda', 'Painel'], fontes: ['Catálogo', 'Fontes'], beneficios: ['Catálogo', 'Benefícios'] };
+    const ht = titles[screen] || ['', ''];
+
+    return {
+      theme: this.props.theme || 'light',
+      isLogin: screen === 'login',
+      isApp,
+      isPainel: screen === 'painel',
+      isFontes: screen === 'fontes',
+      isBeneficios: screen === 'beneficios',
+
+      loginEmail: s.loginEmail, loginSenha: s.loginSenha,
+      onLoginEmail: (e) => this.setState({ loginEmail: e.target.value }),
+      onLoginSenha: (e) => this.setState({ loginSenha: e.target.value }),
+      doLogin: () => this.setState({ screen: 'painel' }),
+
+      goPainel: (e) => { if (e) e.preventDefault(); this.setState({ screen: 'painel' }); },
+      goFontes: (e) => { if (e) e.preventDefault(); this.setState({ screen: 'fontes' }); },
+      goBeneficios: (e) => { if (e) e.preventDefault(); this.setState({ screen: 'beneficios' }); },
+      curPainel: screen === 'painel' ? 'page' : undefined,
+      curFontes: screen === 'fontes' ? 'page' : undefined,
+      curBen: screen === 'beneficios' ? 'page' : undefined,
+
+      headerEyebrow: ht[0], headerTitle: ht[1],
+      showAdd: screen === 'fontes' || screen === 'beneficios',
+      addAction: () => screen === 'fontes' ? this.openFonte(null) : this.openBen(null),
+
+      countFontes: s.fontes.length,
+      countBeneficios: s.beneficios.length,
+      countNovos: s.beneficios.filter((b) => b.novo).length,
+
+      fontes, beneficios, benEmpty: beneficios.length === 0,
+      benQuery: s.benQuery, onBenQuery: (e) => this.setState({ benQuery: e.target.value }),
+      catChips,
+
+      modalOpen: !!modal,
+      isRemove: kind === 'remove', isFonteForm: kind === 'fonte', isBenForm: kind === 'beneficio',
+      modalTitle: modal ? (modal.mode === 'edit' ? (kind === 'fonte' ? 'Editar fonte' : 'Editar benefício') : (kind === 'fonte' ? 'Nova fonte' : 'Novo benefício')) : '',
+      removeName: modal && modal.target ? (modal.target.name || modal.target.title) : '',
+      form: s.form, field: this.fields(),
+      stop: (e) => e.stopPropagation(),
+      closeModal: () => this.setState({ modal: null }),
+      saveModal: () => this.save(),
+      confirmRemove: () => this.doRemove(),
+      toast: s.toast,
+    };
+  }
+
+  fields() {
+    if (!this._fields) {
+      const mk = (k) => (e) => this.setState((s) => ({ form: { ...s.form, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value } }));
+      this._fields = { name: mk('name'), type: mk('type'), title: mk('title'), category: mk('category'), origem: mk('origem'), fonte: mk('fonte'), novo: mk('novo') };
+    }
+    return this._fields;
+  }
+  openFonte(f) { this.setState({ modal: { kind: 'fonte', mode: f ? 'edit' : 'new', target: f }, form: f ? { ...f } : { name: '', type: 'Emissor' } }); }
+  openBen(b) { this.setState({ modal: { kind: 'beneficio', mode: b ? 'edit' : 'new', target: b }, form: b ? { ...b } : { title: '', category: 'Aeroporto', origem: 'Emissor', fonte: '', novo: false } }); }
+  askRemove(kind, target) { this.setState({ modal: { kind: 'remove', removeKind: kind, target } }); }
+  save() {
+    const { modal, form } = this.state;
+    if (modal.kind === 'fonte') {
+      this.setState((s) => modal.mode === 'edit'
+        ? { fontes: s.fontes.map((f) => f.id === modal.target.id ? { ...f, name: form.name, type: form.type } : f), modal: null }
+        : { fontes: [{ id: Date.now(), name: form.name || 'Nova fonte', type: form.type || 'Emissor', benefits: 0 }, ...s.fontes], modal: null });
+      this.toastMsg(modal.mode === 'edit' ? 'Fonte atualizada' : 'Fonte adicionada');
+    } else {
+      this.setState((s) => modal.mode === 'edit'
+        ? { beneficios: s.beneficios.map((b) => b.id === modal.target.id ? { ...b, ...form } : b), modal: null }
+        : { beneficios: [{ id: Date.now(), title: form.title || 'Novo benefício', category: form.category || 'Aeroporto', origem: form.origem || 'Emissor', fonte: form.fonte || '—', novo: !!form.novo }, ...s.beneficios], modal: null });
+      this.toastMsg(modal.mode === 'edit' ? 'Benefício atualizado' : 'Benefício adicionado');
+    }
+  }
+  doRemove() {
+    const { modal } = this.state;
+    const name = modal.target.name || modal.target.title;
+    this.setState((s) => modal.removeKind === 'fonte'
+      ? { fontes: s.fontes.filter((f) => f.id !== modal.target.id), modal: null }
+      : { beneficios: s.beneficios.filter((b) => b.id !== modal.target.id), modal: null });
+    this.toastMsg('Removido: ' + name);
+  }
+}
+</script>
+</body>
+</html>

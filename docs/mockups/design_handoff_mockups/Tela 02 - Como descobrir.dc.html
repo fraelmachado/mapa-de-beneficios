@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/mapa-de-benef-cios-80471905-a90c-46a6-a492-cefadd7a0b6b/styles.css">
+  <script src="_ds/mapa-de-benef-cios-80471905-a90c-46a6-a492-cefadd7a0b6b/_ds_bundle.js"></script>
+  <style>
+    html,body{margin:0}
+    @keyframes mb-bob{from{transform:translateY(0)}to{transform:translateY(-9px)}}
+    @keyframes mb-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes mb-glow{0%,100%{opacity:.55}50%{opacity:.9}}
+    @keyframes mb-aurora{0%{transform:translate(0,0) scale(1);opacity:.5}50%{transform:translate(12px,-8px) scale(1.18);opacity:.85}100%{transform:translate(-8px,6px) scale(1.06);opacity:.55}}
+    @keyframes mb-twinkle{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1)}}
+    @keyframes mb-sweep{to{transform:rotate(360deg)}}
+    @keyframes mb-pop{from{opacity:0;transform:scale(.4)}60%{transform:scale(1.18)}to{opacity:1;transform:scale(1)}}
+    @keyframes mb-ping{0%{transform:scale(.6);opacity:.7}80%,100%{transform:scale(2.1);opacity:0}}
+    @keyframes mb-rowin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    @media (prefers-reduced-motion: reduce){
+      .mb-bob,.mb-rise,.mb-aurora,.mb-twinkle{animation:none !important}
+    }
+  </style>
+</helmet>
+<div data-theme="{{ theme }}" style="position:relative;width:520px;min-height:958px;background:#e9e8e3;font-family:var(--font);display:flex;align-items:flex-start;justify-content:center;padding:46px 0 44px;box-sizing:border-box">
+<a href="Fluxo do App.dc.html" style="position:absolute;left:22px;top:20px;z-index:9;display:inline-flex;align-items:center;gap:6px;font:700 12.5px var(--font);color:var(--ink-2);text-decoration:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="11 6 5 12 11 18"/></svg> Fluxo do app</a>
+<div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:16px">
+    <div style="display:flex;align-items:center;gap:8px;font:700 12px var(--font);color:#6b6c72">
+      <span style="display:grid;place-items:center;width:22px;height:22px;border-radius:7px;background:#0c0d10;color:#fff;font-size:11px;font-weight:700">02</span>
+      Como descobrir
+    </div>
+  <div style="position:relative;width:390px;height:820px;border-radius:46px;background:#0c0d10;padding:11px;box-shadow:0 40px 80px -30px rgba(12,13,16,.55),0 0 0 1px rgba(255,255,255,.04) inset">
+    <div data-screen-label="Onboarding · Como descobrir" style="position:relative;width:100%;height:100%;border-radius:36px;overflow:hidden;background:var(--bg);display:flex;flex-direction:column">
+
+      <!-- status bar -->
+      <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:14px 26px 0;font-size:14px;font-weight:700;color:var(--ink)">
+        <span>9:41</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <svg width="17" height="11" viewBox="0 0 17 11" fill="var(--ink)"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+          <svg width="16" height="11" viewBox="0 0 16 12" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"><path d="M1 4.2C4.8 1 11.2 1 15 4.2"/><path d="M3.4 6.7C6 4.6 10 4.6 12.6 6.7"/><path d="M6 9.2c1.2-1 3.8-1 5 0"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0.5" y="0.5" width="21" height="11" rx="3" fill="none" stroke="var(--ink)" stroke-opacity=".4"/><rect x="2" y="2" width="16" height="8" rx="1.5" fill="var(--ink)"/><rect x="23" y="4" width="1.6" height="4" rx="1" fill="var(--ink)" fill-opacity=".4"/></svg>
+        </div>
+      </div>
+
+      <!-- top: back + dots -->
+      <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0">
+        <button aria-label="Voltar" style="display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--surface);border:1px solid var(--line);color:var(--ink);cursor:pointer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div style="display:flex;align-items:center;gap:7px">
+          <span style="width:6px;height:6px;border-radius:999px;background:var(--line)"></span>
+          <span style="width:22px;height:6px;border-radius:999px;background:var(--accent)"></span>
+          <span style="width:6px;height:6px;border-radius:999px;background:var(--line)"></span>
+        </div>
+        <span style="width:38px;height:38px"></span>
+      </div>
+
+      <!-- title -->
+      <div style="position:relative;padding:22px 26px 0">
+        <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)">Passo 2 de 3</p>
+        <h1 style="margin:0 0 8px;font-size:25px;font-weight:800;line-height:1.14;letter-spacing:-.03em;color:var(--ink);text-wrap:balance">Como quer encontrar seus benefícios?</h1>
+        <p style="margin:0;font-size:14px;line-height:1.5;color:var(--ink-2)">Escolha um método — dá pra mudar depois.</p>
+      </div>
+
+      <!-- options -->
+      <div style="position:relative;padding:18px 22px 0;display:flex;flex-direction:column;gap:12px">
+
+        <!-- Gmail (discover mágico) -->
+        <div role="button" tabindex="0" onClick="{{ selectGmail }}" style="position:relative;background:linear-gradient(180deg, color-mix(in srgb,var(--accent) 6%, var(--surface)), var(--surface) 60%);border:1px solid color-mix(in srgb,var(--accent) 22%, var(--line));border-radius:18px;padding:16px;cursor:pointer;box-shadow:var(--shadow-lg)">
+          <div aria-hidden="true" style="position:absolute;inset:0;border-radius:18px;overflow:hidden;pointer-events:none">
+            <div class="mb-aurora" style="position:absolute;width:170px;height:170px;right:-36px;top:-46px;border-radius:50%;background:radial-gradient(circle at 50% 50%, color-mix(in srgb,var(--c-pontos) 30%, transparent), transparent 70%);filter:blur(16px);animation:mb-aurora 7s var(--ease) infinite alternate"></div>
+            <div class="mb-aurora" style="position:absolute;width:150px;height:150px;left:-34px;bottom:-44px;border-radius:50%;background:radial-gradient(circle at 50% 50%, color-mix(in srgb,var(--c-viagem) 26%, transparent), transparent 70%);filter:blur(18px);animation:mb-aurora 9.4s var(--ease) .8s infinite alternate"></div>
+            <span class="mb-twinkle" style="position:absolute;top:13px;right:54px;color:var(--accent);animation:mb-twinkle 2.6s var(--ease) infinite"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c1 8 4 11 12 12-8 1-11 4-12 12-1-8-4-11-12-12 8-1 11-4 12-12Z"/></svg></span>
+            <span class="mb-twinkle" style="position:absolute;top:32px;right:42px;color:var(--c-pontos);animation:mb-twinkle 3.3s var(--ease) .7s infinite"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c1 8 4 11 12 12-8 1-11 4-12 12-1-8-4-11-12-12 8-1 11-4 12-12Z"/></svg></span>
+            <span class="mb-twinkle" style="position:absolute;left:46px;top:9px;color:var(--c-cashback);animation:mb-twinkle 3s var(--ease) 1.3s infinite"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c1 8 4 11 12 12-8 1-11 4-12 12-1-8-4-11-12-12 8-1 11-4 12-12Z"/></svg></span>
+          </div>
+          <sc-if value="{{ isGmail }}" hint-placeholder-val="{{ true }}">
+            <div aria-hidden="true" style="position:absolute;inset:-1px;border:2px solid var(--accent);border-radius:18px;box-shadow:0 0 0 4px var(--accent-soft);pointer-events:none"></div>
+          </sc-if>
+          <div style="position:relative;display:flex;align-items:flex-start;gap:13px">
+            <span style="flex:none;position:relative;display:grid;place-items:center;width:46px;height:46px;border-radius:13px;background:#fff;box-shadow:0 6px 16px -6px rgba(21,22,27,.28),0 0 0 1px rgba(21,22,27,.07)">
+              <svg width="26" height="20" viewBox="0 0 48 38">
+                <rect x="3" y="6" width="42" height="27" rx="4.5" fill="#fff" stroke="#E8E8E8" stroke-width="1.4"/>
+                <path d="M5.5 9.5 L24 24 L42.5 9.5" fill="none" stroke="#EA4335" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5.5 9.5 V31" stroke="#4285F4" stroke-width="3.4" stroke-linecap="round"/>
+                <path d="M42.5 9.5 V31" stroke="#34A853" stroke-width="3.4" stroke-linecap="round"/>
+                <path d="M5.5 9.5 L24 24" stroke="#FBBC04" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:4px">
+                <span style="font-size:16px;font-weight:700;color:var(--ink);white-space:nowrap">Conectar Gmail</span>
+                <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:linear-gradient(100deg,var(--accent),var(--c-pontos));padding:3px 8px 3px 6px;border-radius:7px;white-space:nowrap;box-shadow:0 4px 10px -5px color-mix(in srgb,var(--c-pontos) 80%,transparent)">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c1 8 4 11 12 12-8 1-11 4-12 12-1-8-4-11-12-12 8-1 11-4 12-12Z"/></svg>
+                  Discover mágico
+                </span>
+              </div>
+              <p style="margin:0 0 11px;font-size:13px;line-height:1.45;color:var(--ink-2)">Revelamos os benefícios escondidos nos seus e-mails — em segundos, como num passe de mágica.</p>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <span style="font-size:11px;font-weight:600;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line);padding:4px 9px;border-radius:999px;white-space:nowrap">Mais rápido</span>
+                <span style="font-size:11px;font-weight:600;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line);padding:4px 9px;border-radius:999px;white-space:nowrap">Você revisa antes de salvar</span>
+              </div>
+            </div>
+            <span style="flex:none;position:relative;width:22px;height:22px;border-radius:50%;border:2px solid var(--line)">
+              <sc-if value="{{ isGmail }}" hint-placeholder-val="{{ true }}">
+                <span style="position:absolute;inset:-2px;border-radius:50%;background:var(--accent);display:grid;place-items:center">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                </span>
+              </sc-if>
+            </span>
+          </div>
+        </div>
+
+        <!-- Manual -->
+        <div role="button" tabindex="0" onClick="{{ selectManual }}" style="position:relative;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:15px;cursor:pointer;box-shadow:var(--shadow)">
+          <sc-if value="{{ isManual }}" hint-placeholder-val="{{ true }}">
+            <div aria-hidden="true" style="position:absolute;inset:-1px;border:2px solid var(--accent);border-radius:18px;box-shadow:0 0 0 4px var(--accent-soft);pointer-events:none"></div>
+          </sc-if>
+          <div style="position:relative;display:flex;align-items:flex-start;gap:13px">
+            <span style="flex:none;display:grid;place-items:center;width:46px;height:46px;border-radius:13px;background:var(--ink);color:var(--surface);box-shadow:0 6px 16px -8px rgba(21,22,27,.5)">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12.5" rx="2.5"/><path d="M2.5 10h19"/><path d="M16.5 14.5h2.5"/></svg>
+            </span>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:4px">
+                <span style="font-size:16px;font-weight:700;color:var(--ink);white-space:nowrap">Adicionar manualmente</span>
+                <span style="font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2);background:transparent;border:1px solid var(--line);padding:3px 7px;border-radius:7px;white-space:nowrap">No controle</span>
+              </div>
+              <p style="margin:0 0 11px;font-size:13px;line-height:1.45;color:var(--ink-2)">Escolha seus provedores numa lista — cartões, assinaturas, saúde e mais. Sem conectar e-mail.</p>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <span style="font-size:11px;font-weight:600;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line);padding:4px 9px;border-radius:999px;white-space:nowrap">Leva ~2 min</span>
+              </div>
+            </div>
+            <span style="flex:none;position:relative;width:22px;height:22px;border-radius:50%;border:2px solid var(--line)">
+              <sc-if value="{{ isManual }}" hint-placeholder-val="{{ true }}">
+                <span style="position:absolute;inset:-2px;border-radius:50%;background:var(--accent);display:grid;place-items:center">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                </span>
+              </sc-if>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- trust -->
+      <div style="position:relative;margin:16px 22px 0;display:flex;gap:11px;align-items:flex-start;padding:13px 14px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line)">
+        <span style="flex:none;color:var(--muted);margin-top:1px">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>
+        </span>
+        <p style="margin:0;font-size:12px;line-height:1.45;color:var(--ink-2)">Acesso <b style="color:var(--ink)">somente leitura</b>. Lemos apenas e-mails de benefícios e programas de fidelidade — nada é compartilhado ou armazenado.</p>
+      </div>
+
+      <!-- actions -->
+      <div style="position:relative;margin-top:auto;padding:16px 22px 10px">
+        <x-import component-from-global-scope="MapaDeBenefCios_804719.Button" variant="primary" on-click="{{ noop }}" hint-size="100%,52px">{{ continueLabel }}</x-import>
+      </div>
+
+      <!-- home indicator -->
+      <div style="position:relative;display:flex;justify-content:center;padding-bottom:9px">
+        <span style="width:128px;height:5px;border-radius:999px;background:var(--ink);opacity:.85"></span>
+      </div>
+
+    </div>
+  </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:438,&quot;height&quot;:868},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light' | 'dark'&quot;},&quot;estValue&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:2480,&quot;min&quot;:0,&quot;max&quot;:12000,&quot;step&quot;:20,&quot;unit&quot;:&quot;R$/ano&quot;,&quot;tsType&quot;:&quot;number&quot;},&quot;showValue&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { selected: 'gmail', progress: 0, count: 0, labelIdx: 0, done: false, activeCat: 'all', query: '', picked: { Nubank: true, Vivo: true }, wizStep: 0, wizQuery: '', wizPicked: { Nubank: 'Ultravioleta' }, openSheet: null, reviewOff: {}, alerts: { novos: true, prazo: true, resumo: false } };
+  WIZARD = [
+    { eyebrow: 'Seu tesouro escondido', question: 'Quais cartões você tem?', providers: [
+      { name: 'Nubank', color: '#820AD1', est: 900, domain: 'nubank.com.br', svg: 'Nu Pagamentos S.A/nubank-logo-2021.svg', products: [ { name: 'Roxinho', tier: 'Básico', benefits: 4, est: 280 }, { name: 'Ultravioleta', tier: 'Premium', benefits: 12, est: 900, recommended: true } ] }, { name: 'Itaú', color: '#EC7000', est: 1200, domain: 'itau.com.br', svg: 'Itaú Unibanco S.A/itau-fundo-azul.svg', products: [ { name: 'Click', tier: 'Básico', benefits: 4, est: 380 }, { name: 'Uniclass', tier: 'Intermediário', benefits: 7, est: 720 }, { name: 'Personnalité', tier: 'Premium', benefits: 12, est: 1200, recommended: true } ] }, { name: 'Bradesco', color: '#CC092F', est: 800, domain: 'bradesco.com.br', svg: 'Bradesco S.A/bradesco.svg', products: [ { name: 'Neo', tier: 'Básico', benefits: 3, est: 260 }, { name: 'Exclusive', tier: 'Intermediário', benefits: 8, est: 760 }, { name: 'Prime', tier: 'Premium', benefits: 12, est: 1100, recommended: true } ] }, { name: 'C6 Bank', color: '#1D1D1D', est: 600, domain: 'c6bank.com', svg: 'Banco C6 S.A/c6 bank.svg', products: [ { name: 'C6', tier: 'Básico', benefits: 4, est: 300 }, { name: 'C6 Carbon', tier: 'Premium', benefits: 11, est: 900, recommended: true } ] }, { name: 'Inter', color: '#FF7A00', est: 500, domain: 'inter.co', svg: 'Banco Inter S.A/inter.svg', products: [ { name: 'Inter', tier: 'Básico', benefits: 3, est: 200 }, { name: 'Inter One Black', tier: 'Premium', benefits: 10, est: 720, recommended: true } ] }, { name: 'XP', color: '#0B0B0B', est: 700, domain: 'xpi.com.br' } ] },
+    { eyebrow: 'Quase lá', question: 'Assinaturas e streaming?', providers: [
+      { name: 'Amazon Prime', color: '#1399C6', est: 300, domain: 'primevideo.com' }, { name: 'Vivo', color: '#660099', est: 240, domain: 'vivo.com.br', mono: true }, { name: 'Claro', color: '#DA291C', est: 200, domain: 'claro.com.br' }, { name: 'TIM', color: '#004691', est: 160, domain: 'tim.com.br' }, { name: 'Spotify', color: '#1DB954', est: 120, domain: 'spotify.com' }, { name: 'Disney+', color: '#113CCF', est: 150, domain: 'disneyplus.com' } ] },
+    { eyebrow: 'Cuidando de você', question: 'Plano de saúde ou odonto?', providers: [
+      { name: 'SulAmérica', color: '#00A859', est: 1100, domain: 'sulamerica.com.br' }, { name: 'Amil', color: '#0061A8', est: 900, domain: 'amil.com.br' }, { name: 'Bradesco Saúde', color: '#CC092F', est: 950, domain: 'bradescoseguros.com.br' }, { name: 'Hapvida', color: '#00833E', est: 700, domain: 'hapvida.com.br' }, { name: 'NotreDame', color: '#0033A0', est: 600, domain: 'gndi.com.br' } ] },
+    { eyebrow: 'Onde seu dinheiro mora', question: 'Bancos e carteiras?', providers: [
+      { name: 'Banco do Brasil', color: '#0033A0', est: 400, domain: 'bb.com.br', svg: 'Banco do Brasil S.A/banco-do-brasil-sem-fundo.svg' }, { name: 'Santander', color: '#EC0000', est: 350, domain: 'santander.com.br', svg: 'Banco Santander Brasil S.A/banco-santander-logo.svg' }, { name: 'Mercado Pago', color: '#00AEEF', est: 300, domain: 'mercadopago.com.br', svg: 'Mercado Pago/mercado-pago.svg' }, { name: 'PicPay', color: '#11C76F', est: 200, domain: 'picpay.com' }, { name: 'BTG', color: '#0A2A43', est: 500, domain: 'btgpactual.com', svg: 'Banco BTG Pacutal/btg-pactual.svg' } ] },
+    { eyebrow: 'Pra suas viagens', question: 'Milhas e companhias aéreas?', providers: [
+      { name: 'LATAM Pass', color: '#1B0088', est: 600, domain: 'latam.com' }, { name: 'Smiles', color: '#FF7A00', est: 500, domain: 'smiles.com.br', mono: true }, { name: 'TudoAzul', color: '#0033A0', est: 450, domain: 'voeazul.com.br', mono: true } ] },
+  ];
+  PROVIDER_GROUPS = [
+    { type: 'Cartões de crédito', sub: 'Cartão de crédito', color: '--accent', names: ['Nubank', 'Itaú', 'Bradesco', 'C6 Bank', 'Inter'] },
+    { type: 'Assinaturas & telefonia', sub: 'Assinatura', color: '--c-compras', names: ['Vivo', 'Claro', 'TIM'] },
+    { type: 'Planos de saúde', sub: 'Plano de saúde', color: '--c-seguro', names: ['SulAmérica', 'Amil', 'Bradesco Saúde'] },
+    { type: 'Bancos & carteiras', sub: 'Banco', color: '--c-viagem', names: ['Banco do Brasil', 'Santander', 'BTG'] },
+    { type: 'Companhias aéreas', sub: 'Programa aéreo', color: '--c-pontos', names: ['LATAM Pass', 'Smiles', 'TudoAzul'] },
+  ];
+  SCAN_LABELS = ['Lendo e-mails de fidelidade…', 'Cartões de crédito…', 'Assinaturas e telefonia…', 'Planos de saúde…', 'Companhias aéreas…', 'Bancos e carteiras…'];
+  PANEL_CATS = [
+    { key: 'all', label: 'Todos' },
+    { key: 'airport', label: 'Aeroporto', color: true },
+    { key: 'compras', label: 'Assinaturas', color: true },
+    { key: 'seguro', label: 'Saúde & Seguros', color: true },
+    { key: 'viagem', label: 'Viagem', color: true },
+    { key: 'cashback', label: 'Cashback', color: true },
+    { key: 'pontos', label: 'Pontos', color: true },
+  ];
+  PANEL_BENEFITS = [
+    { category: 'airport', via: 'Nubank Ultravioleta', title: '4 acessos Priority Pass por ano', desc: '+1.700 salas VIP em 145 países.', isNew: true, originType: 'emissor', originLabel: 'Cartão · Nubank' },
+    { category: 'compras', via: 'Vivo Total', title: 'Disney+ e Max inclusos', desc: 'Streaming sem custo extra no seu plano.', tag: 'Assinatura', originType: 'parceiro', originLabel: 'Telefonia · Vivo' },
+    { category: 'seguro', via: 'SulAmérica Saúde', title: 'Telemedicina 24h sem custo', desc: 'Consultas por vídeo a qualquer hora.', tag: 'Saúde', originType: 'parceiro', originLabel: 'Plano de saúde' },
+    { category: 'cashback', via: 'Itaú Personnalité', title: '5% de cashback em viagens', desc: 'Crédito na fatura do mês seguinte.', tag: 'Cashback', originType: 'emissor', originLabel: 'Cartão · Itaú' },
+    { category: 'viagem', via: 'C6 Carbon', title: 'Seguro-viagem internacional', desc: 'Até US$ 100 mil em despesas médicas.', tag: 'Viagem', originType: 'emissor', originLabel: 'Cartão · C6' },
+    { category: 'pontos', via: 'Banco do Brasil', title: 'Pontos Livelo em dobro', desc: 'Acúmulo turbinado nas compras do mês.', tag: 'Pontos', originType: 'emissor', originLabel: 'Banco · BB' },
+    { category: 'airport', via: 'Bradesco Aeternum', title: 'GRU Lounge — Terminal 3', desc: '2 acessos por mês para você e convidado.', tag: 'Aeroporto', originType: 'parceiro', originLabel: 'Parceiro · GRU' },
+  ];
+  componentDidMount() { this.animateValue(); this.startScan(); }
+  startScan() {
+    const dur = 5200, start = Date.now(), total = 14;
+    const step = () => {
+      const t = Math.min(1, (Date.now() - start) / dur);
+      const count = Math.round(total * (1 - Math.pow(1 - t, 2)));
+      const labelIdx = Math.floor((Date.now() - start) / 850) % this.SCAN_LABELS.length;
+      this.setState({ progress: Math.round(t * 100), count, labelIdx, done: t >= 1 });
+      if (t >= 1) { clearInterval(this._scan); this._scan = null; }
+    };
+    if (this._scan) clearInterval(this._scan);
+    this._scan = setInterval(step, 120);
+    step();
+    this._scanSettle = setTimeout(() => {
+      if (this._scan) { clearInterval(this._scan); this._scan = null; }
+      this.setState({ progress: 100, count: total, done: true });
+    }, dur + 300);
+  }
+  componentDidUpdate(prev) {
+    if (prev.estValue !== this.props.estValue || prev.showValue !== this.props.showValue) {
+      this.animateValue();
+    }
+  }
+  animateValue() {
+    const target = this.props.estValue ?? 2480;
+    const dur = 1400, start = Date.now();
+    const fmt = (n) => 'R$ ' + Math.round(n).toLocaleString('pt-BR');
+    if (this._timer) clearInterval(this._timer);
+    const run = () => {
+      const el = document.getElementById('mb-val');
+      if (!el) return;
+      const t = Math.min(1, (Date.now() - start) / dur);
+      const e = 1 - Math.pow(1 - t, 3);
+      el.textContent = fmt(target * e);
+      if (t >= 1) { clearInterval(this._timer); this._timer = null; }
+    };
+    this._timer = setInterval(run, 33);
+    run();
+    // guarantee final value even if timers get throttled in a backgrounded tab
+    this._settle = setTimeout(() => {
+      const el = document.getElementById('mb-val');
+      if (el) el.textContent = fmt(target);
+      if (this._timer) { clearInterval(this._timer); this._timer = null; }
+    }, dur + 120);
+  }
+  componentWillUnmount() {
+    if (this._timer) clearInterval(this._timer);
+    if (this._settle) clearTimeout(this._settle);
+    if (this._scan) clearInterval(this._scan);
+    if (this._scanSettle) clearTimeout(this._scanSettle);
+  }
+  renderVals() {
+    const sel = this.state.selected;
+    const prog = this.state.progress, count = this.state.count, done = this.state.done;
+    const BLIP_POS = [[28,30],[70,26],[22,62],[78,60],[40,18],[60,80],[16,42],[84,40],[50,14],[34,82],[66,46],[46,68]];
+    const BLIP_COLORS = ['var(--c-airport)','var(--c-cashback)','var(--c-seguro)','var(--c-viagem)','var(--c-compras)','var(--c-pontos)'];
+    const blips = BLIP_POS.slice(0, Math.min(count, BLIP_POS.length)).map((p, i) => ({
+      top: p[0] + '%', left: p[1] + '%', color: BLIP_COLORS[i % BLIP_COLORS.length],
+    }));
+    const CHIP_BASE = 'display:inline-flex;align-items:center;font-size:11px;padding:6px 11px;border-radius:999px;white-space:nowrap;transition:all .3s var(--ease);';
+    const chips = [['Cartões',8],['Assinaturas',28],['Saúde',50],['Viagem',72],['Bancos',90]].map(([label, thr]) => ({
+      label,
+      style: prog >= thr
+        ? CHIP_BASE + 'font-weight:700;border:1px solid color-mix(in srgb,var(--accent) 40%,var(--line));background:var(--accent-soft);color:var(--accent)'
+        : CHIP_BASE + 'font-weight:600;border:1px solid var(--line);background:var(--surface);color:var(--muted)',
+    }));
+    const ac = this.state.activeCat;
+    const panelChips = this.PANEL_CATS.map((c) => ({
+      label: c.label,
+      dotCls: c.color ? `cat-${c.key}` : null,
+      cls: c.key === ac ? 'chip on' : 'chip',
+      pressed: c.key === ac,
+      select: () => this.setState({ activeCat: c.key }),
+    }));
+    const panelPasses = ac === 'all' ? this.PANEL_BENEFITS.slice() : this.PANEL_BENEFITS.filter((p) => p.category === ac);
+    const q = this.state.query.trim().toLowerCase();
+    const picked = this.state.picked;
+    const initials = (name) => { const w = name.split(' '); return (w.length > 1 ? w[0][0] + w[1][0] : name.slice(0, 2)).toUpperCase(); };
+    const mk = (name, g) => ({
+      name, sub: g.sub, badge: initials(name),
+      color: `var(${g.color})`,
+      badgeBg: `color-mix(in srgb, var(${g.color}) 15%, var(--surface))`,
+      selected: !!picked[name],
+      toggle: () => this.setState((s) => ({ picked: { ...s.picked, [name]: !s.picked[name] } })),
+    });
+    const providerGroups = this.PROVIDER_GROUPS.map((g) => ({
+      type: g.type,
+      items: g.names.filter((n) => !q || n.toLowerCase().includes(q)).map((n) => mk(n, g)),
+    })).filter((g) => g.items.length > 0);
+    const selectedCount = Object.values(picked).filter(Boolean).length;
+    // --- wizard manual (proposta) ---
+    const W = this.WIZARD;
+    const wStep = Math.min(this.state.wizStep, W.length - 1);
+    const cur = W[wStep];
+    const wq = this.state.wizQuery.trim().toLowerCase();
+    const wp = this.state.wizPicked;
+    const provMap = {};
+    W.forEach((g) => g.providers.forEach((pp) => { provMap[pp.name] = pp; }));
+    const wizTiles = cur.providers.filter((p) => !wq || p.name.toLowerCase().includes(wq)).map((p) => {
+      const val = wp[p.name];
+      const hasProducts = Array.isArray(p.products) && p.products.length > 1;
+      const sub = val && hasProducts ? (val === '__unsure__' ? 'A confirmar' : val) : '';
+      return {
+        name: p.name, color: p.color, badge: initials(p.name), domain: p.domain,
+        mono: !!p.mono, showLogo: !p.mono,
+        fav: `https://www.google.com/s2/favicons?sz=128&domain=${p.domain}`,
+        logo: p.svg ? 'https://raw.githubusercontent.com/Tgentil/Bancos-em-SVG/main/' + encodeURI(p.svg) : `https://www.google.com/s2/favicons?sz=128&domain=${p.domain}`,
+        selected: !!val,
+        sublabel: sub, hasSub: !!sub,
+        toggle: hasProducts
+          ? () => this.setState({ openSheet: p.name })
+          : () => this.setState((s) => { const n = { ...s.wizPicked }; if (n[p.name]) delete n[p.name]; else n[p.name] = true; return { wizPicked: n }; }),
+      };
+    });
+    const estOf = (pp, val) => {
+      if (!val) return 0;
+      if (pp.products && pp.products.length) {
+        if (val === '__unsure__') return Math.max.apply(null, pp.products.map((x) => x.est));
+        const f = pp.products.find((x) => x.name === val);
+        return f ? f.est : (pp.est || 0);
+      }
+      return pp.est || 0;
+    };
+    const economiaSum = Object.keys(wp).filter((n) => wp[n]).reduce((a, n) => a + (provMap[n] ? estOf(provMap[n], wp[n]) : 0), 0);
+    const openName = this.state.openSheet;
+    const sheetProv = openName ? provMap[openName] : null;
+    const sheetProducts = sheetProv && sheetProv.products ? sheetProv.products.map((pr) => ({
+      name: pr.name,
+      meta: pr.tier + ' · ' + pr.benefits + ' benefícios',
+      est: 'R$ ' + pr.est.toLocaleString('pt-BR'),
+      recommended: !!pr.recommended,
+      selected: wp[openName] === pr.name,
+      pick: () => this.setState((s) => ({ wizPicked: { ...s.wizPicked, [openName]: pr.name }, openSheet: null })),
+    })) : [];
+    const wizSegments = W.map((g, i) => ({ on: i <= wStep, off: i > wStep }));
+    // --- resumo do caminho manual (tela 07) ---
+    const WIZ_CATS = [
+      { label: 'Cartões de crédito', color: '--accent' },
+      { label: 'Assinaturas & streaming', color: '--c-compras' },
+      { label: 'Saúde', color: '--c-seguro' },
+      { label: 'Bancos & carteiras', color: '--c-viagem' },
+      { label: 'Milhas & viagens', color: '--c-pontos' },
+    ];
+    const benefitsOf = (pp, val) => {
+      if (!val) return 0;
+      if (pp.products && pp.products.length) {
+        if (val === '__unsure__') return Math.max.apply(null, pp.products.map((x) => x.benefits || 0));
+        const f = pp.products.find((x) => x.name === val);
+        return f ? (f.benefits || 3) : 3;
+      }
+      return 3;
+    };
+    let summaryBenefits = 0, summaryCount = 0;
+    const summaryGroups = W.map((g, gi) => {
+      const cat = WIZ_CATS[gi] || { label: g.question, color: '--accent' };
+      const items = g.providers.filter((p) => wp[p.name]).map((p) => {
+        const val = wp[p.name];
+        summaryBenefits += benefitsOf(p, val);
+        summaryCount += 1;
+        const product = (val && val !== true && val !== '__unsure__') ? val : (val === '__unsure__' ? 'A confirmar' : '');
+        return {
+          name: p.name, badge: initials(p.name), color: p.color,
+          mono: !!p.mono, showLogo: !p.mono,
+          fav: `https://www.google.com/s2/favicons?sz=128&domain=${p.domain}`,
+          logo: p.svg ? 'https://raw.githubusercontent.com/Tgentil/Bancos-em-SVG/main/' + encodeURI(p.svg) : `https://www.google.com/s2/favicons?sz=128&domain=${p.domain}`,
+          product, hasProduct: !!product,
+          est: 'R$ ' + estOf(p, val).toLocaleString('pt-BR'),
+        };
+      });
+      return { label: cat.label, dot: `var(${cat.color})`, items };
+    }).filter((g) => g.items.length > 0);
+    // --- revisão da descoberta Gmail (tela 08) ---
+    const REVIEW_EST = [1200, 720, 900, 480, 850, 320, 600];
+    const roff = this.state.reviewOff;
+    let reviewSum = 0, reviewKept = 0;
+    const reviewItems = this.PANEL_BENEFITS.map((b, idx) => {
+      const kept = !roff[idx];
+      if (kept) { reviewSum += (REVIEW_EST[idx] || 0); reviewKept += 1; }
+      return {
+        title: b.title,
+        origin: b.originLabel,
+        dot: `var(--c-${b.category})`,
+        est: 'R$ ' + (REVIEW_EST[idx] || 0).toLocaleString('pt-BR'),
+        kept,
+        opacity: kept ? '1' : '.5',
+        toggle: () => this.setState((s) => ({ reviewOff: { ...s.reviewOff, [idx]: !s.reviewOff[idx] } })),
+      };
+    });
+    const reviewTotal = reviewItems.length;
+    // --- opt-in de alertas (tela 09) ---
+    const al = this.state.alerts;
+    const toggleAlert = (k) => this.setState((s) => ({ alerts: { ...s.alerts, [k]: !s.alerts[k] } }));
+    const alertsOn = Object.values(al).filter(Boolean).length;
+    return {
+      theme: this.props.theme ?? 'light',
+      showValue: this.props.showValue ?? true,
+      panelChips,
+      panelPasses,
+      panelEmpty: panelPasses.length === 0,
+      checklistItems: [
+        { label: 'Cartão Ultravioleta identificado no seu radar', done: true },
+        { label: 'Baixe o app Priority Pass (gratuito) e crie sua conta', done: false },
+        { label: 'Ative com o código enviado pelo Nubank', done: false },
+        { label: 'Apresente o cartão digital na entrada da sala VIP', done: false },
+      ],
+      providerGroups,
+      providersEmpty: providerGroups.length === 0,
+      onSearch: (e) => this.setState({ query: e.target.value }),
+      manualDisabled: selectedCount === 0,
+      manualContinueLabel: selectedCount > 0 ? `Continuar (${selectedCount})` : 'Selecione ao menos um',
+      wizTiles,
+      wizSegments,
+      summaryGroups,
+      summaryEmpty: summaryGroups.length === 0,
+      summaryBenefits,
+      summaryCount,
+      reviewItems,
+      reviewKeptCount: reviewKept,
+      reviewTotal,
+      reviewValue: 'R$ ' + reviewSum.toLocaleString('pt-BR'),
+      reviewCountLabel: reviewKept + ' de ' + reviewTotal + ' incluídos',
+      reviewSaveDisabled: reviewKept === 0,
+      reviewSaveLabel: reviewKept > 0 ? `Salvar ${reviewKept} no meu radar  →` : 'Inclua ao menos um',
+      alertNovos: al.novos, notNovos: !al.novos,
+      alertPrazo: al.prazo, notPrazo: !al.prazo,
+      alertResumo: al.resumo, notResumo: !al.resumo,
+      toggleNovos: () => toggleAlert('novos'),
+      togglePrazo: () => toggleAlert('prazo'),
+      toggleResumo: () => toggleAlert('resumo'),
+      alertsCtaLabel: alertsOn > 0 ? 'Ativar alertas  →' : 'Continuar sem alertas  →',
+      wizEyebrow: cur.eyebrow,
+      wizQuestion: cur.question,
+      wizQuery: this.state.wizQuery,
+      wizEmpty: wizTiles.length === 0,
+      canPrev: wStep > 0,
+      noPrev: wStep === 0,
+      wizCtaLabel: wStep >= W.length - 1 ? 'Concluir' : 'Continuar',
+      economia: 'R$ ' + economiaSum.toLocaleString('pt-BR'),
+      imgError: (e) => {
+        const img = e.target, fav = img.getAttribute('data-fav');
+        if (fav && !img.dataset.triedFav && img.src !== fav) { img.dataset.triedFav = '1'; img.src = fav; return; }
+        img.style.display = 'none';
+        const m = img.previousElementSibling; if (m) m.style.visibility = 'visible';
+      },
+      sheetOpen: !!sheetProv,
+      sheetTitle: sheetProv ? `Qual o seu ${sheetProv.name}?` : '',
+      sheetProducts,
+      closeSheet: () => this.setState({ openSheet: null }),
+      pickUnsure: () => this.setState((s) => ({ wizPicked: { ...s.wizPicked, [openName]: '__unsure__' }, openSheet: null })),
+      wizPrev: () => this.setState((s) => ({ wizStep: Math.max(0, s.wizStep - 1), wizQuery: '' })),
+      wizNext: () => this.setState((s) => ({ wizStep: Math.min(W.length - 1, s.wizStep + 1), wizQuery: '' })),
+      wizSkip: () => this.setState((s) => ({ wizStep: Math.min(W.length - 1, s.wizStep + 1), wizQuery: '' })),
+      onWizSearch: (e) => this.setState({ wizQuery: e.target.value }),
+      isGmail: sel === 'gmail',
+      isManual: sel === 'manual',
+      selectGmail: () => this.setState({ selected: 'gmail' }),
+      selectManual: () => this.setState({ selected: 'manual' }),
+      continueLabel: sel === 'gmail' ? 'Conectar Gmail  →' : 'Adicionar cartões  →',
+      blips,
+      chips,
+      scanCount: count,
+      scanLabel: done ? 'Tudo pronto!' : this.SCAN_LABELS[this.state.labelIdx % this.SCAN_LABELS.length],
+      scanProgressPct: prog + '%',
+      scanDone: done,
+      scanning: !done,
+      noop: () => {},
+    };
+  }
+}
+</script>
+</body>
+</html>

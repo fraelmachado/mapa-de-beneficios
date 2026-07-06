@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/mapa-de-benef-cios-80471905-a90c-46a6-a492-cefadd7a0b6b/styles.css">
+  <script src="_ds/mapa-de-benef-cios-80471905-a90c-46a6-a492-cefadd7a0b6b/_ds_bundle.js"></script>
+  <style>
+    html,body{margin:0}
+    @keyframes aa-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    @keyframes aa-pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+    @keyframes aa-sheet{from{transform:translateY(100%)}to{transform:none}}
+    @keyframes aa-toast{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
+    .aa-scroll::-webkit-scrollbar{width:8px;height:8px}
+    .aa-scroll::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--ink) 14%,transparent);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
+
+    .aa-root{container-type:inline-size;width:100%;height:100%;position:relative;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--font)}
+    .aa-shell{height:100%}
+    .aa-side{display:none}
+    .aa-main{height:100%;overflow-y:auto;padding:18px 16px 100px;box-sizing:border-box}
+    .aa-login{height:100%;overflow-y:auto;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;background:radial-gradient(600px 320px at 50% -6%, color-mix(in srgb,var(--accent) 12%,var(--bg)), var(--bg))}
+
+    .aa-tabbar{position:absolute;left:0;right:0;bottom:0;z-index:20;padding:8px 16px calc(8px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(12px);border-top:1px solid var(--line)}
+    .aa-tabbar .nav{border:0;border-radius:0;background:transparent;padding:0}
+    .aa-tabbar .grip{display:flex;justify-content:center;padding:6px 0 2px}
+    .aa-tabbar .grip span{width:120px;height:5px;border-radius:999px;background:var(--ink);opacity:.85}
+
+    .aa-brand{display:flex;align-items:center;gap:10px;padding:6px 8px 20px}
+    .aa-navbtn{display:flex;align-items:center;gap:11px;padding:11px 12px;border:0;border-radius:11px;cursor:pointer;font:inherit;font-size:14px;font-weight:600;text-align:left;background:transparent;color:rgba(255,255,255,.62);width:100%}
+    .aa-navbtn:hover{background:rgba(255,255,255,.06);color:#fff}
+    .aa-navbtn[aria-current="page"]{background:var(--accent);color:#fff}
+    .aa-navcount{margin-left:auto;font-size:11px;font-weight:700;color:rgba(255,255,255,.45)}
+    .aa-side-foot{margin-top:auto;padding-top:16px;border-top:1px solid rgba(255,255,255,.08)}
+
+    .aa-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:18px}
+    .aa-eyebrow{margin:0 0 3px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .aa-h1{margin:0;font-size:23px;font-weight:800;letter-spacing:-.03em;color:var(--ink)}
+
+    .aa-add-txt{display:none}
+    .aa-add-ic{display:grid;place-items:center;width:42px;height:42px;flex:none;border:0;border-radius:13px;background:var(--ink);color:var(--surface);cursor:pointer}
+
+    .aa-statgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:18px}
+    .aa-stat{background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:15px}
+    .aa-stat-k{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+    .aa-stat-v{font-size:28px;font-weight:800;letter-spacing:-.03em;color:var(--ink);margin-top:3px}
+
+    .aa-sublbl{margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+    .aa-areagrid{display:grid;grid-template-columns:1fr;gap:11px}
+    .aa-area{position:relative;display:flex;align-items:center;gap:13px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:16px;cursor:pointer;box-shadow:var(--shadow);font:inherit}
+    .aa-area:hover{border-color:var(--ink)}
+    .aa-area-ic{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:12px}
+    .aa-area-t{font-size:15.5px;font-weight:800;letter-spacing:-.01em;color:var(--ink);line-height:1.25}
+    .aa-area-d{font-size:12.5px;color:var(--ink-2);margin-top:2px;line-height:1.45}
+
+    .aa-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+    .aa-search{margin:0;flex:1;min-width:0;display:flex;align-items:center;gap:9px}
+
+    .aa-list{display:flex;flex-direction:column;gap:10px}
+    .aa-lrow{display:grid;grid-template-columns:1fr auto;grid-template-areas:"name act" "meta act";gap:5px 10px;align-items:center;padding:13px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:var(--shadow)}
+    .aa-brow{grid-template-columns:minmax(0,1fr);grid-template-areas:"name" "meta" "act";align-items:start;gap:8px 0}
+    .aa-brow .aa-cell-act{justify-content:flex-start;margin-top:2px}
+    .aa-cell-name{grid-area:name;display:flex;align-items:center;gap:11px;min-width:0}
+    .aa-cell-meta{grid-area:meta;display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+    .aa-cell-count{display:none}
+    .aa-cell-act{grid-area:act;display:flex;gap:6px;justify-content:flex-end;align-items:center}
+    .aa-avatar{flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--surface-2);color:var(--ink);font-size:13px;font-weight:800}
+    .aa-name{font-size:15px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .aa-count-inline{font-size:12.5px;color:var(--muted)}
+    .aa-fonte{font-size:12.5px;color:var(--muted)}
+
+    .aa-act-d{display:none}
+    .aa-act-m{display:flex;gap:2px}
+    .aa-icobtn{display:grid;place-items:center;width:34px;height:34px;border:0;border-radius:10px;background:transparent;cursor:pointer;color:var(--ink)}
+    .aa-icobtn.warn{color:var(--warn)}
+    .aa-txtbtn{padding:8px 13px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+    .aa-txtbtn:hover{border-color:var(--ink)}
+    .aa-txtbtn.warn{border-color:transparent;background:transparent;color:var(--warn)}
+    .aa-txtbtn.warn:hover{background:color-mix(in srgb,var(--warn) 12%,transparent)}
+
+    .aa-empty{padding:38px 12px;text-align:center;color:var(--muted);font-size:13.5px}
+
+    .aa-overlay{position:absolute;inset:0;z-index:60;background:rgba(10,11,14,.44);display:flex;flex-direction:column;justify-content:flex-end}
+    .aa-dialog{background:var(--surface);border-radius:24px 24px 0 0;max-height:88%;overflow-y:auto;padding:10px 22px 26px;box-sizing:border-box;animation:aa-sheet .3s cubic-bezier(.22,1,.36,1) both}
+    .aa-grip{display:flex;justify-content:center;padding:6px 0 14px}
+    .aa-grip span{width:44px;height:5px;border-radius:999px;background:var(--line)}
+    .aa-dialog h2{margin:0 0 4px;font-size:20px;font-weight:800;letter-spacing:-.02em;color:var(--ink)}
+    .aa-dialog .sub{margin:0 0 20px;font-size:13.5px;color:var(--ink-2)}
+    .aa-fieldlbl{margin:0 0 7px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+    .aa-select{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font:inherit;font-size:15px;color:var(--ink);cursor:pointer;box-sizing:border-box}
+    .aa-2col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+    .aa-dialog-actions{display:flex;gap:10px;justify-content:flex-end}
+
+    .aa-toast{position:absolute;left:50%;bottom:100px;transform:translateX(-50%);z-index:80;display:flex;align-items:center;gap:9px;padding:11px 16px;border-radius:13px;background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);animation:aa-toast .25s ease both;white-space:nowrap}
+
+    .aa-pendbadge{margin-left:auto;font-size:11px;font-weight:800;padding:1px 7px;border-radius:999px;background:var(--accent);color:#fff}
+    .aa-seg{display:inline-flex;gap:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:16px;max-width:100%;overflow-x:auto}
+    .aa-seg button{border:0;background:transparent;font:inherit;font-size:13px;font-weight:700;color:var(--muted);padding:7px 12px;border-radius:9px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+    .aa-seg button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+    .aa-seg .n{font-size:11px;font-weight:800;padding:1px 6px;border-radius:999px;background:color-mix(in srgb,var(--ink) 9%,transparent);color:var(--ink-2)}
+    .aa-seg button.on .n{background:var(--accent);color:#fff}
+    .aa-batch{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:12px 14px;margin-bottom:14px;border-radius:14px;background:color-mix(in srgb,var(--accent) 8%,var(--surface));border:1px solid color-mix(in srgb,var(--accent) 32%,var(--line))}
+    .aa-batch-t{font-size:12.5px;font-weight:600;color:var(--ink);line-height:1.35}
+    .aa-robo{display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:1px;line-height:1.4}
+    .aa-robo b{color:var(--ink-2);font-weight:700}
+    .aa-conf{font-weight:800;color:var(--ok)}
+    .aa-status{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;white-space:nowrap}
+    .aa-status.searching{background:color-mix(in srgb,var(--accent) 14%,var(--surface));color:var(--accent)}
+    .aa-spin{width:12px;height:12px;border-radius:50%;border:2px solid currentColor;border-top-color:transparent;animation:aa-spin .8s linear infinite}
+    @keyframes aa-spin{to{transform:rotate(360deg)}}
+    .aa-btn-ok{padding:8px 14px;border:0;border-radius:10px;background:var(--ink);color:var(--surface);font:inherit;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+    .aa-btn-ok:hover{background:color-mix(in srgb,var(--ink) 85%,#fff)}
+
+    @container (min-width:760px){
+      .aa-shell{display:grid;grid-template-columns:246px 1fr;height:100%}
+      .aa-side{display:flex;flex-direction:column;height:100%;overflow-y:auto;background:#0f1013;color:rgba(255,255,255,.62);padding:20px 16px;box-sizing:border-box}
+      .aa-main{padding:32px 40px;height:100%}
+      .aa-tabbar{display:none}
+      .aa-head{margin-bottom:22px}
+      .aa-h1{font-size:28px}
+      .aa-add-txt{display:inline-flex;align-items:center;gap:7px;width:auto;padding:11px 17px;font-size:14px;white-space:nowrap}
+      .aa-add-ic{display:none}
+      .aa-statgrid{grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:26px}
+      .aa-stat{border-radius:16px;padding:18px}
+      .aa-stat-v{font-size:34px;margin-top:6px}
+      .aa-areagrid{grid-template-columns:1fr 1fr;gap:16px}
+      .aa-area{padding:22px}
+      .aa-search{max-width:340px;flex:0 1 340px}
+      .aa-list{gap:0;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+      .aa-lrow{grid-template-columns:minmax(0,1fr) 150px 110px 170px;grid-template-areas:"name meta count act";align-items:center;border:0;border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent);border-radius:0;box-shadow:none;background:transparent;padding:15px 20px;gap:12px}
+      .aa-brow{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"name act" "meta act"}
+      .aa-cell-count{grid-area:count;display:block;font-size:14px;color:var(--ink-2);font-weight:600}
+      .aa-count-inline{display:none}
+      .aa-act-d{display:flex;gap:8px}
+      .aa-act-m{display:none}
+      .aa-overlay{justify-content:center;align-items:center;padding:24px;backdrop-filter:blur(2px)}
+      .aa-dialog{border-radius:20px;width:440px;max-height:90%;border:1px solid var(--line);box-shadow:var(--shadow-lg);padding:26px;animation:aa-pop .22s ease both}
+      .aa-dialog.aa-wide{width:520px}
+      .aa-grip{display:none}
+      .aa-toast{bottom:26px}
+    }
+  </style>
+</helmet>
+<div class="aa-root" data-theme="{{ theme }}">
+
+  <!-- ================= LOGIN ================= -->
+  <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+    <div class="aa-login aa-scroll">
+      <div style="width:100%;max-width:400px;animation:aa-in .4s ease both">
+        <div style="display:flex;align-items:center;gap:11px;margin-bottom:22px">
+          <span style="display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:var(--accent)"><svg width="23" height="23" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.5"><circle cx="8" cy="8" r="6.4"/><circle cx="8" cy="8" r="3"/><circle cx="8" cy="8" r="1" fill="#fff"/></svg></span>
+          <div><div style="font-size:16px;font-weight:800;letter-spacing:-.02em;color:var(--ink);white-space:nowrap">Mapa de Benefícios</div><div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Painel Admin</div></div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:24px">
+          <h1 style="margin:0 0 4px;font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--ink)">Entrar</h1>
+          <p style="margin:0 0 20px;font-size:13.5px;color:var(--ink-2)">Acesse a curadoria do catálogo.</p>
+          <p class="aa-fieldlbl">E-mail</p>
+          <label class="input" style="margin:0 0 14px;display:flex;align-items:center;gap:9px"><span class="muted" style="display:flex"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 6.5 12 12.5 20.5 6.5"/></svg></span><input type="email" value="{{ loginEmail }}" onChange="{{ onLoginEmail }}" placeholder="voce@empresa.com" style="flex:1;border:0;background:transparent;outline:none;font:inherit;font-size:15px;color:var(--ink)"/></label>
+          <p class="aa-fieldlbl">Senha</p>
+          <label class="input" style="margin:0 0 20px;display:flex;align-items:center;gap:9px"><span class="muted" style="display:flex"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span><input type="password" value="{{ loginSenha }}" onChange="{{ onLoginSenha }}" placeholder="••••••••" style="flex:1;border:0;background:transparent;outline:none;font:inherit;font-size:15px;color:var(--ink)"/></label>
+          <button class="btn" type="button" onClick="{{ doLogin }}" style="font-size:15px">Entrar</button>
+        </div>
+        <p style="margin:16px 2px 0;font-size:12px;color:var(--muted);text-align:center">Instalável como app · acesso restrito à curadoria.</p>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ================= APP ================= -->
+  <sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+    <div class="aa-shell">
+
+      <!-- sidebar (desktop) -->
+      <aside class="aa-side aa-scroll">
+        <div class="aa-brand">
+          <span style="display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--accent)"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.5"><circle cx="8" cy="8" r="6.4"/><circle cx="8" cy="8" r="3"/><circle cx="8" cy="8" r="1" fill="#fff"/></svg></span>
+          <div style="min-width:0"><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em;color:#fff;white-space:nowrap">Mapa de Benefícios</div><div style="font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4)">Admin</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;margin-top:6px">
+          <button type="button" class="aa-navbtn" aria-current="{{ curPainel }}" onClick="{{ goPainel }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> Painel</button>
+          <button type="button" class="aa-navbtn" aria-current="{{ curFontes }}" onClick="{{ goFontes }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/><path d="M9 21v-6h6v6"/></svg> <span style="flex:1">Programas</span> <sc-if value="{{ hasPend }}" hint-placeholder-val="{{ true }}"><span class="aa-pendbadge">{{ pendCount }}</span></sc-if></button>
+          <button type="button" class="aa-navbtn" aria-current="{{ curBen }}" onClick="{{ goBeneficios }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/></svg> <span style="flex:1">Benefícios</span> <span class="aa-navcount">{{ countBeneficios }}</span></button>
+        </div>
+        <div class="aa-side-foot">
+          <div style="display:flex;align-items:center;gap:10px;padding:6px 8px 12px">
+            <span style="display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--c-viagem),var(--accent));color:#fff;font-size:12px;font-weight:800">MC</span>
+            <div style="min-width:0"><div style="font-size:12.5px;font-weight:700;color:#fff;white-space:nowrap">Marina Curadoria</div><div style="font-size:11px;color:rgba(255,255,255,.45)">Editora</div></div>
+          </div>
+          <button type="button" class="aa-navbtn" onClick="{{ doLogout }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Sair</button>
+        </div>
+      </aside>
+
+      <!-- main -->
+      <main class="aa-main aa-scroll">
+
+        <!-- PAINEL -->
+        <sc-if value="{{ isPainel }}" hint-placeholder-val="{{ false }}">
+          <div style="animation:aa-in .3s ease both">
+            <div class="aa-head" style="align-items:flex-start">
+              <div><p class="aa-eyebrow">Bem-vinda, Marina</p><h1 class="aa-h1">Painel do catálogo</h1></div>
+            </div>
+            <div class="aa-statgrid">
+              <div class="aa-stat"><div class="aa-stat-k">Programas</div><div class="aa-stat-v">{{ countFontes }}</div></div>
+              <div class="aa-stat"><div class="aa-stat-k">Benefícios</div><div class="aa-stat-v">{{ countBeneficios }}</div></div>
+              <div class="aa-stat"><div class="aa-stat-k">Pendentes</div><div class="aa-stat-v" style="color:var(--accent)">{{ pendCount }}</div></div>
+              <div class="aa-stat"><div class="aa-stat-k">Novos</div><div class="aa-stat-v" style="color:var(--c-pontos)">{{ countNovos }}</div></div>
+            </div>
+            <p class="aa-sublbl">Áreas de trabalho</p>
+            <div class="aa-areagrid">
+              <div role="button" tabindex="0" class="aa-area" onClick="{{ goFontes }}">
+                <span class="aa-area-ic" style="background:color-mix(in srgb,var(--c-seguro) 15%,var(--surface));color:var(--c-seguro)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/><path d="M9 21v-6h6v6"/></svg></span>
+                <span style="flex:1;min-width:0"><span class="aa-area-t" style="display:block">Programas de fidelidade</span><span class="aa-area-d" style="display:block">Aprovar e gerenciar programas</span></span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>
+              </div>
+              <div role="button" tabindex="0" class="aa-area" onClick="{{ goBeneficios }}">
+                <span class="aa-area-ic" style="background:color-mix(in srgb,var(--accent) 15%,var(--surface));color:var(--accent)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/></svg></span>
+                <span style="flex:1;min-width:0"><span class="aa-area-t" style="display:block">Benefícios</span><span class="aa-area-d" style="display:block">Cadastro, categorias e destaque</span></span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- PROGRAMAS DE FIDELIDADE -->
+        <sc-if value="{{ isFontes }}" hint-placeholder-val="{{ false }}">
+          <div style="animation:aa-in .3s ease both">
+            <div class="aa-head">
+              <div><p class="aa-eyebrow">Catálogo · robô ativo</p><h1 class="aa-h1">Programas de fidelidade</h1></div>
+              <button type="button" class="btn ink aa-add-txt" onClick="{{ openNewFonte }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo programa</button>
+              <button type="button" class="aa-add-ic" aria-label="Novo programa" onClick="{{ openNewFonte }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+            </div>
+
+            <div class="aa-seg aa-scroll" role="tablist" aria-label="Filtrar programas">
+              <button type="button" role="tab" aria-selected="{{ tabPendCls }}" class="{{ tabPendCls }}" onClick="{{ setTabPend }}">Pendentes <span class="n">{{ pendCount }}</span></button>
+              <button type="button" role="tab" aria-selected="{{ tabAtivosCls }}" class="{{ tabAtivosCls }}" onClick="{{ setTabAtivos }}">Ativos <span class="n">{{ activeCount }}</span></button>
+              <button type="button" role="tab" aria-selected="{{ tabRejCls }}" class="{{ tabRejCls }}" onClick="{{ setTabRej }}">Rejeitados <span class="n">{{ rejCount }}</span></button>
+            </div>
+
+            <sc-if value="{{ showBatch }}" hint-placeholder-val="{{ true }}">
+              <div class="aa-batch">
+                <div class="aa-batch-t"><b>{{ pendCount }}</b> programas encontrados pelo robô aguardando aprovação. Ao aprovar, ele começa a buscar os benefícios.</div>
+                <button type="button" class="aa-btn-ok" onClick="{{ approveAll }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Aprovar todos</button>
+              </div>
+            </sc-if>
+
+            <div class="aa-list">
+              <sc-for list="{{ programas }}" as="p" hint-placeholder-count="4">
+                <div class="aa-lrow aa-brow">
+                  <div class="aa-cell-name"><span class="aa-avatar">{{ p.initials }}</span><span class="aa-name">{{ p.name }}</span></div>
+                  <div class="aa-cell-meta" style="flex-direction:column;align-items:flex-start;gap:3px">
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                      <span class="pill">{{ p.type }}</span>
+                      <sc-if value="{{ p.isActive }}" hint-placeholder-val="{{ false }}"><span class="aa-fonte">{{ p.benLabel }}</span></sc-if>
+                      <sc-if value="{{ p.isSearching }}" hint-placeholder-val="{{ false }}"><span class="aa-status searching"><span class="aa-spin"></span> buscando benefícios…</span></sc-if>
+                    </div>
+                    <sc-if value="{{ p.isPending }}" hint-placeholder-val="{{ true }}">
+                      <div class="aa-robo"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4.5"/><circle cx="12" cy="3" r="1.1"/><path d="M9 13h.01M15 13h.01"/><path d="M2 14v2M22 14v2"/></svg> <b>{{ p.origin }}</b> · encontrado {{ p.found }} · <span class="aa-conf">{{ p.confidence }}%</span> confiança · ~{{ p.estBenefits }} benefícios</div>
+                    </sc-if>
+                    <sc-if value="{{ p.isRejected }}" hint-placeholder-val="{{ false }}"><div class="aa-robo">Motivo: {{ p.reason }}</div></sc-if>
+                  </div>
+                  <div class="aa-cell-act">
+                    <sc-if value="{{ p.isPending }}" hint-placeholder-val="{{ true }}">
+                      <button type="button" class="aa-btn-ok" onClick="{{ p.approve }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Aprovar</button>
+                      <button type="button" class="aa-txtbtn warn" onClick="{{ p.reject }}">Rejeitar</button>
+                    </sc-if>
+                    <sc-if value="{{ p.isActive }}" hint-placeholder-val="{{ false }}">
+                      <div class="aa-act-d">
+                        <button type="button" class="aa-txtbtn" onClick="{{ p.edit }}">Editar</button>
+                        <button type="button" class="aa-txtbtn warn" onClick="{{ p.remove }}">Remover</button>
+                      </div>
+                      <div class="aa-act-m">
+                        <button type="button" class="aa-icobtn" aria-label="Editar" onClick="{{ p.edit }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                        <button type="button" class="aa-icobtn warn" aria-label="Remover" onClick="{{ p.remove }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ p.isRejected }}" hint-placeholder-val="{{ false }}">
+                      <button type="button" class="aa-txtbtn" onClick="{{ p.reconsider }}">Reconsiderar</button>
+                    </sc-if>
+                  </div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ progEmpty }}" hint-placeholder-val="{{ false }}"><div class="aa-empty">Nenhum programa nesta aba.</div></sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- BENEFÍCIOS -->
+        <sc-if value="{{ isBeneficios }}" hint-placeholder-val="{{ false }}">
+          <div style="animation:aa-in .3s ease both">
+            <div class="aa-head">
+              <div><p class="aa-eyebrow">Catálogo</p><h1 class="aa-h1">Benefícios</h1></div>
+              <button type="button" class="btn ink aa-add-txt" onClick="{{ openNewBen }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo benefício</button>
+              <button type="button" class="aa-add-ic" aria-label="Novo benefício" onClick="{{ openNewBen }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+            </div>
+            <div class="aa-toolbar">
+              <label class="input aa-search"><span class="muted" style="display:flex"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></span><input type="search" value="{{ benQuery }}" onChange="{{ onBenQuery }}" placeholder="buscar benefício…" style="flex:1;min-width:0;border:0;background:transparent;outline:none;font:inherit;font-size:14px;color:var(--ink)"/></label>
+              <div class="chips aa-scroll" style="flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px">
+                <sc-for list="{{ catChips }}" as="c" hint-placeholder-count="7">
+                  <button type="button" class="{{ c.cls }}" onClick="{{ c.select }}" style="flex:none"><sc-if value="{{ c.dot }}" hint-placeholder-val="{{ false }}"><i class="{{ c.dot }}"></i></sc-if> {{ c.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+            <div class="aa-list">
+              <sc-for list="{{ beneficios }}" as="b" hint-placeholder-count="8">
+                <div class="aa-lrow aa-brow">
+                  <div class="aa-cell-name" style="min-width:0"><span class="aa-name">{{ b.title }}</span><sc-if value="{{ b.isNew }}" hint-placeholder-val="{{ false }}"><span class="new">novo</span></sc-if></div>
+                  <div class="aa-cell-meta"><span class="tag" style="{{ b.catStyle }}">{{ b.catLabel }}</span><span class="pill {{ b.pillClass }}">{{ b.originLabel }}</span><span class="aa-fonte">· {{ b.fonte }}</span></div>
+                  <div class="aa-cell-act">
+                    <div class="aa-act-d">
+                      <button type="button" class="aa-txtbtn" onClick="{{ b.edit }}">Editar</button>
+                      <button type="button" class="aa-txtbtn warn" onClick="{{ b.remove }}">Remover</button>
+                    </div>
+                    <div class="aa-act-m">
+                      <button type="button" class="aa-icobtn" aria-label="Editar" onClick="{{ b.edit }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                      <button type="button" class="aa-icobtn warn" aria-label="Remover" onClick="{{ b.remove }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+                    </div>
+                  </div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ benEmpty }}" hint-placeholder-val="{{ false }}"><div class="aa-empty">Nenhum benefício para os filtros atuais.</div></sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+      </main>
+
+      <!-- bottom tabbar (mobile) -->
+      <div class="aa-tabbar">
+        <nav class="nav" aria-label="Admin">
+          <a href="#" onClick="{{ goPainel }}" aria-current="{{ curPainel }}"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span> Painel</a>
+          <a href="#" onClick="{{ goFontes }}" aria-current="{{ curFontes }}"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/><path d="M9 21v-6h6v6"/></svg></span> Programas</a>
+          <a href="#" onClick="{{ goBeneficios }}" aria-current="{{ curBen }}"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/></svg></span> Benefícios</a>
+        </nav>
+        <div class="grip"><span></span></div>
+      </div>
+
+    </div>
+  </sc-if>
+
+  <!-- ================= MODAL / SHEET ================= -->
+  <sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+    <div class="aa-overlay" onClick="{{ closeModal }}">
+      <div class="aa-dialog aa-scroll {{ dialogWide }}" onClick="{{ stop }}">
+        <div class="aa-grip"><span></span></div>
+
+        <!-- remove -->
+        <sc-if value="{{ isRemove }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><span style="flex:none;display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:color-mix(in srgb,var(--warn) 15%,var(--surface));color:var(--warn)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></span><h2>Remover item?</h2></div>
+          <p class="sub" style="margin-bottom:22px">Remover <b style="color:var(--ink)">{{ removeName }}</b>? Essa ação não pode ser desfeita.</p>
+          <div class="aa-dialog-actions">
+            <button type="button" class="btn ghost" style="width:auto;padding:11px 18px" onClick="{{ closeModal }}">Cancelar</button>
+            <button type="button" class="btn" style="width:auto;padding:11px 18px;background:var(--warn);color:#fff;box-shadow:none" onClick="{{ confirmRemove }}">Remover</button>
+          </div>
+        </sc-if>
+
+        <!-- programa form -->
+        <sc-if value="{{ isFonteForm }}" hint-placeholder-val="{{ false }}">
+          <h2>{{ modalTitle }}</h2>
+          <p class="sub">Programa de fidelidade que origina benefícios no radar.</p>
+          <p class="aa-fieldlbl">Nome do programa</p>
+          <label class="input" style="margin:0 0 16px"><input type="text" value="{{ form.name }}" onChange="{{ field.name }}" placeholder="Ex.: Livelo" style="width:100%;border:0;background:transparent;outline:none;font:inherit;font-size:15px;color:var(--ink)"/></label>
+          <p class="aa-fieldlbl">Tipo</p>
+          <select class="aa-select" style="margin-bottom:16px" value="{{ form.type }}" onChange="{{ field.type }}"><option>Cartão</option><option>Banco</option><option>Bandeira</option><option>Cia aérea</option><option>Programa de pontos</option><option>Assinatura</option><option>Saúde</option></select>
+          <p class="aa-fieldlbl">Origem (site)</p>
+          <label class="input" style="margin:0 0 24px"><input type="text" value="{{ form.origin }}" onChange="{{ field.origin }}" placeholder="Ex.: livelo.com.br" style="width:100%;border:0;background:transparent;outline:none;font:inherit;font-size:15px;color:var(--ink)"/></label>
+          <div class="aa-dialog-actions">
+            <button type="button" class="btn ghost" style="width:auto;padding:11px 18px" onClick="{{ closeModal }}">Cancelar</button>
+            <button type="button" class="btn ink" style="width:auto;padding:11px 20px" onClick="{{ saveModal }}">Salvar</button>
+          </div>
+        </sc-if>
+
+        <!-- reject programa -->
+        <sc-if value="{{ isReject }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><span style="flex:none;display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:color-mix(in srgb,var(--warn) 15%,var(--surface));color:var(--warn)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></span><h2>Rejeitar programa</h2></div>
+          <p class="sub" style="margin-bottom:16px">Descartar <b style="color:var(--ink)">{{ rejectName }}</b>? O robô não vai buscar os benefícios dele.</p>
+          <p class="aa-fieldlbl">Motivo (opcional)</p>
+          <textarea value="{{ form.reason }}" onChange="{{ field.reason }}" placeholder="Ex.: duplicado, fora de escopo, fonte não confiável…" rows="2" style="width:100%;box-sizing:border-box;margin-bottom:22px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font:inherit;font-size:14px;color:var(--ink);resize:none"></textarea>
+          <div class="aa-dialog-actions">
+            <button type="button" class="btn ghost" style="width:auto;padding:11px 18px" onClick="{{ closeModal }}">Cancelar</button>
+            <button type="button" class="btn" style="width:auto;padding:11px 18px;background:var(--warn);color:#fff;box-shadow:none" onClick="{{ confirmReject }}">Rejeitar</button>
+          </div>
+        </sc-if>
+
+        <!-- beneficio form -->
+        <sc-if value="{{ isBenForm }}" hint-placeholder-val="{{ false }}">
+          <h2>{{ modalTitle }}</h2>
+          <p class="sub">Como o benefício aparece no radar dos usuários.</p>
+          <p class="aa-fieldlbl">Título</p>
+          <label class="input" style="margin:0 0 16px"><input type="text" value="{{ form.title }}" onChange="{{ field.title }}" placeholder="Ex.: 4 acessos Priority Pass por ano" style="width:100%;border:0;background:transparent;outline:none;font:inherit;font-size:15px;color:var(--ink)"/></label>
+          <div class="aa-2col">
+            <div><p class="aa-fieldlbl">Categoria</p><select class="aa-select" style="font-size:14px" value="{{ form.category }}" onChange="{{ field.category }}"><option>Aeroporto</option><option>Seguros</option><option>Viagem</option><option>Cashback</option><option>Compras</option><option>Pontos</option></select></div>
+            <div><p class="aa-fieldlbl">Origem</p><select class="aa-select" style="font-size:14px" value="{{ form.origem }}" onChange="{{ field.origem }}"><option>Emissor</option><option>Bandeira</option><option>Parceiro</option></select></div>
+          </div>
+          <p class="aa-fieldlbl">Fonte</p>
+          <label class="input" style="margin:0 0 16px"><input type="text" value="{{ form.fonte }}" onChange="{{ field.fonte }}" placeholder="Ex.: Nubank Ultravioleta" style="width:100%;border:0;background:transparent;outline:none;font:inherit;font-size:15px;color:var(--ink)"/></label>
+          <p class="aa-fieldlbl">Descrição</p>
+          <textarea value="{{ form.desc }}" onChange="{{ field.desc }}" placeholder="Uma linha explicando o benefício…" rows="2" style="width:100%;box-sizing:border-box;margin-bottom:16px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font:inherit;font-size:14px;color:var(--ink);resize:none"></textarea>
+          <label style="display:flex;align-items:center;gap:10px;margin-bottom:24px;cursor:pointer;font-size:14px;font-weight:600;color:var(--ink)"><input type="checkbox" checked="{{ form.novo }}" onChange="{{ field.novo }}" style="width:17px;height:17px;accent-color:var(--accent)"/> Marcar como novidade</label>
+          <div class="aa-dialog-actions">
+            <button type="button" class="btn ghost" style="width:auto;padding:11px 18px" onClick="{{ closeModal }}">Cancelar</button>
+            <button type="button" class="btn ink" style="width:auto;padding:11px 20px" onClick="{{ saveModal }}">Salvar benefício</button>
+          </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ================= TOAST ================= -->
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div class="aa-toast"><span style="display:grid;place-items:center;width:19px;height:19px;border-radius:50%;background:var(--ok);color:#fff"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>{{ toast }}</div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;100%&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light'|'dark'&quot;}}">
+class Component extends DCLogic {
+  state = {
+    screen: 'login',
+    loginEmail: 'marina@mapadebeneficios.com.br',
+    loginSenha: 'demo1234',
+    benQuery: '',
+    benCat: 'all',
+    progTab: 'pendentes',
+    modal: null,
+    form: {},
+    toast: null,
+    fontes: [
+      { id: 1, name: 'Nubank Ultravioleta', type: 'Cartão', status: 'active', benefits: 6 },
+      { id: 2, name: 'Itaú Personnalité', type: 'Cartão', status: 'active', benefits: 4 },
+      { id: 3, name: 'Mastercard Black', type: 'Bandeira', status: 'active', benefits: 4 },
+      { id: 4, name: 'LATAM Pass', type: 'Cia aérea', status: 'active', benefits: 3 },
+      { id: 5, name: 'Smiles', type: 'Cia aérea', status: 'searching', benefits: 0, estBenefits: 7 },
+      { id: 6, name: 'Livelo', type: 'Programa de pontos', status: 'pending', origin: 'livelo.com.br/beneficios', found: 'há 2h', confidence: 96, estBenefits: 12 },
+      { id: 7, name: 'Esfera Santander', type: 'Programa de pontos', status: 'pending', origin: 'esfera.com.vc', found: 'há 5h', confidence: 91, estBenefits: 9 },
+      { id: 8, name: 'C6 Átomos', type: 'Cartão', status: 'pending', origin: 'c6bank.com.br/atomos', found: 'ontem', confidence: 88, estBenefits: 6 },
+      { id: 9, name: 'TudoAzul', type: 'Cia aérea', status: 'pending', origin: 'voeazul.com.br/tudoazul', found: 'ontem', confidence: 84, estBenefits: 8 },
+      { id: 10, name: 'Dotz', type: 'Programa de pontos', status: 'rejected', reason: 'Duplicado de um programa já ativo', benefits: 0 },
+    ],
+    beneficios: [
+      { id: 1, title: 'Pontos ou Cashback Ultravioleta', category: 'Pontos', origem: 'Emissor', fonte: 'Nubank Ultravioleta', novo: false },
+      { id: 2, title: 'Transferência de pontos p/ LATAM, Azul e Gol', category: 'Pontos', origem: 'Emissor', fonte: 'Nubank Ultravioleta', novo: false },
+      { id: 3, title: '4 acessos Priority Pass por ano', category: 'Aeroporto', origem: 'Emissor', fonte: 'Nubank Ultravioleta', novo: true },
+      { id: 4, title: 'Nubank Ultravioleta Lounge em Guarulhos', category: 'Aeroporto', origem: 'Parceiro', fonte: 'GRU Airport', novo: false },
+      { id: 5, title: 'Nu Viagens Ultravioleta', category: 'Viagem', origem: 'Emissor', fonte: 'Nubank Ultravioleta', novo: false },
+      { id: 6, title: 'Compras internacionais com IOF zero', category: 'Compras', origem: 'Emissor', fonte: 'Nubank Ultravioleta', novo: false },
+      { id: 7, title: 'Salas VIP Inter para clientes Prime', category: 'Aeroporto', origem: 'Emissor', fonte: 'Inter Prime', novo: false },
+      { id: 8, title: 'Compra Protegida Mastercard Black', category: 'Compras', origem: 'Bandeira', fonte: 'Mastercard Black', novo: false },
+      { id: 9, title: 'Mastercard Concierge Black', category: 'Viagem', origem: 'Bandeira', fonte: 'Mastercard Black', novo: false },
+      { id: 10, title: 'Seguro para veículos de locadora', category: 'Seguros', origem: 'Bandeira', fonte: 'Visa Infinite', novo: false },
+      { id: 11, title: 'Seguro-viagem internacional', category: 'Seguros', origem: 'Emissor', fonte: 'C6 Carbon', novo: true },
+      { id: 12, title: '5% de cashback em viagens', category: 'Cashback', origem: 'Emissor', fonte: 'Itaú Personnalité', novo: false },
+    ],
+  };
+
+  CATS = { Aeroporto: 'airport', Seguros: 'seguro', Viagem: 'viagem', Cashback: 'cashback', Compras: 'compras', Pontos: 'pontos' };
+  norm(s) { return (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+  initials(n) { return n.split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase(); }
+  pillClass(t) { return t === 'Bandeira' ? 'brand' : t === 'Parceiro' ? 'part' : 'iss'; }
+  toastMsg(m) { this.setState({ toast: m }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2500); }
+
+  renderVals() {
+    const s = this.state;
+    const screen = s.screen;
+
+    const P = s.fontes;
+    const isLive = (p) => p.status === 'active' || p.status === 'searching';
+    const pendCount = P.filter((p) => p.status === 'pending').length;
+    const activeCount = P.filter(isLive).length;
+    const rejCount = P.filter((p) => p.status === 'rejected').length;
+    const tab = s.progTab;
+    const shown = P.filter((p) => tab === 'pendentes' ? p.status === 'pending' : tab === 'rejeitados' ? p.status === 'rejected' : isLive(p));
+    const programas = shown.map((p) => ({
+      ...p,
+      initials: this.initials(p.name),
+      isPending: p.status === 'pending',
+      isSearching: p.status === 'searching',
+      isActive: p.status === 'active',
+      isRejected: p.status === 'rejected',
+      benLabel: p.status === 'searching' ? 'buscando benefícios…' : (p.benefits || 0) + ' benefícios',
+      approve: () => this.approve(p),
+      reject: () => this.askReject(p),
+      edit: () => this.openFonte(p),
+      remove: () => this.askRemove('fonte', p),
+      reconsider: () => this.reconsider(p),
+    }));
+
+    const q = this.norm(s.benQuery.trim());
+    let bens = s.beneficios;
+    if (s.benCat !== 'all') bens = bens.filter((b) => this.CATS[b.category] === s.benCat);
+    if (q) bens = bens.filter((b) => this.norm(`${b.title} ${b.fonte} ${b.category}`).includes(q));
+    const beneficios = bens.map((b) => ({ ...b, catLabel: b.category, catStyle: `--cat:var(--c-${this.CATS[b.category] || 'accent'})`, pillClass: this.pillClass(b.origem), originLabel: b.origem, isNew: !!b.novo, edit: () => this.openBen(b), remove: () => this.askRemove('beneficio', b) }));
+
+    const chipDefs = [['all', 'Todas', null], ...Object.entries(this.CATS).map(([label, key]) => [key, label, `cat-${key}`])];
+    const catChips = chipDefs.map(([key, label, dot]) => ({ label, dot, cls: s.benCat === key ? 'chip on' : 'chip', select: () => this.setState({ benCat: key }) }));
+
+    const modal = s.modal;
+    const kind = modal && modal.kind;
+
+    return {
+      theme: this.props.theme || 'light',
+      isLogin: screen === 'login',
+      isApp: screen !== 'login',
+      isPainel: screen === 'painel',
+      isFontes: screen === 'fontes',
+      isBeneficios: screen === 'beneficios',
+
+      loginEmail: s.loginEmail, loginSenha: s.loginSenha,
+      onLoginEmail: (e) => this.setState({ loginEmail: e.target.value }),
+      onLoginSenha: (e) => this.setState({ loginSenha: e.target.value }),
+      doLogin: () => this.setState({ screen: 'painel' }),
+      doLogout: () => this.setState({ screen: 'login', modal: null }),
+
+      goPainel: (e) => { if (e && e.preventDefault) e.preventDefault(); this.setState({ screen: 'painel' }); },
+      goFontes: (e) => { if (e && e.preventDefault) e.preventDefault(); this.setState({ screen: 'fontes' }); },
+      goBeneficios: (e) => { if (e && e.preventDefault) e.preventDefault(); this.setState({ screen: 'beneficios' }); },
+      curPainel: screen === 'painel' ? 'page' : undefined,
+      curFontes: screen === 'fontes' ? 'page' : undefined,
+      curBen: screen === 'beneficios' ? 'page' : undefined,
+
+      countFontes: activeCount,
+      countBeneficios: s.beneficios.length,
+      countNovos: s.beneficios.filter((b) => b.novo).length,
+
+      programas, progEmpty: programas.length === 0,
+      progTab: s.progTab, pendCount, activeCount, rejCount,
+      hasPend: pendCount > 0,
+      showBatch: s.progTab === 'pendentes' && pendCount > 0,
+      tabPendCls: s.progTab === 'pendentes' ? 'on' : '',
+      tabAtivosCls: s.progTab === 'ativos' ? 'on' : '',
+      tabRejCls: s.progTab === 'rejeitados' ? 'on' : '',
+      setTabPend: () => this.setState({ progTab: 'pendentes' }),
+      setTabAtivos: () => this.setState({ progTab: 'ativos' }),
+      setTabRej: () => this.setState({ progTab: 'rejeitados' }),
+      approveAll: () => this.approveAll(),
+
+      beneficios, benEmpty: beneficios.length === 0,
+      benQuery: s.benQuery, onBenQuery: (e) => this.setState({ benQuery: e.target.value }),
+      catChips,
+      openNewFonte: () => this.openFonte(null),
+      openNewBen: () => this.openBen(null),
+
+      modalOpen: !!modal,
+      dialogWide: kind === 'beneficio' ? 'aa-wide' : '',
+      isRemove: kind === 'remove', isFonteForm: kind === 'fonte', isBenForm: kind === 'beneficio', isReject: kind === 'reject',
+      modalTitle: modal ? (modal.mode === 'edit' ? (kind === 'fonte' ? 'Editar programa' : 'Editar benefício') : (kind === 'fonte' ? 'Novo programa' : 'Novo benefício')) : '',
+      removeName: modal && modal.target ? (modal.target.name || modal.target.title) : '',
+      rejectName: modal && modal.target ? modal.target.name : '',
+      confirmReject: () => this.doReject(),
+      form: s.form, field: this.fields(),
+      stop: (e) => e.stopPropagation(),
+      closeModal: () => this.setState({ modal: null }),
+      saveModal: () => this.save(),
+      confirmRemove: () => this.doRemove(),
+      toast: s.toast,
+    };
+  }
+
+  fields() {
+    if (!this._fields) {
+      const mk = (k) => (e) => this.setState((s) => ({ form: { ...s.form, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value } }));
+      this._fields = { name: mk('name'), type: mk('type'), title: mk('title'), category: mk('category'), origem: mk('origem'), fonte: mk('fonte'), desc: mk('desc'), novo: mk('novo'), reason: mk('reason'), origin: mk('origin') };
+    }
+    return this._fields;
+  }
+  openFonte(f) { this.setState({ modal: { kind: 'fonte', mode: f ? 'edit' : 'new', target: f }, form: f ? { ...f } : { name: '', type: 'Cartão' } }); }
+  openBen(b) { this.setState({ modal: { kind: 'beneficio', mode: b ? 'edit' : 'new', target: b }, form: b ? { ...b } : { title: '', category: 'Aeroporto', origem: 'Emissor', fonte: '', desc: '', novo: false } }); }
+  askRemove(kind, target) { this.setState({ modal: { kind: 'remove', removeKind: kind, target } }); }
+  approve(p, silent) {
+    this.setState((s) => ({ fontes: s.fontes.map((x) => x.id === p.id ? { ...x, status: 'searching', benefits: 0 } : x) }));
+    if (!silent) this.toastMsg('Aprovado — robô buscando benefícios');
+    clearTimeout(this['_srch' + p.id]);
+    this['_srch' + p.id] = setTimeout(() => {
+      this.setState((s) => ({ fontes: s.fontes.map((x) => x.id === p.id ? { ...x, status: 'active', benefits: x.estBenefits || 0 } : x) }));
+    }, 2800);
+  }
+  approveAll() {
+    const pend = this.state.fontes.filter((p) => p.status === 'pending');
+    pend.forEach((p) => this.approve(p, true));
+    if (pend.length) this.toastMsg(pend.length + ' programas aprovados — robô buscando benefícios');
+  }
+  askReject(p) { this.setState({ modal: { kind: 'reject', target: p }, form: { reason: '' } }); }
+  doReject() {
+    const { modal, form } = this.state;
+    this.setState((s) => ({ fontes: s.fontes.map((x) => x.id === modal.target.id ? { ...x, status: 'rejected', reason: form.reason || 'Sem motivo informado' } : x), modal: null }));
+    this.toastMsg('Programa rejeitado');
+  }
+  reconsider(p) {
+    this.setState((s) => ({ fontes: s.fontes.map((x) => x.id === p.id ? { ...x, status: 'pending', reason: undefined } : x) }));
+    this.toastMsg('Voltou para pendentes');
+  }
+  save() {
+    const { modal, form } = this.state;
+    if (modal.kind === 'fonte') {
+      this.setState((s) => modal.mode === 'edit'
+        ? { fontes: s.fontes.map((f) => f.id === modal.target.id ? { ...f, name: form.name, type: form.type, origin: form.origin } : f), modal: null }
+        : { fontes: [{ id: Date.now(), name: form.name || 'Novo programa', type: form.type || 'Cartão', origin: form.origin, status: 'active', benefits: 0 }, ...s.fontes], modal: null });
+      this.toastMsg(modal.mode === 'edit' ? 'Programa atualizado' : 'Programa adicionado');
+    } else {
+      this.setState((s) => modal.mode === 'edit'
+        ? { beneficios: s.beneficios.map((b) => b.id === modal.target.id ? { ...b, ...form } : b), modal: null }
+        : { beneficios: [{ id: Date.now(), title: form.title || 'Novo benefício', category: form.category || 'Aeroporto', origem: form.origem || 'Emissor', fonte: form.fonte || '—', novo: !!form.novo }, ...s.beneficios], modal: null });
+      this.toastMsg(modal.mode === 'edit' ? 'Benefício atualizado' : 'Benefício adicionado');
+    }
+  }
+  doRemove() {
+    const { modal } = this.state;
+    const name = modal.target.name || modal.target.title;
+    this.setState((s) => modal.removeKind === 'fonte'
+      ? { fontes: s.fontes.filter((f) => f.id !== modal.target.id), modal: null }
+      : { beneficios: s.beneficios.filter((b) => b.id !== modal.target.id), modal: null });
+    this.toastMsg('Removido: ' + name);
+  }
+}
+</script>
+</body>
+</html>
