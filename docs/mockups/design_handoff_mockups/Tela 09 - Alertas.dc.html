@@ -73,7 +73,7 @@
           <span style="flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:13px;background:color-mix(in srgb,var(--accent) 13%,var(--surface));color:var(--accent)"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1c.8 6.8 3.2 9.2 10 10-6.8.8-9.2 3.2-10 10-.8-6.8-3.2-9.2-10-10 6.8-.8 9.2-3.2 10-10Z"/></svg></span>
           <span style="flex:1;min-width:0">
             <span style="display:block;font-size:15px;font-weight:700;color:var(--ink)">Novos benefícios</span>
-            <span style="display:block;margin-top:2px;font-size:12.5px;line-height:1.35;color:var(--ink-2)">Quando acharmos algo novo nos seus provedores</span>
+            <span style="display:block;margin-top:2px;font-size:12.5px;line-height:1.35;color:var(--ink-2)">Quando acharmos algo novo nos seus programas</span>
           </span>
           <span role="switch" tabindex="0" aria-checked="{{ alertNovos }}" onClick="{{ toggleNovos }}" style="flex:none;position:relative;width:46px;height:28px;border-radius:999px;cursor:pointer">
             <sc-if value="{{ alertNovos }}" hint-placeholder-val="{{ true }}"><span style="position:absolute;inset:0;border-radius:999px;background:var(--accent)"></span><span style="position:absolute;top:3px;left:21px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25)"></span></sc-if>
@@ -154,7 +154,7 @@ class Component extends DCLogic {
     { type: 'Bancos & carteiras', sub: 'Banco', color: '--c-viagem', names: ['Banco do Brasil', 'Santander', 'BTG'] },
     { type: 'Companhias aéreas', sub: 'Programa aéreo', color: '--c-pontos', names: ['LATAM Pass', 'Smiles', 'TudoAzul'] },
   ];
-  SCAN_LABELS = ['Lendo e-mails de fidelidade…', 'Cartões de crédito…', 'Assinaturas e telefonia…', 'Planos de saúde…', 'Companhias aéreas…', 'Bancos e carteiras…'];
+  SCAN_LABELS = ['Lendo e-mails de benefícios…', 'Cartões de crédito…', 'Assinaturas e telefonia…', 'Planos de saúde…', 'Companhias aéreas…', 'Bancos e carteiras…'];
   PANEL_CATS = [
     { key: 'all', label: 'Todos' },
     { key: 'airport', label: 'Aeroporto', color: true },

@@ -130,7 +130,7 @@
                 <span style="font-size:16px;font-weight:700;color:var(--ink);white-space:nowrap">Adicionar manualmente</span>
                 <span style="font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2);background:transparent;border:1px solid var(--line);padding:3px 7px;border-radius:7px;white-space:nowrap">No controle</span>
               </div>
-              <p style="margin:0 0 11px;font-size:13px;line-height:1.45;color:var(--ink-2)">Escolha seus provedores numa lista — cartões, assinaturas, saúde e mais. Sem conectar e-mail.</p>
+              <p style="margin:0 0 11px;font-size:13px;line-height:1.45;color:var(--ink-2)">Escolha seus programas de benefícios numa lista — cartões, assinaturas, saúde e mais. Sem conectar e-mail.</p>
               <div style="display:flex;flex-wrap:wrap;gap:6px">
                 <span style="font-size:11px;font-weight:600;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line);padding:4px 9px;border-radius:999px;white-space:nowrap">Leva ~2 min</span>
               </div>
@@ -151,7 +151,7 @@
         <span style="flex:none;color:var(--muted);margin-top:1px">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>
         </span>
-        <p style="margin:0;font-size:12px;line-height:1.45;color:var(--ink-2)">Acesso <b style="color:var(--ink)">somente leitura</b>. Lemos apenas e-mails de benefícios e programas de fidelidade — nada é compartilhado ou armazenado.</p>
+        <p style="margin:0;font-size:12px;line-height:1.45;color:var(--ink-2)">Acesso <b style="color:var(--ink)">somente leitura</b>. Lemos apenas e-mails sobre seus benefícios e programas — nada é compartilhado ou armazenado.</p>
       </div>
 
       <!-- actions -->
@@ -191,7 +191,7 @@ class Component extends DCLogic {
     { type: 'Bancos & carteiras', sub: 'Banco', color: '--c-viagem', names: ['Banco do Brasil', 'Santander', 'BTG'] },
     { type: 'Companhias aéreas', sub: 'Programa aéreo', color: '--c-pontos', names: ['LATAM Pass', 'Smiles', 'TudoAzul'] },
   ];
-  SCAN_LABELS = ['Lendo e-mails de fidelidade…', 'Cartões de crédito…', 'Assinaturas e telefonia…', 'Planos de saúde…', 'Companhias aéreas…', 'Bancos e carteiras…'];
+  SCAN_LABELS = ['Lendo e-mails de benefícios…', 'Cartões de crédito…', 'Assinaturas e telefonia…', 'Planos de saúde…', 'Companhias aéreas…', 'Bancos e carteiras…'];
   PANEL_CATS = [
     { key: 'all', label: 'Todos' },
     { key: 'airport', label: 'Aeroporto', color: true },

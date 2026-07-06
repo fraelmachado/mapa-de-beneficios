@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/mapa-de-benef-cios-80471905-a90c-46a6-a492-cefadd7a0b6b/styles.css">
+  <script src="_ds/mapa-de-benef-cios-80471905-a90c-46a6-a492-cefadd7a0b6b/_ds_bundle.js"></script>
+  <style>
+    html,body{margin:0}
+    @keyframes aa-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    @keyframes aa-toast{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
+    @keyframes dv-spin{to{transform:rotate(360deg)}}
+    .aa-scroll::-webkit-scrollbar{width:8px;height:8px}
+    .aa-scroll::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--ink) 14%,transparent);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
+
+    .aa-root{container-type:inline-size;width:100%;height:100%;position:relative;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--font)}
+    .aa-shell{height:100%}
+    .aa-side{display:none}
+    .aa-main{height:100%;overflow-y:auto;padding:18px 16px 100px;box-sizing:border-box}
+
+    .aa-tabbar{position:absolute;left:0;right:0;bottom:0;z-index:20;padding:8px 16px calc(8px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(12px);border-top:1px solid var(--line)}
+    .aa-tabbar .nav{border:0;border-radius:0;background:transparent;padding:0}
+    .aa-tabbar .grip{display:flex;justify-content:center;padding:6px 0 2px}
+    .aa-tabbar .grip span{width:120px;height:5px;border-radius:999px;background:var(--ink);opacity:.85}
+
+    .aa-brand{display:flex;align-items:center;gap:10px;padding:6px 8px 20px}
+    .aa-navbtn{display:flex;align-items:center;gap:11px;padding:11px 12px;border:0;border-radius:11px;cursor:pointer;font:inherit;font-size:14px;font-weight:600;text-align:left;background:transparent;color:rgba(255,255,255,.62);width:100%}
+    .aa-navbtn:hover{background:rgba(255,255,255,.06);color:#fff}
+    .aa-navbtn[aria-current="page"]{background:var(--accent);color:#fff}
+    .aa-navcount{margin-left:auto;font-size:11px;font-weight:700;color:rgba(255,255,255,.45)}
+    .aa-pendbadge{margin-left:auto;font-size:11px;font-weight:800;padding:1px 7px;border-radius:999px;background:var(--accent);color:#fff}
+    .aa-side-foot{margin-top:auto;padding-top:16px;border-top:1px solid rgba(255,255,255,.08)}
+
+    .aa-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:6px}
+    .aa-eyebrow{margin:0 0 3px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .aa-h1{margin:0;font-size:23px;font-weight:800;letter-spacing:-.03em;color:var(--ink)}
+    .aa-sublbl{margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+    .aa-btn-ok{padding:8px 14px;border:0;border-radius:10px;background:var(--ink);color:var(--surface);font:inherit;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+    .aa-btn-ok:hover{background:color-mix(in srgb,var(--ink) 85%,#fff)}
+    .aa-btn-ok[disabled]{opacity:.32;cursor:not-allowed;background:var(--ink)}
+    .aa-txtbtn{padding:8px 13px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+    .aa-txtbtn:hover{border-color:var(--ink)}
+    .aa-txtbtn.warn{border-color:transparent;background:transparent;color:var(--warn)}
+    .aa-txtbtn.warn:hover{background:color-mix(in srgb,var(--warn) 12%,transparent)}
+
+    .aa-toast{position:absolute;left:50%;bottom:100px;transform:translateX(-50%);z-index:80;display:flex;align-items:center;gap:9px;padding:11px 16px;border-radius:13px;background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);animation:aa-toast .25s ease both;white-space:nowrap}
+
+    /* ---- Discovery-specific ---- */
+    .dv-sub{margin:0 0 22px;font-size:13.5px;color:var(--ink-2);max-width:60ch;line-height:1.5}
+    .dv-jobnew{display:flex;gap:9px;margin-bottom:12px}
+    .dv-jobinput{flex:1;min-width:0;margin:0;display:flex;align-items:center;gap:9px}
+    .dv-jobs{display:flex;flex-direction:column;gap:8px;margin-bottom:26px}
+    .dv-job{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--line);border-radius:13px;background:var(--surface);cursor:pointer;font:inherit;text-align:left;width:100%;box-shadow:var(--shadow)}
+    .dv-job:hover{border-color:var(--ink)}
+    .dv-job.on{border-color:var(--accent);box-shadow:0 0 0 1.5px var(--accent) inset}
+    .dv-jname{font-size:14.5px;font-weight:700;color:var(--ink);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .dv-jst{font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+    .dv-jst.done{color:var(--ok);background:color-mix(in srgb,var(--ok) 13%,var(--surface))}
+    .dv-jst.running{color:var(--accent);background:color-mix(in srgb,var(--accent) 13%,var(--surface))}
+    .dv-jst.queued{color:var(--muted);background:var(--surface-2)}
+    .dv-jst.error{color:var(--warn);background:color-mix(in srgb,var(--warn) 13%,var(--surface))}
+    .dv-jspin{width:9px;height:9px;border-radius:50%;border:2px solid currentColor;border-top-color:transparent;animation:dv-spin .8s linear infinite}
+    .dv-jcount{font-size:12px;color:var(--muted);white-space:nowrap}
+
+    .dv-treehead{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+    .dv-legend{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--ink-2);line-height:1.45;background:color-mix(in srgb,var(--accent) 7%,var(--surface));border:1px solid color-mix(in srgb,var(--accent) 24%,var(--line));border-radius:12px;padding:10px 13px}
+    .dv-empty{padding:34px 16px;text-align:center;color:var(--muted);font-size:13.5px;border:1px dashed var(--line);border-radius:16px}
+
+    /* node header: mobile stacks actions below; desktop puts them right */
+    .dv-node{display:grid;grid-template-columns:minmax(0,1fr);grid-template-areas:"main" "act";gap:11px}
+    .dv-node-main{grid-area:main;min-width:0}
+    .dv-node-act{grid-area:act;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .dv-title{display:flex;align-items:center;gap:9px;flex-wrap:wrap;min-width:0}
+    .dv-kind{font-size:9.5px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:2px 6px;flex:none}
+    .dv-nm{font-weight:800;letter-spacing:-.01em;color:var(--ink);min-width:0}
+    .dv-chips{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-top:9px}
+    .dv-verif{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,var(--surface));padding:3px 9px;border-radius:999px}
+    .dv-link{font-size:12px;color:var(--muted);text-decoration:none;border-bottom:1px dashed color-mix(in srgb,var(--muted) 55%,transparent)}
+    .dv-link:hover{color:var(--ink)}
+    .dv-lock{font-size:11px;color:var(--muted);font-style:italic;line-height:1.3;max-width:180px}
+    .dv-badge-ok{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;color:var(--ok);background:color-mix(in srgb,var(--ok) 13%,var(--surface));padding:6px 11px;border-radius:999px}
+    .dv-badge-rej{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;color:var(--warn);background:color-mix(in srgb,var(--warn) 12%,var(--surface));padding:6px 11px;border-radius:999px}
+
+    /* source = big card */
+    .dv-src{border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+    .dv-src.is-approved{border-color:color-mix(in srgb,var(--ok) 45%,var(--line))}
+    .dv-src.is-rejected{opacity:.5}
+    .dv-node-src .dv-nm{font-size:17px}
+
+    /* variants nested under source, indented with rail + distinct bg */
+    .dv-vars{display:flex;flex-direction:column;gap:10px;margin-top:14px;padding-left:14px;border-left:2px solid color-mix(in srgb,var(--ink) 12%,transparent)}
+    .dv-var{background:var(--surface-2);border:1px solid var(--line);border-radius:13px;padding:13px 14px}
+    .dv-var.is-approved{border-color:color-mix(in srgb,var(--ok) 40%,var(--line))}
+    .dv-var.is-rejected{opacity:.5}
+    .dv-node-var .dv-nm{font-size:14.5px}
+    .dv-submeta{font-size:12px;color:var(--muted);font-weight:600}
+
+    /* benefits nested under variant */
+    .dv-bens{display:flex;flex-direction:column;gap:8px;margin-top:11px;padding-left:12px;border-left:2px solid color-mix(in srgb,var(--ink) 9%,transparent)}
+    .dv-ben{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:11px 12px}
+    .dv-ben.is-approved{border-color:color-mix(in srgb,var(--ok) 38%,var(--line))}
+    .dv-ben.is-rejected{opacity:.5}
+    .dv-ben-title{font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.35}
+    .dv-ben-sum{font-size:12px;color:var(--ink-2);line-height:1.4}
+    .dv-ben-meta{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-top:6px}
+
+    @container (min-width:760px){
+      .aa-shell{display:grid;grid-template-columns:246px 1fr;height:100%}
+      .aa-side{display:flex;flex-direction:column;height:100%;overflow-y:auto;background:#0f1013;color:rgba(255,255,255,.62);padding:20px 16px;box-sizing:border-box}
+      .aa-main{padding:32px 40px;height:100%}
+      .aa-tabbar{display:none}
+      .aa-head{margin-bottom:6px}
+      .aa-h1{font-size:28px}
+      .dv-jobs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+      .dv-node{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"main act";align-items:center;gap:16px}
+      .dv-node-act{justify-content:flex-end}
+      .dv-toast{bottom:26px}
+      .aa-toast{bottom:26px}
+    }
+  </style>
+</helmet>
+<div class="aa-root" data-theme="{{ theme }}">
+  <div class="aa-shell">
+
+    <!-- sidebar (desktop) -->
+    <aside class="aa-side aa-scroll">
+      <div class="aa-brand">
+        <span style="display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--accent)"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.5"><circle cx="8" cy="8" r="6.4"/><circle cx="8" cy="8" r="3"/><circle cx="8" cy="8" r="1" fill="#fff"/></svg></span>
+        <div style="min-width:0"><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em;color:#fff;white-space:nowrap">Mapa de Benefícios</div><div style="font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4)">Admin</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;margin-top:6px">
+        <button type="button" class="aa-navbtn" onClick="{{ inert }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> Painel</button>
+        <button type="button" class="aa-navbtn" onClick="{{ inert }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/><path d="M9 21v-6h6v6"/></svg> Programas de benefícios</button>
+        <button type="button" class="aa-navbtn" onClick="{{ inert }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/></svg> Benefícios</button>
+        <button type="button" class="aa-navbtn" aria-current="page" onClick="{{ inert }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg> <span style="flex:1">Discovery</span> <sc-if value="{{ hasPending }}" hint-placeholder-val="{{ true }}"><span class="aa-pendbadge">{{ pendingCount }}</span></sc-if></button>
+      </div>
+      <div class="aa-side-foot">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 8px 12px">
+          <span style="display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--c-viagem),var(--accent));color:#fff;font-size:12px;font-weight:800">MC</span>
+          <div style="min-width:0"><div style="font-size:12.5px;font-weight:700;color:#fff;white-space:nowrap">Marina Curadoria</div><div style="font-size:11px;color:rgba(255,255,255,.45)">Editora</div></div>
+        </div>
+        <button type="button" class="aa-navbtn" onClick="{{ inert }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Sair</button>
+      </div>
+    </aside>
+
+    <!-- main -->
+    <main class="aa-main aa-scroll">
+      <div style="animation:aa-in .3s ease both">
+        <div class="aa-head">
+          <div><p class="aa-eyebrow">Catálogo</p><h1 class="aa-h1">Discovery</h1></div>
+        </div>
+        <p class="dv-sub">Revise os candidatos propostos pelo agente antes de entrarem no catálogo. O agente nunca publica sozinho — nada entra no catálogo sem a sua aprovação.</p>
+
+        <!-- fila de jobs -->
+        <p class="aa-sublbl">Fila de jobs</p>
+        <div class="dv-jobnew">
+          <label class="input dv-jobinput"><span class="muted" style="display:flex"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></span><input type="text" value="{{ newJob }}" onChange="{{ onNewJob }}" placeholder="Novo job — ex.: Priority Pass, Wellhub…" style="flex:1;min-width:0;border:0;background:transparent;outline:none;font:inherit;font-size:14px;color:var(--ink)"/></label>
+          <button type="button" class="aa-btn-ok" onClick="{{ enqueue }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Enfileirar</button>
+        </div>
+        <div class="dv-jobs">
+          <sc-for list="{{ jobs }}" as="j" hint-placeholder-count="4">
+            <button type="button" class="dv-job {{ j.cls }}" onClick="{{ j.select }}">
+              <span class="dv-jname">{{ j.name }}</span>
+              <sc-if value="{{ j.showCount }}" hint-placeholder-val="{{ false }}"><span class="dv-jcount">{{ j.countLabel }}</span></sc-if>
+              <span class="dv-jst {{ j.stCls }}"><sc-if value="{{ j.isRunning }}" hint-placeholder-val="{{ false }}"><span class="dv-jspin"></span></sc-if>{{ j.stLabel }}</span>
+            </button>
+          </sc-for>
+        </div>
+
+        <!-- candidatos do job selecionado -->
+        <sc-if value="{{ hasCandidates }}" hint-placeholder-val="{{ true }}">
+          <div style="animation:aa-in .3s ease both">
+            <div class="dv-treehead">
+              <p class="aa-sublbl" style="margin:0">Candidatos · {{ selJobName }}</p>
+              <div class="dv-legend"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;color:var(--accent)"><path d="M12 2v6l3-1.5"/><circle cx="12" cy="14" r="8"/><path d="M12 10v4l2.5 1.5"/></svg><span>Aprovação em cascata, nó a nó: <b>aprove o programa primeiro</b>, depois as variantes e, por fim, os benefícios. Nada entra no catálogo sem aprovação.</span></div>
+            </div>
+
+            <sc-for list="{{ sources }}" as="s" hint-placeholder-count="2">
+              <div class="dv-src {{ s.stateCls }}">
+                <!-- fonte -->
+                <div class="dv-node dv-node-src">
+                  <div class="dv-node-main">
+                    <div class="dv-title"><span class="dv-kind">Programa</span><span class="dv-nm">{{ s.name }}</span></div>
+                    <div class="dv-chips">
+                      <span class="tag" style="{{ s.catStyle }}">{{ s.category }}</span>
+                      <sc-for list="{{ s.flags }}" as="f" hint-placeholder-count="1"><span class="pill {{ f.cls }}">{{ f.label }}</span></sc-for>
+                      <span class="dv-verif"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>{{ s.verification }}</span>
+                      <a class="dv-link" href="{{ s.href }}" onClick="{{ inert }}">{{ s.procedencia }}</a>
+                    </div>
+                  </div>
+                  <div class="dv-node-act">
+                    <sc-if value="{{ s.isPending }}" hint-placeholder-val="{{ true }}">
+                      <button type="button" class="aa-btn-ok" onClick="{{ s.approve }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Aprovar programa</button>
+                      <button type="button" class="aa-txtbtn warn" onClick="{{ s.reject }}">Rejeitar</button>
+                    </sc-if>
+                    <sc-if value="{{ s.isApproved }}" hint-placeholder-val="{{ false }}"><span class="dv-badge-ok"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> aprovado</span></sc-if>
+                    <sc-if value="{{ s.isRejected }}" hint-placeholder-val="{{ false }}"><span class="dv-badge-rej">rejeitado</span></sc-if>
+                  </div>
+                </div>
+
+                <!-- variantes -->
+                <div class="dv-vars">
+                  <sc-for list="{{ s.variants }}" as="v" hint-placeholder-count="2">
+                    <div class="dv-var {{ v.stateCls }}">
+                      <div class="dv-node dv-node-var">
+                        <div class="dv-node-main">
+                          <div class="dv-title"><span class="dv-kind">Variante</span><span class="dv-nm">{{ v.label }}</span><sc-if value="{{ v.sub }}" hint-placeholder-val="{{ false }}"><span class="dv-submeta">{{ v.sub }}</span></sc-if></div>
+                        </div>
+                        <div class="dv-node-act">
+                          <sc-if value="{{ v.isPending }}" hint-placeholder-val="{{ true }}">
+                            <sc-if value="{{ v.locked }}" hint-placeholder-val="{{ false }}"><span class="dv-lock">{{ v.lockMsg }}</span></sc-if>
+                            <button type="button" class="aa-btn-ok" disabled="{{ v.locked }}" onClick="{{ v.approve }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Aprovar</button>
+                            <button type="button" class="aa-txtbtn warn" onClick="{{ v.reject }}">Rejeitar</button>
+                          </sc-if>
+                          <sc-if value="{{ v.isApproved }}" hint-placeholder-val="{{ false }}"><span class="dv-badge-ok"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> aprovada</span></sc-if>
+                          <sc-if value="{{ v.isRejected }}" hint-placeholder-val="{{ false }}"><span class="dv-badge-rej">rejeitada</span></sc-if>
+                        </div>
+                      </div>
+
+                      <!-- benefícios -->
+                      <div class="dv-bens">
+                        <sc-for list="{{ v.benefits }}" as="b" hint-placeholder-count="2">
+                          <div class="dv-ben {{ b.stateCls }}">
+                            <div class="dv-node dv-node-ben">
+                              <div class="dv-node-main">
+                                <div class="dv-ben-title">{{ b.title }}</div>
+                                <div class="dv-ben-meta"><span class="tag" style="{{ b.catStyle }}">{{ b.category }}</span><span class="dv-ben-sum">{{ b.summary }}</span><a class="dv-link" href="{{ b.href }}" onClick="{{ inert }}">{{ b.procedencia }}</a></div>
+                              </div>
+                              <div class="dv-node-act">
+                                <sc-if value="{{ b.isPending }}" hint-placeholder-val="{{ true }}">
+                                  <sc-if value="{{ b.locked }}" hint-placeholder-val="{{ false }}"><span class="dv-lock">{{ b.lockMsg }}</span></sc-if>
+                                  <button type="button" class="aa-btn-ok" disabled="{{ b.locked }}" onClick="{{ b.approve }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Aprovar</button>
+                                  <button type="button" class="aa-txtbtn warn" onClick="{{ b.reject }}">Rejeitar</button>
+                                </sc-if>
+                                <sc-if value="{{ b.isApproved }}" hint-placeholder-val="{{ false }}"><span class="dv-badge-ok"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> aprovado</span></sc-if>
+                                <sc-if value="{{ b.isRejected }}" hint-placeholder-val="{{ false }}"><span class="dv-badge-rej">rejeitado</span></sc-if>
+                              </div>
+                            </div>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showEmpty }}" hint-placeholder-val="{{ false }}">
+          <div class="dv-empty">{{ emptyMsg }}</div>
+        </sc-if>
+      </div>
+    </main>
+
+    <!-- bottom tabbar (mobile) -->
+    <div class="aa-tabbar">
+      <nav class="nav" aria-label="Admin">
+        <a href="#" onClick="{{ inert }}"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span> Painel</a>
+        <a href="#" onClick="{{ inert }}"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/><path d="M9 21v-6h6v6"/></svg></span> Programas</a>
+        <a href="#" onClick="{{ inert }}"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/></svg></span> Benefícios</a>
+        <a href="#" onClick="{{ inert }}" aria-current="page"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg></span> Discovery</a>
+      </nav>
+      <div class="grip"><span></span></div>
+    </div>
+
+  </div>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div class="aa-toast"><span style="display:grid;place-items:center;width:19px;height:19px;border-radius:50%;background:var(--ok);color:#fff"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>{{ toast }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;100%&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light'|'dark'&quot;}}">
+class Component extends DCLogic {
+  state = {
+    newJob: '',
+    selJob: 'wellhub',
+    toast: null,
+    jobs: [
+      {
+        id: 'wellhub', name: 'Wellhub', status: 'done',
+        sources: [
+          {
+            id: 's1', name: 'Wellhub', category: 'Multibenefícios corporativos',
+            verification: 'oficial confirmado', procedencia: 'wellhub.com', href: 'https://wellhub.com',
+            flags: ['novo'], status: 'pending',
+            variants: [
+              { id: 's1v1', label: 'Wellhub para empresas', status: 'pending', benefits: [
+                { id: 's1v1b1', title: 'Assinatura de bem-estar integral', category: 'outro', summary: 'Plano único que reúne academias, apps e terapias.', procedencia: 'wellhub.com/empresas', href: '#', status: 'pending' },
+                { id: 's1v1b2', title: 'Acesso a academias e estúdios', category: 'outro', summary: 'Rede de milhares de locais parceiros no Brasil.', procedencia: 'wellhub.com/academias', href: '#', status: 'pending' },
+              ] },
+              { id: 's1v2', label: 'Planos para colaboradores', status: 'pending', benefits: [
+                { id: 's1v2b1', title: 'Sem taxa de adesão ou cancelamento', category: 'serviço de conta', summary: 'Colaborador entra e sai do plano sem custo extra.', procedencia: 'wellhub.com/planos', href: '#', status: 'pending' },
+                { id: 's1v2b2', title: 'Plano Digital gratuito', category: 'outro', summary: 'Apps de treino e meditação sem mensalidade.', procedencia: 'wellhub.com/digital', href: '#', status: 'pending' },
+              ] },
+              { id: 's1v3', label: 'Gestão corporativa', status: 'pending', benefits: [
+                { id: 's1v3b1', title: 'Dashboard de adesão e engajamento', category: 'serviço de conta', summary: 'Métricas de uso agregadas para o RH.', procedencia: 'wellhub.com/rh', href: '#', status: 'pending' },
+              ] },
+              { id: 's1v4', label: 'Desconto em folha', status: 'pending', benefits: [
+                { id: 's1v4b1', title: 'Cobrança integrada à folha de pagamento', category: 'serviço de conta', summary: 'Mensalidade descontada direto do holerite.', procedencia: 'wellhub.com/folha', href: '#', status: 'pending' },
+              ] },
+            ],
+          },
+          {
+            id: 's2', name: 'Wellz by Wellhub', category: 'Multibenefícios corporativos',
+            verification: 'oficial confirmado', procedencia: 'wellhub.com/wellz', href: 'https://wellhub.com/wellz',
+            flags: ['novo'], status: 'pending',
+            variants: [
+              { id: 's2v1', label: 'Saúde mental', status: 'pending', benefits: [
+                { id: 's2v1b1', title: 'Terapia online individual e em grupo', category: 'outro', summary: 'Sessões com psicólogos por vídeo.', procedencia: 'wellhub.com/wellz/terapia', href: '#', status: 'pending' },
+                { id: 's2v1b2', title: 'Dashboard de saúde mental para o RH', category: 'serviço de conta', summary: 'Indicadores agregados e anônimos de uso.', procedencia: 'wellhub.com/wellz/rh', href: '#', status: 'pending' },
+              ] },
+            ],
+          },
+        ],
+      },
+      { id: 'priority', name: 'Priority Pass', status: 'running', sources: [] },
+      { id: 'alelo', name: 'Alelo', status: 'queued', sources: [] },
+      { id: 'ticket', name: 'Ticket', status: 'error', sources: [] },
+    ],
+  };
+
+  ST = { done: 'concluído', running: 'processando', queued: 'pendente', error: 'erro' };
+  catColor(label) {
+    const m = {
+      'Multibenefícios corporativos': 'var(--c-cashback)',
+      'Saúde mental': 'var(--c-seguro)',
+      'serviço de conta': 'var(--c-pontos)',
+      'outro': 'var(--muted)',
+    };
+    return m[label] || 'var(--muted)';
+  }
+  toastMsg(m) { this.setState({ toast: m }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2400); }
+
+  updateSel(mapper) {
+    this.setState((s) => ({ jobs: s.jobs.map((j) => j.id !== s.selJob ? j : { ...j, sources: mapper(j.sources) }) }));
+  }
+  setSrc(id, st) {
+    this.updateSel((srcs) => srcs.map((x) => x.id === id ? { ...x, status: st } : x));
+    this.toastMsg(st === 'approved' ? 'Programa aprovado — variantes liberadas' : 'Programa rejeitado');
+  }
+  setVar(sid, vid, st) {
+    this.updateSel((srcs) => srcs.map((s) => s.id !== sid ? s : { ...s, variants: s.variants.map((v) => v.id === vid ? { ...v, status: st } : v) }));
+    this.toastMsg(st === 'approved' ? 'Variante aprovada — benefícios liberados' : 'Variante rejeitada');
+  }
+  setBen(sid, vid, bid, st) {
+    this.updateSel((srcs) => srcs.map((s) => s.id !== sid ? s : { ...s, variants: s.variants.map((v) => v.id !== vid ? v : { ...v, benefits: v.benefits.map((b) => b.id === bid ? { ...b, status: st } : b) }) }));
+    this.toastMsg(st === 'approved' ? 'Benefício aprovado' : 'Benefício rejeitado');
+  }
+  enqueue() {
+    const name = this.state.newJob.trim();
+    if (!name) return;
+    this.setState((s) => ({ jobs: [...s.jobs, { id: 'j' + Date.now(), name, status: 'queued', sources: [] }], newJob: '' }));
+    this.toastMsg('Job enfileirado');
+  }
+
+  renderVals() {
+    const s = this.state;
+    const job = s.jobs.find((j) => j.id === s.selJob);
+    const rawSources = (job && job.sources) || [];
+
+    const countBens = (src) => src.reduce((a, x) => a + x.variants.reduce((b, v) => b + v.benefits.length, 0), 0);
+
+    const jobs = s.jobs.map((j) => {
+      const nSrc = (j.sources || []).length;
+      const nBen = countBens(j.sources || []);
+      return {
+        name: j.name,
+        cls: j.id === s.selJob ? 'on' : '',
+        stCls: j.status,
+        stLabel: this.ST[j.status] || j.status,
+        isRunning: j.status === 'running',
+        showCount: j.status === 'done' && nSrc > 0,
+        countLabel: nSrc + (nSrc === 1 ? ' programa' : ' programas') + ' · ' + nBen + ' benef.',
+        select: () => this.setState({ selJob: j.id }),
+      };
+    });
+
+    const sources = rawSources.map((src) => {
+      const srcApproved = src.status === 'approved';
+      return {
+        name: src.name,
+        category: src.category,
+        catStyle: `--cat:${this.catColor(src.category)}`,
+        verification: src.verification,
+        procedencia: src.procedencia,
+        href: src.href,
+        flags: (src.flags || []).map((f) => ({ label: f, cls: f === 'novo' ? 'new' : '' })),
+        isPending: src.status === 'pending',
+        isApproved: srcApproved,
+        isRejected: src.status === 'rejected',
+        stateCls: srcApproved ? 'is-approved' : src.status === 'rejected' ? 'is-rejected' : '',
+        approve: () => this.setSrc(src.id, 'approved'),
+        reject: () => this.setSrc(src.id, 'rejected'),
+        variants: src.variants.map((v) => {
+          const varApproved = v.status === 'approved';
+          const vLocked = !srcApproved;
+          return {
+            label: v.label,
+            sub: v.sub,
+            isPending: v.status === 'pending',
+            isApproved: varApproved,
+            isRejected: v.status === 'rejected',
+            stateCls: varApproved ? 'is-approved' : v.status === 'rejected' ? 'is-rejected' : '',
+            locked: vLocked,
+            lockMsg: 'aprove o programa primeiro',
+            approve: () => this.setVar(src.id, v.id, 'approved'),
+            reject: () => this.setVar(src.id, v.id, 'rejected'),
+            benefits: v.benefits.map((b) => {
+              const bLocked = !varApproved;
+              return {
+                title: b.title,
+                category: b.category,
+                summary: b.summary,
+                procedencia: b.procedencia,
+                href: b.href,
+                catStyle: `--cat:${this.catColor(b.category)}`,
+                isPending: b.status === 'pending',
+                isApproved: b.status === 'approved',
+                isRejected: b.status === 'rejected',
+                stateCls: b.status === 'approved' ? 'is-approved' : b.status === 'rejected' ? 'is-rejected' : '',
+                locked: bLocked,
+                lockMsg: 'aprove a variante primeiro',
+                approve: () => this.setBen(src.id, v.id, b.id, 'approved'),
+                reject: () => this.setBen(src.id, v.id, b.id, 'rejected'),
+              };
+            }),
+          };
+        }),
+      };
+    });
+
+    const pendingCount = rawSources.filter((x) => x.status === 'pending').length;
+    const hasCandidates = sources.length > 0;
+    const emptyMsg = !job ? 'Selecione um job para ver os candidatos.'
+      : job.status === 'running' ? 'O agente ainda está processando este job.'
+      : job.status === 'queued' ? 'Job na fila — aguardando o agente iniciar a pesquisa.'
+      : job.status === 'error' ? 'O job falhou. Reenfileire para tentar novamente.'
+      : 'Nenhum candidato encontrado neste job.';
+
+    return {
+      theme: this.props.theme || 'light',
+      newJob: s.newJob,
+      onNewJob: (e) => this.setState({ newJob: e.target.value }),
+      enqueue: () => this.enqueue(),
+      jobs,
+      selJobName: job ? job.name : '',
+      sources,
+      hasCandidates,
+      showEmpty: !hasCandidates,
+      emptyMsg,
+      hasPending: pendingCount > 0,
+      pendingCount,
+      inert: (e) => { if (e && e.preventDefault) e.preventDefault(); },
+      toast: s.toast,
+    };
+  }
+}
+</script>
+</body>
+</html>

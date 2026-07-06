@@ -3,6 +3,35 @@
 Pacote de referência de design para implementação do frontend. Contém **todos os
 mockups** criados na ferramenta de design + o design system usado por eles.
 
+## Como este pacote é usado (leia primeiro)
+
+Duas ferramentas, papéis que não se misturam:
+
+- **Claude Design** = fonte da verdade **visual**. Decide layout, hierarquia,
+  estados, responsividade e copy. Entrega os mockups `.dc.html` deste pacote.
+- **Claude Code** (você) = **implementador**. Não decide design; **reproduz** o
+  mockup aprovado no código real (React+Vite, `src/ui`), ligando aos dados.
+
+**Regra de ouro:** cada tela tem UM dono de design — o mockup. Se algo visual
+precisar mudar, muda no mockup (no Claude Design) e o `.dc.html` atualizado volta
+pra este pacote; a implementação então reflete. Nunca há duas "verdades".
+
+- Se, ao implementar, você sugerir algo visual diferente do mockup, **pergunte** —
+  a decisão volta pro Design, não fica só no código.
+- Em conflito entre uma instrução pontual e o padrão dos mockups existentes,
+  **prefira a consistência com os mockups existentes**.
+
+O fluxo completo (loop por tela + frases prontas) está em
+`FLUXO-Design-e-Code.md` nesta pasta.
+
+## Terminologia (obrigatória)
+
+O conceito que originava benefícios — antes **provedores / fontes / programas de
+fidelidade** — agora se chama **programa de benefícios** (plural: **programas de
+benefícios**). Hierarquia canônica do catálogo: **programa de benefícios → variante
+→ benefício**. Não confundir "programa de benefícios" (nó de topo) com "benefício"
+(item folha). Use esse vocabulário em nomes de rota, componentes e copy.
+
 ## O que são estes arquivos
 
 Os arquivos `*.dc.html` são **referências de design feitas em HTML** (protótipos que
@@ -53,8 +82,16 @@ conferência e ajustes finos — **não** recrie do zero o que já está pronto.
 - **Admin (feito):** Login, Home, Fontes/Programas, Benefícios.
 
 O que realmente falta / está fraco é **uma tela**: `/admin/discovery` (revisão de
-candidatos do P4, hoje um v1 mínimo). O padrão certo para ela já está desenhado
-nos mockups do Admin — ver a seção dedicada abaixo.
+candidatos do P4, hoje um v1 mínimo). **Já existe um mockup dedicado pra ela:**
+`Admin Discovery.dc.html` — use-o como referência principal (ver seção abaixo).
+
+> Nota de consistência: `Admin Discovery.dc.html` foi montado com as **classes CSS
+> do DS** (`.btn`, `.input`, `.pill`, `.tag`, `.nav`) + HTML, igual aos demais
+> mockups admin — e não com os componentes React `Button`/`Chip`/`Row`/etc. Isso é
+> proposital (consistência com os mockups existentes). Na implementação, mapeie
+> esses elementos para os componentes equivalentes de `src/ui`. Ex.: no mockup a
+> sidebar chama o item de **"Fontes"**; confirme o rótulo real com o time (o app
+> admin existente usa **"Programas"**) e padronize.
 
 ## Design System (tokens principais)
 
@@ -90,6 +127,7 @@ Definidos em `_ds/.../styles.css` (consumir via `var(--*)`, nunca hardcode):
 | `Onboarding` | App | `/onboarding` | Fluxo consolidado (multi-step) |
 | `Busca` | App | `/busca` | Busca/filtros |
 | `Admin` / `Admin App` | Admin | `/admin/*` | App admin completo (login, home, fontes, benefícios) |
+| `Admin Discovery` | Admin | `/admin/discovery` | **Tela nova** — revisão de candidatos do Discovery (fila de jobs + árvore fonte→variante→benefício, aprovação em cascata) |
 | `Admin Responsivo` | Admin | — | Mesmo app admin em frame mobile + desktop lado a lado (só demonstra responsividade) |
 | `Admin Mobile` | Admin | — | Recorte mobile do admin |
 | `Fluxo do App` / `Fluxo do Admin` | — | — | Diagramas de fluxo (navegação entre telas), referência de arquitetura |
@@ -110,12 +148,13 @@ projeto — o importante é preservar as duas formas de cada layout.
 
 ## FOCO: `/admin/discovery` (a tela que falta)
 
-O padrão certo está no mockup **`Admin App.dc.html`**, aba **"Pendentes"** da tela
-de Programas/Fontes. Abra esse arquivo, faça login (botão "Entrar") e vá em
-"Programas de fidelidade" para ver renderizado.
+Referência principal: o mockup **`Admin Discovery.dc.html`** (abre renderizado, mesmo
+shell admin). O padrão de card Aprovar/Rejeitar também aparece na aba **"Pendentes"**
+de **`Admin App.dc.html`** — abra, faça login ("Entrar") e vá em
+"Programas de benefícios".
 
 ### Cabeçalho + abas
-- Eyebrow "Programas de fidelidade" + `h1`.
+- Eyebrow "Programas de benefícios" + `h1`.
 - `SegmentedControl` com contagem: **"Pendentes {n}" | "Ativos {n}" | "Rejeitados {n}"**
   (aba inicial: Pendentes).
 
