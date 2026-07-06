@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { sanitizedEnv, buildCodexArgs } from './runCodex'
+import { sanitizedEnv, buildCodexArgs, extractJson } from './runCodex'
 
 describe('sanitizedEnv', () => {
   it('remove segredos e mantém só o allowlist', () => {
@@ -21,17 +21,32 @@ describe('sanitizedEnv', () => {
 })
 
 describe('buildCodexArgs', () => {
-  it('roda exec headless, sandbox read-only, com schema e saída em arquivo', () => {
-    const args = buildCodexArgs({ cwd: '/tmp/wd', schemaPath: '/tmp/wd/schema.json', outPath: '/tmp/wd/out.json' })
+  it('roda exec headless, sandbox read-only, saída em arquivo, sem --output-schema', () => {
+    const args = buildCodexArgs({ cwd: '/tmp/wd', outPath: '/tmp/wd/out.json' })
     expect(args[0]).toBe('exec')
     expect(args).toContain('--skip-git-repo-check')
     expect(args).toContain('--sandbox')
     expect(args).toContain('read-only')
-    expect(args).toContain('--output-schema')
-    expect(args).toContain('/tmp/wd/schema.json')
     expect(args).toContain('--output-last-message')
     expect(args).toContain('/tmp/wd/out.json')
     expect(args).toContain('-C')
     expect(args).toContain('/tmp/wd')
+    // --output-schema é incompatível com o strict mode do OpenAI; validação é via zod
+    expect(args).not.toContain('--output-schema')
+  })
+})
+
+describe('extractJson', () => {
+  it('parseia JSON puro', () => {
+    expect(extractJson('{"sources":[]}')).toEqual({ sources: [] })
+  })
+  it('extrai JSON de cercas de código markdown', () => {
+    expect(extractJson('```json\n{"sources":[{"name":"X"}]}\n```')).toEqual({ sources: [{ name: 'X' }] })
+  })
+  it('recorta JSON embrulhado em prosa', () => {
+    expect(extractJson('Aqui está:\n{"sources":[]}\nEspero que ajude.')).toEqual({ sources: [] })
+  })
+  it('lança quando não há objeto JSON', () => {
+    expect(() => extractJson('desculpe, não encontrei nada')).toThrow()
   })
 })

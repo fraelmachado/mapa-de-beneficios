@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@supabase/supabase-js'
-import { mkdtemp, writeFile } from 'node:fs/promises'
+import { mkdtemp } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { config as loadEnv } from 'dotenv'
@@ -71,19 +71,19 @@ async function main() {
           existing_benefits: [...snap.benefits.keys()],
           source_categories: SOURCE_CATEGORY_TAXONOMY,
         }
-        const schemaPath = join(wd, 'schema.json')
         const outPath = join(wd, 'out.json')
-        await writeFile(schemaPath, JSON.stringify(candidatesJsonSchema))
         const retry = ctx.attemptErrors ? `\nA tentativa anterior falhou na validação:\n${ctx.attemptErrors}\nCorrija.` : ''
         const prompt = [
-          `Pesquise na web o brief a seguir e proponha catálogo de benefícios como JSON no schema fornecido.`,
+          `Pesquise na web o brief a seguir e proponha catálogo de benefícios conforme o JSON Schema abaixo.`,
           `Brief: ${job.brief}`,
           `Classifique cada fonte numa source_category da taxonomia. Cite source_url em CADA nó.`,
-          `NÃO reproponha itens já existentes (contexto abaixo). Não faça nada além de produzir o JSON final.`,
+          `NÃO reproponha itens já existentes (contexto abaixo).`,
+          `Sua resposta final deve ser APENAS o objeto JSON válido — sem prosa, sem cercas de código (\`\`\`), nada além do JSON.`,
+          `JSON Schema: ${JSON.stringify(candidatesJsonSchema)}`,
           `Contexto do catálogo: ${JSON.stringify(context)}`,
           retry,
         ].join('\n')
-        return runCodex({ cwd: wd, prompt, schemaPath, outPath })
+        return runCodex({ cwd: wd, prompt, outPath })
       },
     })
     if (res.status === 'idle') break
