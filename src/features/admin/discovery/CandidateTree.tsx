@@ -1,34 +1,56 @@
+import './discovery.css'
+import type { CSSProperties } from 'react'
 import type { DiscoveryCandidate } from './types'
+import { benefitCategoryChip, sourceCategoryChip, verificationLabel } from './discoveryMeta'
 
-const label = (c: DiscoveryCandidate): string => {
-  const p = c.payload as { name?: string; label?: string; title?: string }
-  return p.name ?? p.label ?? p.title ?? c.fingerprint
+type P = Record<string, unknown>
+
+const str = (v: unknown): string => (typeof v === 'string' ? v : '')
+
+function host(url: string): string {
+  try {
+    return new URL(url).host
+  } catch {
+    return url
+  }
 }
 
-function Chip({ text }: { text: string }) {
-  return (
-    <span className="muted" style={{ fontSize: 11, border: '1px solid var(--line)', borderRadius: 6, padding: '0 6px' }}>
-      {text}
-    </span>
-  )
+function stateCls(review: string): string {
+  return review === 'approved' ? 'is-approved' : review === 'rejected' ? 'is-rejected' : ''
 }
 
-function Node({
-  c, depth, onPromote, onReject,
-}: { c: DiscoveryCandidate; depth: number; onPromote: (id: string) => void; onReject: (id: string) => void }) {
-  const prov = c.provenance as { verification_status?: string | null }
+const catStyle = (colorVar: string) => ({ '--cat': colorVar }) as CSSProperties
+
+function Actions({
+  c, locked, lockMsg, kind, onPromote, onReject,
+}: {
+  c: DiscoveryCandidate
+  locked: boolean
+  lockMsg: string
+  kind: 'programa' | 'variante' | 'beneficio'
+  onPromote: (id: string) => void
+  onReject: (id: string) => void
+}) {
+  if (c.review_status === 'approved') {
+    return <span className="dv-badge-ok">{kind === 'variante' ? 'aprovada' : 'aprovado'}</span>
+  }
+  if (c.review_status === 'rejected') {
+    return <span className="dv-badge-rej">{kind === 'variante' ? 'rejeitada' : 'rejeitado'}</span>
+  }
   return (
-    <div style={{ paddingLeft: depth * 16, display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0' }}>
-      <strong>{label(c)}</strong>
-      <Chip text={c.match_status} />
-      {prov.verification_status ? <Chip text={prov.verification_status} /> : null}
-      {c.review_status !== 'pending' ? <Chip text={c.review_status} /> : (
-        <span style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-          <button type="button" onClick={() => onPromote(c.id)}>Aprovar</button>
-          <button type="button" className="muted" onClick={() => onReject(c.id)}>Rejeitar</button>
-        </span>
-      )}
-    </div>
+    <>
+      {locked ? <span className="dv-lock">{lockMsg}</span> : null}
+      <button
+        type="button"
+        className="dv-btn-ok"
+        aria-label={kind === 'beneficio' ? 'Aprovar benefício' : undefined}
+        disabled={locked}
+        onClick={() => onPromote(c.id)}
+      >
+        {kind === 'programa' ? 'Aprovar programa' : 'Aprovar'}
+      </button>
+      <button type="button" className="dv-txtbtn" onClick={() => onReject(c.id)}>Rejeitar</button>
+    </>
   )
 }
 
@@ -39,27 +61,124 @@ export function CandidateTree({
   onPromote: (id: string) => void
   onReject: (id: string) => void
 }) {
-  const byParent = new Map<string | null, DiscoveryCandidate[]>()
-  for (const c of candidates) {
-    const k = c.parent_fingerprint
-    byParent.set(k, [...(byParent.get(k) ?? []), c])
+  const byFp = new Map(candidates.map((c) => [c.fingerprint, c]))
+  const childrenOf = (fp: string | null) => candidates.filter((c) => c.parent_fingerprint === fp)
+
+  const unlocked = (c: DiscoveryCandidate): boolean => {
+    if (!c.parent_fingerprint) return true
+    const parent = byFp.get(c.parent_fingerprint)
+    if (!parent) return true
+    return parent.review_status === 'approved' || parent.matched_id != null
   }
 
-  const rows: { c: DiscoveryCandidate; depth: number }[] = []
-  const walk = (parentFp: string | null, depth: number) => {
-    for (const c of byParent.get(parentFp) ?? []) {
-      rows.push({ c, depth })
-      walk(c.fingerprint, depth + 1)
-    }
-  }
-  walk(null, 0) // raízes = sources (parent_fingerprint null)
+  const sources = candidates.filter((c) => c.entity_type === 'source')
+  if (sources.length === 0) return <div className="dv-empty">Nenhum candidato neste job.</div>
 
-  if (rows.length === 0) return <p className="muted">Nenhum candidato ainda.</p>
   return (
     <div>
-      {rows.map(({ c, depth }) => (
-        <Node key={c.id} c={c} depth={depth} onPromote={onPromote} onReject={onReject} />
-      ))}
+      <div className="dv-legend">
+        <span>
+          Aprovação em cascata, nó a nó: <b>aprove o programa primeiro</b>, depois as variantes e,
+          por fim, os benefícios. Nada entra no catálogo sem aprovação.
+        </span>
+      </div>
+
+      {sources.map((s) => {
+        const sp = s.payload as P
+        const sChip = sourceCategoryChip(str(sp.source_category))
+        const sProv = s.provenance as P
+        const verif = verificationLabel(str(sProv.verification_status))
+        const srcUrl = str(sProv.source_url)
+
+        return (
+          <div key={s.id} className={`dv-src ${stateCls(s.review_status)}`}>
+            <div className="dv-node dv-node-src">
+              <div className="dv-node-main">
+                <div className="dv-title">
+                  <span className="dv-kind">Programa</span>
+                  <span className="dv-nm">{str(sp.name) || s.fingerprint}</span>
+                </div>
+                <div className="dv-chips">
+                  <span className="tag" style={catStyle(sChip.colorVar)}>{sChip.label}</span>
+                  {s.match_status === 'new' ? <span className="new">novo</span> : null}
+                  {verif ? <span className="dv-verif">{verif}</span> : null}
+                  {srcUrl ? <a className="dv-link" href={srcUrl} target="_blank" rel="noreferrer">{host(srcUrl)}</a> : null}
+                </div>
+              </div>
+              <div className="dv-node-act">
+                <Actions c={s} locked={false} lockMsg="" kind="programa" onPromote={onPromote} onReject={onReject} />
+              </div>
+            </div>
+
+            <div className="dv-vars">
+              {childrenOf(s.fingerprint).map((v) => {
+                const vp = v.payload as P
+                const sub = [str(vp.card_brand), str(vp.card_level)].filter(Boolean).join(' ')
+                const vLocked = !unlocked(v)
+
+                return (
+                  <div key={v.id} className={`dv-var ${stateCls(v.review_status)}`}>
+                    <div className="dv-node dv-node-var">
+                      <div className="dv-node-main">
+                        <div className="dv-title">
+                          <span className="dv-kind">Variante</span>
+                          <span className="dv-nm">{str(vp.label) || str(vp.display_name) || v.fingerprint}</span>
+                          {sub ? <span className="dv-submeta">{sub}</span> : null}
+                        </div>
+                      </div>
+                      <div className="dv-node-act">
+                        <Actions
+                          c={v}
+                          locked={vLocked}
+                          lockMsg="aprove o programa primeiro"
+                          kind="variante"
+                          onPromote={onPromote}
+                          onReject={onReject}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="dv-bens">
+                      {childrenOf(v.fingerprint).map((b) => {
+                        const bp = b.payload as P
+                        const bChip = benefitCategoryChip(str(bp.category))
+                        const bProv = b.provenance as P
+                        const bUrl = str(bProv.source_url)
+                        const bLocked = !unlocked(b)
+
+                        return (
+                          <div key={b.id} className={`dv-ben ${stateCls(b.review_status)}`}>
+                            <div className="dv-node dv-node-ben">
+                              <div className="dv-node-main">
+                                <div className="dv-ben-title">{str(bp.title) || b.fingerprint}</div>
+                                <div className="dv-ben-meta">
+                                  <span className="tag" style={catStyle(bChip.colorVar)}>{bChip.label}</span>
+                                  {str(bp.summary) ? <span className="dv-ben-sum">{str(bp.summary)}</span> : null}
+                                  {bUrl ? <a className="dv-link" href={bUrl} target="_blank" rel="noreferrer">{host(bUrl)}</a> : null}
+                                </div>
+                              </div>
+                              <div className="dv-node-act">
+                                <Actions
+                                  c={b}
+                                  locked={bLocked}
+                                  lockMsg="aprove a variante primeiro"
+                                  kind="beneficio"
+                                  onPromote={onPromote}
+                                  onReject={onReject}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }
