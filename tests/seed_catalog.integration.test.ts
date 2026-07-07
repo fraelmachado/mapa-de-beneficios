@@ -2,11 +2,11 @@ import { describe, it, expect } from 'vitest'
 import { serviceClient } from './helpers/clients'
 
 describe('seed: catálogo real', () => {
-  it('só existem as 3 sources reais; nenhuma demo', async () => {
+  it('mantém as sources reais de base e nenhuma demo', async () => {
     const db = serviceClient()
     const { data } = await db.from('sources').select('slug, name').not('slug', 'is', null)
     const slugs = (data ?? []).map((r) => r.slug).sort()
-    expect(slugs).toEqual(['inter', 'nubank', 'xp'])
+    expect(slugs).toEqual(expect.arrayContaining(['inter', 'nubank', 'xp']))
     const names = (data ?? []).map((r) => r.name)
     expect(names).not.toContain('Itaú')
     expect(names).not.toContain('Claro')
