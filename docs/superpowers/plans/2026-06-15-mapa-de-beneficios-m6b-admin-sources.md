@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Status de execução (auditado em 2026-07-10):** implementação concluída no repositório (`28c31a9` a `7a97fd1`). CRUD de fontes e variantes está coberto por testes de componente e integração aprovados; produção não foi reauditada nesta rodada.
+
 **Goal:** O admin cria/edita/remove fontes (`sources`), suas variantes (`source_items`) e os campos de alinhamento Pluggy, com upload de logo — substituindo o seed por curadoria real.
 
 **Architecture:** Rota `/admin/sources` sob o `AdminGuard`+`AdminLayout` (M6a). Hooks TanStack Query usando a sessão autenticada do admin (RLS já permite escrita só admin, M1). Fonte e variantes são operações separadas (CRUD por linha) — sem transação aninhada. Logo via `ImageUpload` (M6a).

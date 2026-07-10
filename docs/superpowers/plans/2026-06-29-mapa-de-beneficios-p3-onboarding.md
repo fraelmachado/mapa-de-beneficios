@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Status de execução (auditado em 2026-07-10):** implementação concluída no repositório (`2e14317` a `5b2e806`, com hardening em `1eb8e32`). Wizard por categoria, gate, busca, captura de Outro e persistência estão cobertos pela suíte cumulativa. Publicação atual em produção não foi reauditada.
+
 **Goal:** Reescrever o onboarding de "marcar cartões" para um **wizard híbrido por categoria de fonte** ("Você tem [categoria]? → Tenho/Não tenho" → busca + provedores), consumindo dados reais e persistindo em `user_sources` (inalterado), com captura de "Outro" (provedor não-listado) para o P4.
 
 **Architecture:** O onboarding passa a agrupar as fontes por `sources.source_category` (coluna do P1) em vez de `kind`. Cada categoria não-vazia vira uma etapa com gate "Tenho/Não tenho"; ao dizer "Tenho", revela busca + blocos de provedor (reusa `SourceBlock`/`selectionReducer`) + um campo "Outro" que grava um pedido em `source_requests` (nova tabela, só sinal de curadoria — não destrava benefício). O admin `SourceForm` ganha o campo `source_category` para curadores categorizarem fontes corretamente (fecha o follow-up do P1). A seleção continua salva via `replace_user_sources` (RPC existente). Visual com os primitivos DS do `src/ui` (P2).

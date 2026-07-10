@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Status de execução (auditado em 2026-07-10):** implementação concluída no repositório (`cc335e5` a `c00316c`). Taxonomia, contrato da view e tipos estão cobertos pelos testes de integração aprovados. Os checklists abaixo permanecem como roteiro histórico.
+
 **Goal:** Dar à `my_benefits` o contrato de dados que o reskin fonte-agnóstico (P2) precisa: origem primária (tipo-de-fonte + provedor) e origem secundária (bandeira/parceiro), introduzindo a taxonomia `source_category`.
 
 **Architecture:** Duas migrations aditivas. A primeira cria o enum `source_category` (7 valores) + coluna em `sources`, faz backfill das fontes atuais para `bank_card` e atualiza o `seed.sql`. A segunda recria a view `my_benefits` (security_invoker mantido) levando o `join sources` nos **dois** caminhos (direto e derivado por bandeira) para agregar `origins` (`{provider, category}[]`) e `networks` (`{brand, level}[]`), e projeta o escalar `benefit_source`. Os tipos TypeScript do front (`MyBenefit`) e os tipos gerados (`database.types.ts`) acompanham.

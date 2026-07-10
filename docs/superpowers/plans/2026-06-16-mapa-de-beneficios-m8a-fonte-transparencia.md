@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Status de execução (auditado em 2026-07-10):** implementação local concluída (`7c5133e` a `092abd2`). View, correlação por fonte e UI de detalhe estão cobertas pela suíte cumulativa. Aplicação da migration e rebuild em produção não foram reauditos nesta rodada.
+
 **Goal:** Exibir, na tela de detalhe do benefício, a fonte oficial (link + nome), a data da última coleta, e a lista de outros benefícios do usuário catalogados da mesma fonte.
 
 **Architecture:** Estende a view `my_benefits` com `source_url`/`source_name`/`observed_at` (já existentes em `benefits`). A correlação "da mesma fonte" é uma função pura sobre os dados já carregados por `useMyBenefits` (sem query nova), exposta via `useBenefit`. A UI nova fica só na `BenefitDetail`.

@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Status de execução (auditado em 2026-07-10):** implementação concluída no repositório (`9dfd5ce` a `53b7200`), incluindo Storage, login, guard, layout e upload. Testes locais cumulativos aprovados; aplicação das mudanças em produção não foi reauditada nesta rodada.
+
 **Goal:** Tornar o painel admin acessível e seguro: login por e-mail/senha, gate por `is_admin`, layout/rotas `/admin`, bootstrap do 1º admin, e upload de imagens pro Supabase Storage.
 
 **Architecture:** Admin é uma árvore de rotas `/admin` no mesmo SPA, reusando `lib/supabase.ts` + TanStack Query + React Router. Acesso restrito por `useIsAdmin` (lê `profiles.is_admin`) dentro de um `AdminGuard`. Imagens vão pra um bucket público `assets` (escrita só admin via RLS de storage).

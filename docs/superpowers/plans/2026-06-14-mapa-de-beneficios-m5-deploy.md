@@ -2,6 +2,8 @@
 
 > **For agentic workers:** Este plano é um RUNBOOK de infra/ops. Tasks 1–2 são código/artefato no repo (verificáveis localmente) e podem ir por subagente. Tasks 3–7 são **outward-facing** (criam infra real, fazem deploy, enviam e-mail): execute **inline no loop principal**, confirmando com o usuário em cada passo marcado ⚠️ CONFIRMAR. Muitos valores (IDs do Dokploy, domínios gerados, segredos) são descobertos ao vivo — registre-os conforme aparecem.
 
+> **Status de execução (auditado em 2026-07-10):** artefatos de deploy concluídos (`9842f3f`, `45b1551`) e infraestrutura Dokploy registrada em `docs/ops/snapshots/2026-06-28-pre-rebrand.md`. A aplicação respondeu HTTP 200 na auditoria. O bundle publicado não corresponde ao estado atual do repositório; auto-deploy/redeploy e smoke final permanecem pendentes. Checkboxes outward-facing não foram marcados sem nova verificação operacional.
+
 **Goal:** Mapa de Benefícios (M1–M4) no ar num deploy temporário: Supabase dedicado + front PWA estático no Dokploy, com magic link via Resend, em domínios `traefik.me`.
 
 **Architecture:** Projeto Dokploy `benefy` com um compose Supabase oficial (só Kong exposto) e um app `web` (Dockerfile nginx) buildado do GitHub com auto-deploy. Front fala com o Supabase pela URL pública do Kong embutida no build.

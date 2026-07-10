@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Status de execução (auditado em 2026-07-10):** implementação concluída no repositório (`2540c71` a `2ec0b11`). Painel, detalhe, busca e navegação estão cobertos pela suíte cumulativa aprovada. Os checklists abaixo permanecem como roteiro histórico.
+
 **Goal:** O usuário vê seus benefícios cruzados num painel real: saudação + contagem, destaque, chips de categoria e feed; abre o detalhe de cada benefício (fontes "via", passo-a-passo, ação); e busca por texto/categoria. Navegação inferior entre Painel e Buscar.
 
 **Architecture:** Uma única query React Query `useMyBenefits(userId)` traz todos os benefícios do usuário (view `my_benefits`, agora 1 linha por benefício com `via text[]`). Painel, Busca e Detalhe derivam desse resultado cacheado (filtro client-side). Rotas `/painel` e `/buscar` ficam sob um `AppLayout` com `BottomNav`; `/beneficio/:id` é tela cheia com voltar.

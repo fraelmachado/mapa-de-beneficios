@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Status de execução (auditado em 2026-07-10):** implementação concluída no repositório (`20bbde8` a `432c197`). Design system, componentes, telas, responsividade e tema estão presentes; suíte cumulativa e build aprovados. Publicação atual em produção não foi reauditada.
+
 **Goal:** Aplicar o design system v3 "passe" (importado do Claude Design) às telas atuais do app, consumindo dados reais do Supabase.
 
 **Architecture:** O design system real está em `design-system-source/` (tokens em `styles.css`; componentes React em `COMPONENTS_SOURCE.txt`; shell em `PAINEL_TEMPLATE_REFERENCE.txt`). Integramos os tokens via uma folha global importada no `index.css` e recriamos os componentes como TSX tipado em `src/ui/`. As telas existentes (`src/features/**`) passam a compor esses componentes, com um adaptador puro `toPassProps()` mapeando `MyBenefit` → props do `Pass`. Coexiste com Tailwind v3 (classes do DS são `.pass/.chip/.btn/.nav/.row/.input/.alert/.check/.seg/.sk`, sem colisão com utilitários).

@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Status de execução (auditado em 2026-07-10):** implementação concluída no repositório (`040e169` a `d3dd1e2`). Helpers, árvore aninhada, página, responsividade e fluxo real de promoção foram verificados localmente; suíte cumulativa e build aprovados. O redesign não foi identificado no bundle atualmente publicado, portanto deploy e smoke de produção permanecem pendentes.
+
 **Goal:** Reconstruir a UI de revisão do discovery (`/admin/discovery`) para a hierarquia de cards aninhados aprovada no mockup do Claude Design, reusando `src/ui`/`ds.css` e os hooks existentes — sem tocar em backend, schema ou hooks de dados.
 
 **Architecture:** Reescreve dois componentes de apresentação (`AdminDiscovery.tsx`, `CandidateTree.tsx`), adiciona um helper puro de apresentação (`discoveryMeta.ts`) e uma folha de estilo `discovery.css` (classes `.dv-*` transcritas do mockup, usando tokens do DS). A fonte de dados (`useDiscovery.ts` hooks + RPC `promote_discovery_candidate`) permanece intocada. É um redesenho **fiel ao mockup** `Admin Discovery.dc.html`.

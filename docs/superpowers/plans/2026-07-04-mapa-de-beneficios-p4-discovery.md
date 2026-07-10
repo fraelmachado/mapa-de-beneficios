@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Status de execução (auditado em 2026-07-10):** implementação concluída no repositório (`ccc0beb` a `29e7d3a`). Schema staging, agente, validação, promoção transacional e UI admin passaram na suíte cumulativa; o smoke real local foi executado anteriormente com Wellhub. O P4 não foi identificado no bundle atualmente publicado, portanto deploy e smoke de produção permanecem pendentes.
+
 **Goal:** Build a human-gated discovery pipeline that lets an LLM research agent propose new catalog sources/items/benefits as reviewable candidates, which an admin approves and promotes into the real catalog.
 
 **Architecture:** A staging layer (`discovery_jobs` + `discovery_candidates`) holds machine-proposed candidates; nothing reaches the catalog without an admin promoting it. A Node script (`scripts/discovery/discover.ts`) claims a job atomically, shells out to the Codex CLI (untrusted subprocess, secret-free env) to produce a `candidates.json` tree, validates it with zod, and upserts fingerprinted candidates. An admin reviews at `/admin/discovery` and promotes via a transactional SECURITY DEFINER RPC. Idempotency (fingerprint upsert) and parallelism (`FOR UPDATE SKIP LOCKED` claim) live in the schema, so a future Worker wraps the same code with no data rework.

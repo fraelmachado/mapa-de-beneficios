@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Status de execução (auditado em 2026-07-10):** implementação concluída no repositório (`2fe9d92` a `eefd0d9`). CRUD de benefícios, vínculos e locais está coberto por testes de componente e integração aprovados; produção não foi reauditada nesta rodada.
+
 **Goal:** O admin cria/edita/remove benefícios com todos os campos, define quais variantes (`source_items`) destravam cada um (`benefit_sources`) e gerencia os locais (`benefit_locations`), com upload de banner.
 
 **Architecture:** Rota `/admin/benefits` sob `AdminGuard`+`AdminLayout`. Hooks TanStack Query com a sessão admin (RLS M1). O vínculo benefício↔variantes é editado como multi-select no form e salvo por "replace" (delete+insert). Locais são CRUD por linha (só em benefício existente). Reusa `useAdminSources` (M6b) pra montar o seletor de variantes e `ImageUpload` (M6a) pro banner.

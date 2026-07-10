@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Status de execução (auditado em 2026-07-10):** implementação concluída no repositório (`29545a8` a `64dbc67`). Perfil, edição de fontes e artefatos PWA estão presentes e o build cumulativo foi aprovado. Os checklists abaixo permanecem como roteiro histórico.
+
 **Goal:** O usuário consegue editar suas fontes (varredura pré-preenchida), transformar a conta anônima em permanente por magic link (e-mail), e instalar o app como PWA.
 
 **Architecture:** `/onboarding` passa a dobrar como editor: pré-carrega a seleção atual (`user_sources`) no reducer. Nova tela `/perfil` mostra o estado da conta (anônima vs. com e-mail) e oferece o link mágico via `supabase.auth.updateUser({ email })`. PWA via `vite-plugin-pwa` (manifest + service worker autoUpdate). Bottom nav ganha o terceiro item (Perfil).

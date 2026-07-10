@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Status de execução (auditado em 2026-07-10):** implementação concluída no repositório (`43360de`, `d49006e`). Estrutura visual, CTA fixo e adaptação desktop estão presentes; suíte cumulativa e build aprovados. Publicação atual em produção não foi reauditada.
+
 **Goal:** Elevar o visual do wizard de onboarding (já funcional do P3) à anatomia da tela 01 "Onboarding esperto" do mockup v3, sem mudar o comportamento (gate obrigatório, persistência, "Outro").
 
 **Architecture:** O `OnboardingPage` hoje usa muitos `style` inline ad-hoc e renderiza os provedores como um accordion (`SourceBlock`) que esconde as variantes atrás de um clique. Este refino: (1) extrai a estilização para uma folha `onboarding.css` (importada no `index.css`, seguindo o padrão de `ds.css`/`layout.css`); (2) reestrutura a tela em **header** (logo + barra de progresso + eyebrow "Passo X de N" + título-pergunta + subtítulo), **gate**, **provedores como seções compactas com chips de variante inline (sem accordion)**, e **CTA fixo na base** (barra inferior, botão largo, desabilitado até responder o gate); (3) no desktop, centraliza tudo num **card** com largura confortável e respiro. Nenhuma mudança em hooks/dados/RLS.

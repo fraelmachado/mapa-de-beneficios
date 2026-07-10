@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Status de execução (auditado em 2026-07-10):** implementação local concluída (`fe9c373` a `fcb75ee`, com correções posteriores `a543ffe` e `a278bd3`). Schema, seed e checklist do catálogo real passaram na suíte cumulativa. O hard replace/migrations em produção não foram reauditos nesta rodada e continuam tratados como gate operacional separado.
+
 **Goal:** Substituir o seed demo pelo catálogo real (Nubank/Inter/XP + bandeiras Mastercard/Visa), estendendo o schema para acomodar os dados e fazendo benefícios de bandeira serem herdados por `(card_brand, card_level)`.
 
 **Architecture:** Reaproveita o backbone existente (`sources → source_items → benefits` + `benefit_sources` + `user_sources` + view `my_benefits`). Adiciona colunas de compliance, recria o enum de categoria com 16 chaves técnicas, e introduz `benefit_card_tiers` para herança de bandeira. A `my_benefits` passa a unir dois caminhos: direto (emissor via `benefit_sources`) e derivado (bandeira via brand/level). Backend + catálogo apenas; sem UI de compliance (M8).

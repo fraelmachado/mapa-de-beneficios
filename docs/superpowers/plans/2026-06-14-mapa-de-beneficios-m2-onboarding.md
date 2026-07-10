@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Status de execução (auditado em 2026-07-10):** implementação concluída no repositório (`f6893f1` a `4f164f8`). O fluxo está coberto pela suíte cumulativa aprovada. Os checklists abaixo permanecem como roteiro histórico e não foram marcados retroativamente.
+
 **Goal:** App PWA navegável onde o usuário entra (sessão anônima Supabase), faz a varredura em 3 passos selecionando o que possui, e cai num painel que já mostra a contagem real de benefícios cruzados.
 
 **Architecture:** SPA React com React Router (rotas) e TanStack Query (estado de servidor: cache/loading/error). Auth anônimo do Supabase cria um usuário real no primeiro acesso; o perfil é criado pelo trigger do M1. O onboarding lê `sources`/`source_items` (catálogo M1), coleta a seleção em estado local, e grava em `user_sources`. Um `/painel` mínimo lê a view `my_benefits` (contagem distinta) — o painel completo é o M3.

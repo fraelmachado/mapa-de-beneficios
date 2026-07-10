@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Status de execução (auditado em 2026-07-10):** implementação concluída no repositório (`9ed6733` a `c5c9428`). O estado cumulativo foi validado pela suíte local (64 arquivos/182 testes) e pelo build. Os checklists abaixo permanecem como roteiro histórico e não foram marcados retroativamente.
+
 **Goal:** Repositório scaffoldado (Vite+React+TS+Tailwind+Vitest) com Supabase local rodando, schema completo via migrations, RLS aplicada e testada, view `my_benefits` e seed do catálogo inicial.
 
 **Architecture:** Backend é Supabase (Postgres). Todo o schema vive em `supabase/migrations/*.sql` versionado pela Supabase CLI. A segurança é garantida por RLS testada com testes de integração (Vitest + @supabase/supabase-js contra a instância local). O front nesta milestone é só o scaffold que builda — telas vêm em M2+.
