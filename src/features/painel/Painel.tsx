@@ -61,6 +61,12 @@ export function Painel() {
 
   return (
     <div className="app-page app-page-wide radar-page">
+      <div className="radar-banner">
+        <span className="radar-banner-check" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+        </span>
+        <span className="radar-banner-text">Radar montado — <b>{all.length} benefício{all.length === 1 ? '' : 's'}</b> a partir dos seus programas.</span>
+      </div>
       <header className="radar-head">
         <p className="lbl">Olá, {greetingName}</p>
         <h1>Seu radar de benefícios</h1>

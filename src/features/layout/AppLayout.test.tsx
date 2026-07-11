@@ -18,6 +18,7 @@ describe('AppLayout', () => {
     expect(screen.getByRole('main')).toHaveTextContent('Painel teste')
     expect(screen.getAllByRole('link', { name: /painel/i })).toHaveLength(2)
     expect(screen.getAllByRole('link', { name: /buscar/i })).toHaveLength(2)
+    expect(screen.getAllByRole('link', { name: /programas/i })).toHaveLength(2)
     expect(screen.getAllByRole('link', { name: /perfil/i })).toHaveLength(2)
     expect(screen.getAllByRole('navigation', { name: /principal/i })).toHaveLength(2)
   })

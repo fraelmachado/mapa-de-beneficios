@@ -1,11 +1,12 @@
 import { Outlet, NavLink } from 'react-router-dom'
 import { BottomNav } from './BottomNav'
-import { PainelIcon, SearchIcon, PerfilIcon, ThemeIcon } from './navIcons'
+import { PainelIcon, SearchIcon, ProgramasIcon, PerfilIcon, ThemeIcon } from './navIcons'
 import { toggleTheme } from '../../ui/theme'
 
 const links = [
   { to: '/painel', label: 'Painel', Icon: PainelIcon },
   { to: '/buscar', label: 'Buscar', Icon: SearchIcon },
+  { to: '/onboarding?mode=edit', label: 'Programas', Icon: ProgramasIcon },
   { to: '/perfil', label: 'Perfil', Icon: PerfilIcon },
 ]
 
