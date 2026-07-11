@@ -47,6 +47,18 @@
 .ob-back .btn { width: auto; }
 .ob-cta { flex: 1; }
 
+.ob-intro { min-height: 100dvh; display: grid; align-items: center; padding: var(--s6) var(--s4); background: var(--bg); }
+.ob-intro-card { width: 100%; max-width: 520px; margin: 0 auto; }
+.ob-intro-mark { width: 58px; height: 58px; display: grid; place-items: center; margin-bottom: var(--s6); border-radius: 18px; background: var(--accent); color: var(--accent-ink); font-size: 24px; font-weight: 800; }
+.ob-intro h1 { max-width: 14ch; margin: var(--s2) 0 var(--s3); font-size: clamp(32px, 8vw, 48px); line-height: 1.05; }
+.ob-intro-card > p:not(.lbl) { max-width: 44ch; margin: 0 0 var(--s6); color: var(--ink-2); line-height: var(--lh-body); }
+.ob-intro .btn { max-width: 320px; }
+.ob-methods { display: grid; gap: var(--s3); }
+.ob-method { display: grid; gap: var(--s1); width: 100%; padding: var(--s5); border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface); color: var(--ink); text-align: left; cursor: pointer; }
+.ob-method span { color: var(--ink-2); }
+.ob-method:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ob-method:disabled { cursor: not-allowed; opacity: .62; }
+
 @media (min-width: 720px) {
   /* desktop: card central com respiro; o scroll deixa de ser a área rolável
      (a página rola normalmente) e o CTA fica ABAIXO do card, alinhado à mesma
@@ -59,4 +71,5 @@
   }
   .ob-foot { background: transparent; border-top: 0; padding: 0; margin-top: var(--s5); }
   .ob-foot-inner { max-width: 520px; }
+  .ob-intro-card { padding: var(--s8); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
 }
