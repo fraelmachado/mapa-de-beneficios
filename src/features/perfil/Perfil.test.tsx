@@ -13,12 +13,19 @@ vi.mock('./useLinkEmail', () => ({
   useLinkEmail: () => linkState,
 }))
 
+const signOut = vi.fn()
+vi.mock('../../lib/supabase', () => ({
+  supabase: { auth: { signOut: (...args: unknown[]) => signOut(...args) } },
+}))
+
 import { Perfil } from './Perfil'
 
 beforeEach(() => {
   linkMutate.mockReset()
   linkMutate.mockResolvedValue(undefined)
   linkState = { mutateAsync: linkMutate, isPending: false, isError: false }
+  signOut.mockReset()
+  document.documentElement.setAttribute('data-theme', 'light')
 })
 
 describe('Perfil', () => {
@@ -53,7 +60,7 @@ describe('Perfil', () => {
     fireEvent.click(screen.getByRole('button', { name: /salvar meu acesso/i }))
     await waitFor(() => expect(linkMutate).toHaveBeenCalled())
     expect(input).toHaveValue('a@b.com')
-    expect(screen.getByText(/não foi possível enviar/i)).toBeInTheDocument()
+    expect(screen.getByRole('alert')).toHaveTextContent(/não foi possível enviar/i)
   })
 
   it('desabilita o envio enquanto a solicitação está pendente', () => {
@@ -61,5 +68,49 @@ describe('Perfil', () => {
     linkState.isPending = true
     renderWithProviders(<Perfil />)
     expect(screen.getByRole('button', { name: /enviando/i })).toBeDisabled()
+  })
+
+  it('encerra a sessão vinculada pelo fluxo do Supabase', async () => {
+    sessionValue = { session: { user: { id: 'u1', is_anonymous: false, email: 'x@y.com' } }, loading: false }
+    signOut.mockResolvedValue({ error: null })
+    renderWithProviders(<Perfil />)
+
+    fireEvent.click(screen.getByRole('button', { name: /encerrar sessão/i }))
+
+    await waitFor(() => expect(signOut).toHaveBeenCalledTimes(1))
+  })
+
+  it('indica que o logout está em andamento', () => {
+    sessionValue = { session: { user: { id: 'u1', is_anonymous: false, email: 'x@y.com' } }, loading: false }
+    signOut.mockReturnValue(new Promise(() => {}))
+    renderWithProviders(<Perfil />)
+
+    fireEvent.click(screen.getByRole('button', { name: /encerrar sessão/i }))
+
+    expect(screen.getByRole('button', { name: /saindo/i })).toBeDisabled()
+  })
+
+  it('anuncia um erro quando não consegue encerrar a sessão', async () => {
+    sessionValue = { session: { user: { id: 'u1', is_anonymous: false, email: 'x@y.com' } }, loading: false }
+    signOut.mockResolvedValue({ error: new Error('offline') })
+    renderWithProviders(<Perfil />)
+
+    fireEvent.click(screen.getByRole('button', { name: /encerrar sessão/i }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/não foi possível encerrar a sessão/i)
+  })
+
+  it('expõe e anuncia o tema selecionado', () => {
+    sessionValue = { session: { user: { id: 'u1', is_anonymous: true, email: null } }, loading: false }
+    renderWithProviders(<Perfil />)
+
+    const themeButton = screen.getByRole('button', { name: /tema claro/i })
+    expect(themeButton).toHaveAttribute('aria-pressed', 'false')
+
+    fireEvent.click(themeButton)
+
+    expect(themeButton).toHaveAccessibleName(/tema escuro/i)
+    expect(themeButton).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('status')).toHaveTextContent(/tema escuro ativado/i)
   })
 })

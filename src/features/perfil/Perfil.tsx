@@ -5,6 +5,7 @@ import { useSession } from '../auth/AuthProvider'
 import { useLinkEmail } from './useLinkEmail'
 import { Button } from '../../ui/Button'
 import { toggleTheme } from '../../ui/theme'
+import { supabase } from '../../lib/supabase'
 
 export function Perfil() {
   const { session } = useSession()
@@ -13,6 +14,11 @@ export function Perfil() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [submitError, setSubmitError] = useState(false)
+  const [isSigningOut, setIsSigningOut] = useState(false)
+  const [signOutError, setSignOutError] = useState(false)
+  const [theme, setTheme] = useState(() =>
+    document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light',
+  )
   const link = useLinkEmail()
 
   async function submit(event: FormEvent) {
@@ -24,6 +30,23 @@ export function Perfil() {
     } catch {
       setSubmitError(true)
     }
+  }
+
+  async function signOut() {
+    setIsSigningOut(true)
+    setSignOutError(false)
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) throw error
+    } catch {
+      setSignOutError(true)
+    } finally {
+      setIsSigningOut(false)
+    }
+  }
+
+  function changeTheme() {
+    setTheme(toggleTheme())
   }
 
   return (
@@ -66,7 +89,7 @@ export function Perfil() {
                   placeholder="voce@email.com"
                 />
               </label>
-              {submitError ? <p className="profile-error">Não foi possível enviar. Tente de novo.</p> : null}
+              {submitError ? <p className="profile-error" role="alert">Não foi possível enviar. Tente de novo.</p> : null}
               <Button type="submit" disabled={link.isPending}>
                 {link.isPending ? 'Enviando...' : 'Salvar meu acesso'}
               </Button>
@@ -85,14 +108,30 @@ export function Perfil() {
         </Link>
       </section>
 
+      {!isAnon ? (
+        <section>
+          <p className="lbl">Conta</p>
+          <button className="row profile-row-button" type="button" disabled={isSigningOut} onClick={signOut}>
+            {isSigningOut ? 'Saindo...' : 'Encerrar sessão'}
+          </button>
+          {signOutError ? <p className="profile-error" role="alert">Não foi possível encerrar a sessão. Tente de novo.</p> : null}
+        </section>
+      ) : null}
+
       <section>
         <p className="lbl">Preferências</p>
-        <button className="row profile-row-button" type="button" onClick={() => toggleTheme()}>
-          Tema claro ou escuro
+        <button
+          aria-pressed={theme === 'dark'}
+          className="row profile-row-button"
+          type="button"
+          onClick={changeTheme}
+        >
+          Tema {theme === 'dark' ? 'escuro' : 'claro'}
           <span className="muted" aria-hidden="true">
             ◑
           </span>
         </button>
+        <p className="sr-only" role="status" aria-live="polite">Tema {theme === 'dark' ? 'escuro' : 'claro'} ativado</p>
       </section>
     </div>
   )
