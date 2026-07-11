@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../test/renderWithProviders'
 import type { MyBenefit } from '../benefits/types'
 
@@ -11,7 +11,8 @@ vi.mock('react-router-dom', async (orig) => {
   return { ...actual, useParams: () => ({ id: 'b1' }) }
 })
 
-let result: { data: MyBenefit[] | undefined; isLoading: boolean; error: unknown }
+const refetch = vi.fn()
+let result: { data: MyBenefit[] | undefined; isLoading: boolean; error: unknown; refetch: typeof refetch }
 vi.mock('../benefits/useMyBenefits', () => ({ useMyBenefits: () => result }))
 
 const b: MyBenefit = {
@@ -24,10 +25,24 @@ const b: MyBenefit = {
 import { BenefitDetail } from './BenefitDetail'
 
 beforeEach(() => {
-  result = { data: [b], isLoading: false, error: null }
+  refetch.mockReset()
+  result = { data: [b], isLoading: false, error: null, refetch }
 })
 
 describe('BenefitDetail', () => {
+  it('renders stable detail loading', () => {
+    result = { data: undefined, isLoading: true, error: null, refetch }
+    renderWithProviders(<BenefitDetail />, { route: '/beneficio/b1' })
+    expect(screen.getByLabelText(/carregando benefício/i)).toBeInTheDocument()
+  })
+
+  it('retries detail error', () => {
+    result = { data: undefined, isLoading: false, error: new Error('down'), refetch }
+    renderWithProviders(<BenefitDetail />, { route: '/beneficio/b1' })
+    fireEvent.click(screen.getByRole('button', { name: /tentar novamente/i }))
+    expect(refetch).toHaveBeenCalledTimes(1)
+  })
+
   it('mostra título, via, passos e o botão de ação', () => {
     renderWithProviders(<BenefitDetail />, { route: '/beneficio/b1' })
     expect(screen.getByText('Seguro Viagem')).toBeInTheDocument()
@@ -38,14 +53,14 @@ describe('BenefitDetail', () => {
   })
 
   it('mostra "não encontrado" quando o id não está na lista', () => {
-    result = { data: [], isLoading: false, error: null }
+    result = { data: [], isLoading: false, error: null, refetch }
     renderWithProviders(<BenefitDetail />, { route: '/beneficio/b1' })
     expect(screen.getByText(/não encontrado/i)).toBeInTheDocument()
   })
 
   it('não renderiza ação com esquema perigoso (javascript:)', () => {
     const evil = { ...b, action_url: 'javascript:alert(1)', action_label: 'Clique' }
-    result = { data: [evil], isLoading: false, error: null }
+    result = { data: [evil], isLoading: false, error: null, refetch }
     renderWithProviders(<BenefitDetail />, { route: '/beneficio/b1' })
     expect(screen.queryByRole('link', { name: /clique/i })).not.toBeInTheDocument()
   })
@@ -55,7 +70,7 @@ describe('BenefitDetail', () => {
       ...b, source_url: 'https://www.visa.com.br/beneficios', source_name: 'Visa Brasil',
       observed_at: '2026-06-15',
     }
-    result = { data: [withSource], isLoading: false, error: null }
+    result = { data: [withSource], isLoading: false, error: null, refetch }
     renderWithProviders(<BenefitDetail />, { route: '/beneficio/b1' })
     const src = screen.getByRole('link', { name: /visa brasil/i })
     expect(src).toHaveAttribute('href', 'https://www.visa.com.br/beneficios')
@@ -64,7 +79,7 @@ describe('BenefitDetail', () => {
   })
 
   it('oculta o bloco de fonte quando não há source_url', () => {
-    result = { data: [{ ...b, source_url: null, source_name: null, observed_at: null }], isLoading: false, error: null }
+    result = { data: [{ ...b, source_url: null, source_name: null, observed_at: null }], isLoading: false, error: null, refetch }
     renderWithProviders(<BenefitDetail />, { route: '/beneficio/b1' })
     expect(screen.queryByText(/coletadas em/i)).not.toBeInTheDocument()
   })
@@ -73,7 +88,7 @@ describe('BenefitDetail', () => {
     const cur: MyBenefit = { ...b, id: 'b1', source_url: 'https://visa.com/x' }
     const sib: MyBenefit = { ...b, id: 'b2', title: 'Outro Visa', source_url: 'https://visa.com/x' }
     const other: MyBenefit = { ...b, id: 'b3', title: 'Mastercard X', source_url: 'https://mc.com/y' }
-    result = { data: [cur, sib, other], isLoading: false, error: null }
+    result = { data: [cur, sib, other], isLoading: false, error: null, refetch }
     renderWithProviders(<BenefitDetail />, { route: '/beneficio/b1' })
     const link = screen.getByRole('link', { name: /outro visa/i })
     expect(link).toHaveAttribute('href', '/beneficio/b2')
@@ -83,7 +98,7 @@ describe('BenefitDetail', () => {
   it('não renderiza fonte com esquema perigoso (javascript:) em source_url', () => {
     result = {
       data: [{ ...b, source_url: 'javascript:alert(1)', source_name: 'Mau', observed_at: '2026-06-15' }],
-      isLoading: false, error: null,
+      isLoading: false, error: null, refetch,
     }
     renderWithProviders(<BenefitDetail />, { route: '/beneficio/b1' })
     expect(screen.queryByRole('link', { name: /mau/i })).not.toBeInTheDocument()
@@ -93,7 +108,7 @@ describe('BenefitDetail', () => {
   it('não mostra "Da mesma fonte" quando não há outros benefícios da mesma fonte', () => {
     result = {
       data: [{ ...b, id: 'b1', source_url: 'https://only.test/x', source_name: 'Única' }],
-      isLoading: false, error: null,
+      isLoading: false, error: null, refetch,
     }
     renderWithProviders(<BenefitDetail />, { route: '/beneficio/b1' })
     expect(screen.queryByText(/da mesma fonte/i)).not.toBeInTheDocument()
