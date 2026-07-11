@@ -171,7 +171,8 @@ describe('ManualWizard (wizard híbrido)', () => {
   it('shows stable loading and retries both read queries', () => {
     sourceResult.isLoading = true
     const view = renderWithProviders(<ManualWizard />)
-    expect(screen.getByLabelText(/carregando seus programas/i)).toBeInTheDocument()
+    const loading = screen.getByRole('status', { name: /carregando seus programas/i })
+    expect(loading).toHaveAttribute('aria-busy', 'true')
     view.unmount()
     sourceResult = { ...sourceResult, isLoading: false, error: new Error('down') }
     renderWithProviders(<ManualWizard />)
@@ -194,7 +195,27 @@ describe('ManualWizard (wizard híbrido)', () => {
     const item = screen.getByRole('button', { name: /black/i })
     fireEvent.click(item)
     fireEvent.click(screen.getByRole('button', { name: /concluir/i }))
-    expect(await screen.findByText(/não foi possível salvar/i)).toBeInTheDocument()
+    const error = await screen.findByRole('alert')
+    expect(error).toHaveTextContent(/não foi possível salvar/i)
+    expect(error).toHaveAttribute('aria-live', 'assertive')
     expect(item).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  it('recovers a later step when retry returns a smaller catalog', () => {
+    const view = renderWithProviders(<ManualWizard />)
+    fireEvent.click(screen.getByRole('button', { name: /^tenho$/i }))
+    fireEvent.click(screen.getByRole('button', { name: /avançar/i }))
+    expect(screen.getByText(/passo 2 de 2/i)).toBeInTheDocument()
+
+    sourceResult = { ...sourceResult, data: undefined, error: new Error('down') }
+    view.rerender(<ManualWizard />)
+    expect(screen.getByText(/não foi possível carregar seus programas/i)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /tentar novamente/i }))
+    expect(refetchSources).toHaveBeenCalledTimes(1)
+
+    sourceResult = { ...sourceResult, data: [bankGroup], error: null }
+    view.rerender(<ManualWizard />)
+    expect(screen.getByText(/passo 1 de 1/i)).toBeInTheDocument()
+    expect(screen.getByText(/bancos & cartões/i)).toBeInTheDocument()
   })
 })

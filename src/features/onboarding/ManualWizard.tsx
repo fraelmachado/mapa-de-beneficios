@@ -54,6 +54,8 @@ export function ManualWizard() {
   const sourcesQuery = useSources()
   const existing = existingQuery.data
   const groups = sourcesQuery.data
+  const steps: CategoryGroup[] = groups ?? []
+  const lastStep = Math.max(steps.length - 1, 0)
   const [selected, dispatch] = useReducer(selectionReducer, new Set<string>())
   const [step, setStep] = useState(0)
   const [gates, setGates] = useState<Record<SourceCategory, Gate>>({} as Record<SourceCategory, Gate>)
@@ -72,6 +74,11 @@ export function ManualWizard() {
     setOtherSent(false)
   }, [step])
 
+  useEffect(() => {
+    if (steps.length === 0) return
+    setStep((currentStep) => Math.min(currentStep, lastStep))
+  }, [lastStep, steps.length])
+
   // Conjunto de item ids existentes (modo edição) para pré-marcar gates "yes".
   const inited = useRef(false)
   useEffect(() => {
@@ -89,19 +96,19 @@ export function ManualWizard() {
   }, [existing, groups])
 
   if (sourcesQuery.isLoading || existingQuery.isLoading) {
-    return <div className="ob-state" aria-label="Carregando seus programas"><Skeleton height="28px" /><Skeleton height="180px" radius="18px" /><Skeleton height="52px" radius="13px" /></div>
+    return <div className="ob-state" role="status" aria-label="Carregando seus programas" aria-busy="true"><Skeleton height="28px" /><Skeleton height="180px" radius="18px" /><Skeleton height="52px" radius="13px" /></div>
   }
   if (sourcesQuery.error || existingQuery.error) {
     return <div className="ob-state"><PageState title="Não foi possível carregar seus programas" action={{ label: 'Tentar novamente', onClick: () => { void sourcesQuery.refetch(); void existingQuery.refetch() } }} /></div>
   }
   if (saving) return <TransitionScreen />
 
-  const steps: CategoryGroup[] = groups ?? []
   if (steps.length === 0) {
     return <div className="ob-state"><PageState title="Nenhum programa disponível" description="O catálogo ainda não possui programas para esta etapa." /></div>
   }
-  const current = steps[step]
-  const isLast = step === steps.length - 1
+  const currentStep = Math.min(step, lastStep)
+  const current = steps[currentStep]
+  const isLast = currentStep === lastStep
   const gate = gates[current.category]
 
   const filteredSources = current.sources.filter((s) =>
@@ -135,7 +142,7 @@ export function ManualWizard() {
   async function next() {
     if (gate === undefined) return // exige responder "Tenho/Não tenho" antes de prosseguir
     if (!isLast) {
-      setStep((s) => s + 1)
+      setStep((currentStep) => Math.min(currentStep + 1, lastStep))
       return
     }
     setSaving(true)
@@ -159,10 +166,10 @@ export function ManualWizard() {
           </div>
 
           <div className="ob-progress">
-            <i style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
+            <i style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }} />
           </div>
           <p className="lbl" style={{ margin: 0 }}>
-            Passo {step + 1} de {steps.length} · sua carteira
+            Passo {currentStep + 1} de {steps.length} · sua carteira
           </p>
 
           <h1 className="ob-title">
@@ -238,7 +245,7 @@ export function ManualWizard() {
           )}
 
           {saveError && (
-            <p style={{ fontSize: 14, color: 'var(--warn)', marginTop: 'var(--s3)' }}>
+            <p role="alert" aria-live="assertive" style={{ fontSize: 14, color: 'var(--warn)', marginTop: 'var(--s3)' }}>
               Não foi possível salvar. Tente de novo.
             </p>
           )}
@@ -247,9 +254,9 @@ export function ManualWizard() {
 
       <div className="ob-foot">
         <div className="ob-foot-inner">
-          {step > 0 && (
+          {currentStep > 0 && (
             <div className="ob-back">
-              <Button variant="ghost" onClick={() => setStep((s) => s - 1)}>
+              <Button variant="ghost" onClick={() => setStep((currentStep) => Math.max(currentStep - 1, 0))}>
                 Voltar
               </Button>
             </div>
