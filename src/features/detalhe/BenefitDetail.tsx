@@ -40,7 +40,7 @@ export function BenefitDetail() {
   const { session } = useSession()
   const { benefit, related, isLoading, error, refetch } = useBenefit(session?.user.id, id)
 
-  if (isLoading) return <div className="detail-page detail-loading" aria-label="Carregando benefício"><Skeleton height="24px" width="90px" /><Skeleton height="38px" /><Skeleton variant="pass" /></div>
+  if (isLoading) return <div className="detail-page detail-loading" role="status" aria-label="Carregando benefício" aria-busy="true"><Skeleton height="24px" width="90px" /><Skeleton height="38px" /><Skeleton variant="pass" /></div>
   if (error) return <div className="detail-page"><PageState title="Não foi possível carregar este benefício" action={{ label: 'Tentar novamente', onClick: () => void refetch() }} /></div>
   if (!benefit) return <div className="detail-page"><Link to="/painel" className="detail-back">← Voltar</Link><PageState title="Benefício não encontrado" description="Ele pode ter sido removido do seu radar." /></div>
 

@@ -30,10 +30,11 @@ beforeEach(() => {
 })
 
 describe('BenefitDetail', () => {
-  it('renders stable detail loading', () => {
+  it('expõe o carregamento como status ocupado', () => {
     result = { data: undefined, isLoading: true, error: null, refetch }
     renderWithProviders(<BenefitDetail />, { route: '/beneficio/b1' })
-    expect(screen.getByLabelText(/carregando benefício/i)).toBeInTheDocument()
+    const loading = screen.getByRole('status', { name: /carregando benefício/i })
+    expect(loading).toHaveAttribute('aria-busy', 'true')
   })
 
   it('retries detail error', () => {
