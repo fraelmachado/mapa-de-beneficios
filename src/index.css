@@ -1,6 +1,7 @@
 @import './ui/ds.css';
 @import './ui/layout.css';
 @import './features/onboarding/onboarding.css';
+@import './features/painel/painel.css';
 
 @tailwind base;
 @tailwind components;

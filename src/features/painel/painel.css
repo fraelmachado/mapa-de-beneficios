@@ -1,0 +1,10 @@
+.radar-page > .lbl { margin-bottom: var(--s2); }
+.hero-radar { padding: var(--s5); border-radius: 18px; background: var(--ink); color: var(--surface); }
+.hero-radar .lbl { margin-bottom: 5px; color: color-mix(in srgb, var(--surface) 78%, transparent); }
+.hero-radar > strong { display: block; font-size: var(--fz-display); line-height: 1; }
+.hero-radar > div { margin-top: var(--s1); font-size: var(--fz-sm); }
+.radar-filters { margin: var(--s5) 0 var(--s3); }
+.radar-loading { display: grid; gap: var(--s4); }
+.radar-empty-mark { width: 96px; height: 96px; display: grid; place-items: center; border-radius: 28px; background: var(--accent-soft); color: var(--accent); font-size: var(--fz-display); font-weight: 800; }
+.radar-empty-actions { width: min(100%, 320px); margin: calc(-1 * var(--s5)) auto 0; }
+.radar-empty-actions .btn { text-decoration: none; }
