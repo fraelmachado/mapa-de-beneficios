@@ -1,5 +1,6 @@
-import { useState, type FormEvent, type CSSProperties } from 'react'
+import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
+import './perfil.css'
 import { useSession } from '../auth/AuthProvider'
 import { useLinkEmail } from './useLinkEmail'
 import { Button } from '../../ui/Button'
@@ -11,118 +12,88 @@ export function Perfil() {
   const isAnon = user?.is_anonymous ?? true
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
+  const [submitError, setSubmitError] = useState(false)
   const link = useLinkEmail()
 
-  async function submit(e: FormEvent) {
-    e.preventDefault()
+  async function submit(event: FormEvent) {
+    event.preventDefault()
+    setSubmitError(false)
     try {
       await link.mutateAsync(email)
       setSent(true)
     } catch {
-      // erro exibido via link.isError
+      setSubmitError(true)
     }
   }
 
   return (
-    <div className="mx-auto max-w-md p-4 pb-24" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--s4)' }}>
-      <h1 style={{ fontSize: 'var(--fz-h1)', fontWeight: 700, letterSpacing: '-.03em', margin: 0 }}>Seu perfil</h1>
+    <div className="app-page profile-page">
+      <header>
+        <p className="lbl">Conta e preferências</p>
+        <h1>Seu perfil</h1>
+      </header>
 
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 'var(--s3)',
-          background: 'var(--surface)',
-          border: '1px solid var(--line)',
-          borderRadius: 'var(--radius)',
-          padding: 'var(--s4)',
-          boxShadow: 'var(--shadow)',
-        }}
-      >
-        <span
-          aria-hidden="true"
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: 13,
-            background: 'linear-gradient(135deg,var(--c-airport),var(--c-viagem))',
-            color: '#fff',
-            display: 'grid',
-            placeItems: 'center',
-            fontWeight: 800,
-            fontSize: 17,
-          }}
-        >
+      <section className="profile-identity">
+        <span className="profile-avatar" aria-hidden="true">
           {(user?.email ?? 'V').charAt(0).toUpperCase()}
         </span>
         <div>
-          <div style={{ fontWeight: 700, fontSize: 16 }}>{isAnon ? 'Visitante' : user?.email}</div>
-          <div className="muted" style={{ fontSize: 12.5 }}>
-            {isAnon ? 'sessão anônima' : 'conta vinculada'}
-          </div>
+          <strong>{isAnon ? 'Visitante' : user?.email}</strong>
+          <span>{isAnon ? 'sessão anônima' : 'conta vinculada'}</span>
         </div>
-      </div>
+      </section>
 
       {isAnon ? (
-        sent ? (
-          <div
-            className="pass"
-            style={{ '--cat': 'var(--c-airport)' } as CSSProperties}
-          >
-            <div className="edge" />
-            <div className="stub" style={{ padding: 'var(--s4)' }}>
-              <p style={{ margin: 0, color: 'var(--ink-2)' }}>
-                Enviamos um link de confirmação para <strong>{email}</strong>. Abra seu e-mail para
-                garantir seu acesso.
-              </p>
+        <section>
+          <p className="lbl">Garanta seu acesso</p>
+          {sent ? (
+            <div className="profile-confirmation" role="status">
+              Enviamos um link de confirmação para <strong>{email}</strong>.
             </div>
-          </div>
-        ) : (
-          <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--s2)' }}>
-            <p className="muted" style={{ fontSize: 14, margin: 0 }}>
-              Sua conta é temporária. Adicione um e-mail para não perder seus benefícios ao trocar de
-              aparelho.
-            </p>
-            <label className="lbl" htmlFor="email" style={{ margin: 'var(--s2) 0 0' }}>
-              E-mail
-            </label>
-            <label className="input">
-              <input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="voce@email.com"
-              />
-            </label>
-            {link.isError && (
-              <p style={{ fontSize: 14, color: 'var(--warn)' }}>Não foi possível enviar. Tente de novo.</p>
-            )}
-            <Button type="submit" disabled={link.isPending}>
-              Salvar meu acesso
-            </Button>
-          </form>
-        )
+          ) : (
+            <form onSubmit={submit} className="profile-form">
+              <p>Sua conta é temporária. Adicione um e-mail para não perder seus benefícios.</p>
+              <label className="lbl" htmlFor="email">
+                E-mail
+              </label>
+              <label className="input">
+                <input
+                  id="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="voce@email.com"
+                />
+              </label>
+              {submitError ? <p className="profile-error">Não foi possível enviar. Tente de novo.</p> : null}
+              <Button type="submit" disabled={link.isPending}>
+                {link.isPending ? 'Enviando...' : 'Salvar meu acesso'}
+              </Button>
+            </form>
+          )}
+        </section>
       ) : null}
 
-      <div>
-        <p className="lbl" style={{ margin: '0 0 var(--s2)' }}>
-          Conta
-        </p>
-        <Link className="row" to="/onboarding" style={{ color: 'inherit' }}>
-          Editar minhas fontes
+      <section>
+        <p className="lbl">Seus programas</p>
+        <Link className="row" to="/onboarding?mode=edit">
+          Editar meus programas
           <span className="muted" aria-hidden="true">
             →
           </span>
         </Link>
-        <div className="row" role="button" tabIndex={0} onClick={() => toggleTheme()}>
-          Tema (claro / escuro)
+      </section>
+
+      <section>
+        <p className="lbl">Preferências</p>
+        <button className="row profile-row-button" type="button" onClick={() => toggleTheme()}>
+          Tema claro ou escuro
           <span className="muted" aria-hidden="true">
             ◑
           </span>
-        </div>
-      </div>
+        </button>
+      </section>
     </div>
   )
 }

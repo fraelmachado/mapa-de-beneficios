@@ -8,8 +8,9 @@ vi.mock('../auth/AuthProvider', () => ({
 }))
 
 const linkMutate = vi.fn()
+let linkState: { mutateAsync: typeof linkMutate; isPending: boolean; isError: boolean }
 vi.mock('./useLinkEmail', () => ({
-  useLinkEmail: () => ({ mutateAsync: linkMutate, isPending: false, isError: false }),
+  useLinkEmail: () => linkState,
 }))
 
 import { Perfil } from './Perfil'
@@ -17,6 +18,7 @@ import { Perfil } from './Perfil'
 beforeEach(() => {
   linkMutate.mockReset()
   linkMutate.mockResolvedValue(undefined)
+  linkState = { mutateAsync: linkMutate, isPending: false, isError: false }
 })
 
 describe('Perfil', () => {
@@ -36,19 +38,28 @@ describe('Perfil', () => {
     expect(screen.queryByRole('button', { name: /salvar meu acesso/i })).not.toBeInTheDocument()
   })
 
-  it('tem link para editar as fontes', () => {
+  it('tem link para editar meus programas', () => {
     sessionValue = { session: { user: { id: 'u1', is_anonymous: true, email: null } }, loading: false }
     renderWithProviders(<Perfil />)
-    expect(screen.getByRole('link', { name: /editar minhas fontes/i })).toHaveAttribute('href', '/onboarding')
+    expect(screen.getByRole('link', { name: /editar meus programas/i })).toHaveAttribute('href', '/onboarding?mode=edit')
   })
 
-  it('falha no envio não quebra nem mostra confirmação', async () => {
+  it('mantém o e-mail após falha no envio', async () => {
     sessionValue = { session: { user: { id: 'u1', is_anonymous: true, email: null } }, loading: false }
     linkMutate.mockRejectedValue(new Error('smtp down'))
     renderWithProviders(<Perfil />)
-    fireEvent.change(screen.getByRole('textbox', { name: /e-mail/i }), { target: { value: 'a@b.com' } })
+    const input = screen.getByRole('textbox', { name: /e-mail/i })
+    fireEvent.change(input, { target: { value: 'a@b.com' } })
     fireEvent.click(screen.getByRole('button', { name: /salvar meu acesso/i }))
-    await waitFor(() => expect(linkMutate).toHaveBeenCalledWith('a@b.com'))
-    expect(screen.queryByText(/enviamos um link/i)).not.toBeInTheDocument()
+    await waitFor(() => expect(linkMutate).toHaveBeenCalled())
+    expect(input).toHaveValue('a@b.com')
+    expect(screen.getByText(/não foi possível enviar/i)).toBeInTheDocument()
+  })
+
+  it('desabilita o envio enquanto a solicitação está pendente', () => {
+    sessionValue = { session: { user: { id: 'u1', is_anonymous: true, email: null } }, loading: false }
+    linkState.isPending = true
+    renderWithProviders(<Perfil />)
+    expect(screen.getByRole('button', { name: /enviando/i })).toBeDisabled()
   })
 })
