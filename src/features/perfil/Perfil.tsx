@@ -7,6 +7,17 @@ import { Button } from '../../ui/Button'
 import { toggleTheme } from '../../ui/theme'
 import { supabase } from '../../lib/supabase'
 
+const stroke = {
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  stroke: 'currentColor',
+  strokeWidth: 2,
+  strokeLinecap: 'round' as const,
+  strokeLinejoin: 'round' as const,
+  width: 17,
+  height: 17,
+}
+
 export function Perfil() {
   const { session } = useSession()
   const user = session?.user
@@ -52,7 +63,6 @@ export function Perfil() {
   return (
     <div className="app-page profile-page">
       <header>
-        <p className="lbl">Conta e preferências</p>
         <h1>Seu perfil</h1>
       </header>
 
@@ -60,25 +70,26 @@ export function Perfil() {
         <span className="profile-avatar" aria-hidden="true">
           {(user?.email ?? 'V').charAt(0).toUpperCase()}
         </span>
-        <div>
+        <div className="profile-identity-info">
           <strong>{isAnon ? 'Visitante' : user?.email}</strong>
           <span>{isAnon ? 'sessão anônima' : 'conta vinculada'}</span>
         </div>
       </section>
 
       {isAnon ? (
-        <section>
+        <section className="profile-access">
           <p className="lbl">Garanta seu acesso</p>
           {sent ? (
             <div className="profile-confirmation" role="status">
-              Enviamos um link de confirmação para <strong>{email}</strong>.
+              <span className="profile-confirmation-check" aria-hidden="true">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+              </span>
+              <span>Enviamos um link de confirmação para <strong>{email}</strong>.</span>
             </div>
           ) : (
             <form onSubmit={submit} className="profile-form">
-              <p>Sua conta é temporária. Adicione um e-mail para não perder seus benefícios.</p>
-              <label className="lbl" htmlFor="email">
-                E-mail
-              </label>
+              <p>Sua conta é temporária. Adicione um e-mail para não perder seus benefícios ao trocar de aparelho.</p>
+              <label className="lbl" htmlFor="email">E-mail</label>
               <label className="input">
                 <input
                   id="email"
@@ -98,41 +109,47 @@ export function Perfil() {
         </section>
       ) : null}
 
-      <section>
-        <p className="lbl">Seus programas</p>
-        <Link className="row" to="/onboarding?mode=edit">
-          Editar meus programas
-          <span className="muted" aria-hidden="true">
-            →
-          </span>
-        </Link>
-      </section>
+      <section className="profile-conta">
+        <p className="lbl">Conta</p>
+        <div className="profile-rows">
+          <Link className="profile-row" to="/onboarding?mode=edit">
+            <span className="profile-row-icon" aria-hidden="true">
+              <svg {...stroke}><rect x="3" y="5" width="18" height="13" rx="2.5" /><path d="M3 9h18" /></svg>
+            </span>
+            <span className="profile-row-label">Editar meus programas</span>
+            <span className="profile-row-chev" aria-hidden="true">›</span>
+          </Link>
 
-      {!isAnon ? (
-        <section>
-          <p className="lbl">Conta</p>
-          <button className="row profile-row-button" type="button" disabled={isSigningOut} onClick={signOut}>
-            {isSigningOut ? 'Saindo...' : 'Encerrar sessão'}
+          <button className="profile-row" type="button" aria-pressed={theme === 'dark'} onClick={changeTheme}>
+            <span className="profile-row-icon" aria-hidden="true">
+              <svg {...stroke}><path d="M12 3a9 9 0 1 0 9 9c-5 0-9-4-9-9Z" /></svg>
+            </span>
+            <span className="profile-row-label">Tema <span className="profile-row-sub">{theme === 'dark' ? 'escuro' : 'claro'}</span></span>
+            <span className="profile-row-chev" aria-hidden="true">◑</span>
           </button>
-          {signOutError ? <p className="profile-error" role="alert">Não foi possível encerrar a sessão. Tente de novo.</p> : null}
-        </section>
-      ) : null}
 
-      <section>
-        <p className="lbl">Preferências</p>
-        <button
-          aria-pressed={theme === 'dark'}
-          className="row profile-row-button"
-          type="button"
-          onClick={changeTheme}
-        >
-          Tema {theme === 'dark' ? 'escuro' : 'claro'}
-          <span className="muted" aria-hidden="true">
-            ◑
-          </span>
-        </button>
-        <p className="sr-only" role="status" aria-live="polite">Tema {theme === 'dark' ? 'escuro' : 'claro'} ativado</p>
+          {!isAnon ? (
+            <button className="profile-row" type="button" disabled={isSigningOut} onClick={signOut}>
+              <span className="profile-row-icon" aria-hidden="true">
+                <svg {...stroke}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
+              </span>
+              <span className="profile-row-label">{isSigningOut ? 'Saindo...' : 'Encerrar sessão'}</span>
+            </button>
+          ) : null}
+
+          <a className="profile-row" href="#">
+            <span className="profile-row-icon" aria-hidden="true">
+              <svg {...stroke}><circle cx="12" cy="12" r="9" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
+            </span>
+            <span className="profile-row-label">Ajuda e privacidade</span>
+            <span className="profile-row-chev" aria-hidden="true">›</span>
+          </a>
+        </div>
+        {signOutError ? <p className="profile-error" role="alert">Não foi possível encerrar a sessão. Tente de novo.</p> : null}
       </section>
+
+      <p className="profile-version">Mapa de Benefícios · v1.0</p>
+      <p className="sr-only" role="status" aria-live="polite">Tema {theme === 'dark' ? 'escuro' : 'claro'} ativado</p>
     </div>
   )
 }
