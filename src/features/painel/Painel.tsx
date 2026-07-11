@@ -47,13 +47,25 @@ export function Painel() {
   if (all.length === 0) {
     return (
       <div className="app-page radar-page">
-        <p className="lbl">Seu radar de benefícios</p>
-        <PageState title="Nenhum benefício no seu radar ainda" description="Adicione seus programas para revelar seus benefícios.">
-          <span className="radar-empty-mark">0</span>
-        </PageState>
+        <header className="radar-head">
+          <p className="lbl">Olá, {greetingName}</p>
+          <h1>Seu radar de benefícios</h1>
+        </header>
+        <div className="radar-empty-body">
+          <div className="radar-rings" aria-hidden="true">
+            <span className="radar-ring" />
+            <span className="radar-ring" />
+            <span className="radar-ring" />
+            <span className="radar-rings-center">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="8" /><circle cx="12" cy="12" r="3" /><path d="M12 4v2M12 18v2M4 12h2M18 12h2" /></svg>
+            </span>
+          </div>
+          <h2>Nenhum benefício no radar ainda</h2>
+          <p>Adicione seus programas — a gente começa a mapear na hora.</p>
+        </div>
         <div className="radar-empty-actions">
           <Link className="btn" to="/onboarding?mode=edit">Adicionar programas</Link>
-          <button className="btn ghost" type="button" disabled>Conectar Gmail - Em breve</button>
+          <button className="btn ghost" type="button" disabled>Conectar Gmail — Em breve</button>
         </div>
       </div>
     )
