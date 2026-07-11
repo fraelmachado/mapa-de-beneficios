@@ -1,49 +1,32 @@
-/* ============================================================
-   Shell responsivo do app (Painel/Buscar/Perfil). Mobile-first:
-   coluna única + tabbar no mobile; desktop = expansão responsiva
-   (sidebar + grid). Referência de design = Claude Design (fonte
-   absoluta) — docs/mockups/design_handoff_mockups/.
-   ============================================================ */
-.app { min-height: 100vh; background: var(--bg); }
-
-/* sidebar desktop (oculta no mobile) */
+.app { min-height: 100dvh; background: var(--bg); }
 .side { display: none; }
-
-/* área principal */
-.main { max-width: 480px; margin: 0 auto; padding: var(--s5) var(--s4) 104px; }
-
-/* tabbar mobile */
-.tabbar {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
-  padding: var(--s2) var(--s4) calc(var(--s2) + env(safe-area-inset-bottom));
-  background: color-mix(in srgb, var(--surface) 88%, transparent);
-  backdrop-filter: blur(12px); border-top: 1px solid var(--line);
-}
+.main { min-width: 0; }
+.app-page { width: 100%; max-width: 480px; margin: 0 auto; padding: var(--s5) var(--s4) 112px; }
+.app-page-wide { max-width: 1040px; }
+.app-brand-mark { width: 30px; height: 30px; border-radius: 9px; background: var(--accent); display: inline-block; flex: none; }
+.tabbar { position: fixed; inset: auto 0 0; z-index: 20; padding: var(--s2) var(--s4) calc(var(--s2) + env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(12px); border-top: 1px solid var(--line); }
 .tabbar .nav { border: 0; border-radius: 0; background: transparent; padding: 0; }
-
-/* grid de passes */
-.passes { display: grid; gap: var(--s3); grid-template-columns: 1fr; }
+.passes { display: grid; gap: var(--s3); grid-template-columns: minmax(0, 1fr); }
+.page-state { min-height: 260px; display: grid; place-content: center; justify-items: center; text-align: center; padding: var(--s8) var(--s4); }
+.page-state-visual { margin-bottom: var(--s4); }
+.page-state h2 { margin: 0; font-size: var(--fz-h2); }
+.page-state p { max-width: 34ch; margin: var(--s2) 0 0; color: var(--ink-2); line-height: var(--lh-body); }
+.page-state-actions { width: min(100%, 280px); margin-top: var(--s5); }
+.page-state-actions .btn { margin: 0; }
 
 @media (min-width: 960px) {
-  .app { display: grid; grid-template-columns: 256px 1fr; align-items: start; }
-  .side {
-    display: flex; flex-direction: column; gap: var(--s2);
-    position: sticky; top: 0; height: 100vh; padding: var(--s6) var(--s4);
-    border-right: 1px solid var(--line); background: var(--surface);
-  }
-  .side .brand {
-    display: flex; align-items: center; gap: var(--s3);
-    font-weight: 800; font-size: var(--fz-title); letter-spacing: -.02em; margin-bottom: var(--s5);
-  }
-  .side a {
-    display: flex; align-items: center; gap: var(--s3); padding: 11px var(--s3);
-    border-radius: var(--r-sm); color: var(--ink-2); text-decoration: none;
-    font-weight: 600; font-size: var(--fz-body); transition: background .18s, color .18s;
-  }
+  .app { display: grid; grid-template-columns: 256px minmax(0, 1fr); }
+  .side { display: flex; flex-direction: column; position: sticky; top: 0; height: 100dvh; padding: var(--s6) var(--s4); border-right: 1px solid var(--line); background: var(--surface); }
+  .side .brand { display: flex; align-items: center; gap: var(--s3); margin-bottom: var(--s5); font-size: var(--fz-title); font-weight: 800; }
+  .side nav { display: grid; gap: var(--s2); }
+  .side a { display: flex; align-items: center; gap: var(--s3); padding: 11px var(--s3); border-radius: var(--r-sm); color: var(--ink-2); text-decoration: none; font-weight: 600; }
   .side a:hover { background: var(--surface-2); color: var(--ink); }
   .side a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); }
+  .side a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .side a svg { width: 20px; height: 20px; }
-  .main { max-width: 1040px; margin: 0; padding: var(--s8) var(--s8) var(--s10); }
+  .side-theme { width: auto; margin: auto 0 0; }
+  .app-page { max-width: 720px; padding: var(--s8); }
+  .app-page-wide { max-width: 1120px; }
   .tabbar { display: none; }
   .passes { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--s4); }
 }

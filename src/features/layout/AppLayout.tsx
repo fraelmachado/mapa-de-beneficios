@@ -3,45 +3,23 @@ import { BottomNav } from './BottomNav'
 import { PainelIcon, SearchIcon, PerfilIcon, ThemeIcon } from './navIcons'
 import { toggleTheme } from '../../ui/theme'
 
+const links = [
+  { to: '/painel', label: 'Painel', Icon: PainelIcon },
+  { to: '/buscar', label: 'Buscar', Icon: SearchIcon },
+  { to: '/perfil', label: 'Perfil', Icon: PerfilIcon },
+]
+
 export function AppLayout() {
   return (
     <div className="app">
-      <aside className="side">
-        <div className="brand">
-          <span
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: 9,
-              background: 'linear-gradient(135deg,var(--c-airport),var(--c-viagem))',
-              display: 'inline-block',
-            }}
-          />
-          Mapa de Benefícios
-        </div>
-        <NavLink to="/painel">
-          <PainelIcon /> Painel
-        </NavLink>
-        <NavLink to="/buscar">
-          <SearchIcon /> Buscar
-        </NavLink>
-        <NavLink to="/perfil">
-          <PerfilIcon /> Perfil
-        </NavLink>
-        <button
-          className="btn ghost"
-          type="button"
-          onClick={() => toggleTheme()}
-          style={{ marginTop: 'auto', width: 'auto' }}
-        >
-          <ThemeIcon /> Tema
-        </button>
+      <aside className="side" aria-label="Navegacao principal">
+        <div className="brand"><span className="app-brand-mark" aria-hidden="true" />Mapa de Benefícios</div>
+        <nav aria-label="Principal">
+          {links.map(({ to, label, Icon }) => <NavLink key={to} to={to}><Icon />{label}</NavLink>)}
+        </nav>
+        <button className="btn ghost side-theme" type="button" onClick={() => toggleTheme()}><ThemeIcon /> Tema</button>
       </aside>
-
-      <main className="main">
-        <Outlet />
-      </main>
-
+      <main className="main"><Outlet /></main>
       <BottomNav />
     </div>
   )
