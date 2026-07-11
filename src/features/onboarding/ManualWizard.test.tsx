@@ -58,11 +58,11 @@ beforeEach(() => {
   groups = [bankGroup, loyaltyGroup]
 })
 
-import { OnboardingPage } from './OnboardingPage'
+import { ManualWizard } from './ManualWizard'
 
-describe('OnboardingPage (wizard híbrido)', () => {
+describe('ManualWizard (wizard híbrido)', () => {
   it('mostra a 1ª categoria; gate "Tenho" revela provedores (chips inline); seleciona e conclui', async () => {
-    renderWithProviders(<OnboardingPage />)
+    renderWithProviders(<ManualWizard />)
     expect(screen.getByText(/Passo 1 de 2/i)).toBeInTheDocument()
     expect(screen.getByText(/Bancos & cartões/)).toBeInTheDocument()
     // provedores escondidos até "Tenho"
@@ -85,7 +85,7 @@ describe('OnboardingPage (wizard híbrido)', () => {
 
   it('mostra só categorias com provedores; Concluir exige responder o gate', () => {
     groups = [bankGroup]
-    renderWithProviders(<OnboardingPage />)
+    renderWithProviders(<ManualWizard />)
     expect(screen.queryByText(/Fidelidade & pontos/)).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /avançar/i })).not.toBeInTheDocument()
     const concluir = screen.getByRole('button', { name: /concluir/i })
@@ -96,7 +96,7 @@ describe('OnboardingPage (wizard híbrido)', () => {
 
   it('não conclui sem responder o gate (não salva nem navega)', () => {
     groups = [bankGroup]
-    renderWithProviders(<OnboardingPage />)
+    renderWithProviders(<ManualWizard />)
     fireEvent.click(screen.getByRole('button', { name: /concluir/i })) // desabilitado → no-op
     expect(saveMutate).not.toHaveBeenCalled()
     expect(navigateMock).not.toHaveBeenCalled()
@@ -104,7 +104,7 @@ describe('OnboardingPage (wizard híbrido)', () => {
 
   it('modo edição: categoria com item pré-selecionado já aparece como "Tenho"', () => {
     existing = { data: ['i1'], isLoading: false }
-    renderWithProviders(<OnboardingPage />)
+    renderWithProviders(<ManualWizard />)
     // provedores já visíveis sem clicar em "Tenho"
     expect(screen.getByText('Itaú')).toBeInTheDocument()
   })
@@ -112,7 +112,7 @@ describe('OnboardingPage (wizard híbrido)', () => {
   it('modo edição: "Não tenho" remove os itens da categoria ao concluir', async () => {
     existing = { data: ['i1'], isLoading: false }
     groups = [bankGroup]
-    renderWithProviders(<OnboardingPage />)
+    renderWithProviders(<ManualWizard />)
     expect(screen.getByText('Itaú')).toBeInTheDocument() // pré-selecionado → "Tenho"
     fireEvent.click(screen.getByRole('button', { name: /não tenho/i }))
     fireEvent.click(screen.getByRole('button', { name: /concluir/i }))
@@ -122,7 +122,7 @@ describe('OnboardingPage (wizard híbrido)', () => {
 
   it('erro ao carregar fontes existentes não salva', () => {
     existing = { data: undefined, isLoading: false, error: new Error('x') } as unknown as typeof existing
-    renderWithProviders(<OnboardingPage />)
+    renderWithProviders(<ManualWizard />)
     expect(screen.getByText(/erro ao carregar seus dados/i)).toBeInTheDocument()
     expect(saveMutate).not.toHaveBeenCalled()
   })
@@ -136,7 +136,7 @@ describe('OnboardingPage (wizard híbrido)', () => {
           source_items: [{ id: 'i9', label: 'Ultravioleta', sort_order: 1 }] },
       ],
     }]
-    renderWithProviders(<OnboardingPage />)
+    renderWithProviders(<ManualWizard />)
     fireEvent.click(screen.getByRole('button', { name: /^tenho$/i }))
     expect(screen.getByText('Itaú')).toBeInTheDocument()
     expect(screen.getByText('Nubank')).toBeInTheDocument()
@@ -146,7 +146,7 @@ describe('OnboardingPage (wizard híbrido)', () => {
   })
 
   it('"Outro" grava um pedido com a categoria atual', async () => {
-    renderWithProviders(<OnboardingPage />)
+    renderWithProviders(<ManualWizard />)
     fireEvent.click(screen.getByRole('button', { name: /^tenho$/i }))
     fireEvent.change(screen.getByLabelText(/outro/i), { target: { value: 'C6 Bank' } })
     fireEvent.click(screen.getByRole('button', { name: /adicionar/i }))
