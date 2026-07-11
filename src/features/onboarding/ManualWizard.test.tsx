@@ -92,7 +92,10 @@ describe('ManualWizard (wizard híbrido)', () => {
     fireEvent.click(screen.getByRole('button', { name: /não tenho/i }))
     fireEvent.click(screen.getByRole('button', { name: /concluir/i }))
     await waitFor(() => expect(saveMutate).toHaveBeenCalledWith(expect.arrayContaining(['i1'])))
-    await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/painel'), { timeout: 2500 })
+    // tela de conclusão (Radar montado) antes de ir pro painel
+    const ver = await screen.findByRole('button', { name: /ver meu radar/i }, { timeout: 2500 })
+    fireEvent.click(ver)
+    expect(navigateMock).toHaveBeenCalledWith('/painel')
   })
 
   it('mostra só categorias com provedores; Concluir exige responder o gate', () => {

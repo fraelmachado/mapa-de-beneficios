@@ -5,6 +5,7 @@ import { selectionReducer } from './selection'
 import { useSaveUserSources } from './useSaveUserSources'
 import { useSaveSourceRequest } from './useSaveSourceRequest'
 import { TransitionScreen } from './TransitionScreen'
+import { RadarMontado, type SummaryGroup } from './RadarMontado'
 import { useSession } from '../auth/AuthProvider'
 import { useUserSources } from './useUserSources'
 import type { CategoryGroup } from './groupSourcesByCategory'
@@ -60,6 +61,7 @@ export function ManualWizard() {
   const [step, setStep] = useState(0)
   const [gates, setGates] = useState<Record<SourceCategory, Gate>>({} as Record<SourceCategory, Gate>)
   const [saving, setSaving] = useState(false)
+  const [done, setDone] = useState(false)
   const [saveError, setSaveError] = useState(false)
   const save = useSaveUserSources()
   const saveRequest = useSaveSourceRequest()
@@ -102,6 +104,18 @@ export function ManualWizard() {
     return <div className="ob-state"><PageState title="Não foi possível carregar seus programas" action={{ label: 'Tentar novamente', onClick: () => { void sourcesQuery.refetch(); void existingQuery.refetch() } }} /></div>
   }
   if (saving) return <TransitionScreen />
+
+  if (done) {
+    const summaryGroups: SummaryGroup[] = steps
+      .map((g) => ({
+        label: g.meta.label,
+        items: g.sources.flatMap((s) =>
+          s.source_items.filter((it) => selected.has(it.id)).map((it) => ({ provider: s.name, variant: it.label })),
+        ),
+      }))
+      .filter((g) => g.items.length > 0)
+    return <RadarMontado groups={summaryGroups} onView={() => navigate('/painel')} />
+  }
 
   if (steps.length === 0) {
     return <div className="ob-state"><PageState title="Nenhum programa disponível" description="O catálogo ainda não possui programas para esta etapa." /></div>
@@ -150,7 +164,8 @@ export function ManualWizard() {
     try {
       await save.mutateAsync([...selected])
       await new Promise((r) => setTimeout(r, 1200))
-      navigate('/painel')
+      setSaving(false)
+      setDone(true)
     } catch {
       setSaving(false)
       setSaveError(true)

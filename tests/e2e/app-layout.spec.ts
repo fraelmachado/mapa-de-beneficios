@@ -67,6 +67,8 @@ test('manual setup produces a populated radar and navigable detail', async ({ pa
     }
     await page.getByRole('button', { name: /avan.ar/i }).click()
   }
+  // tela de conclusão (Radar montado) → Ver meu radar
+  await page.getByRole('button', { name: /ver meu radar/i }).click()
   await expect(page).toHaveURL(/\/painel$/, { timeout: 10_000 })
   await expect(page.locator('.pass').first()).toBeVisible()
   await assertNoHorizontalOverflow(page)
