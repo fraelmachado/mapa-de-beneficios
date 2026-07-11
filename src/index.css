@@ -2,6 +2,7 @@
 @import './ui/layout.css';
 @import './features/onboarding/onboarding.css';
 @import './features/painel/painel.css';
+@import './features/busca/search.css';
 
 @tailwind base;
 @tailwind components;

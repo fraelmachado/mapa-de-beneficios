@@ -28,6 +28,11 @@ describe('filterBenefits', () => {
   it('filtra por texto no partner_name', () => {
     expect(filterBenefits(list, { category: null, text: 'master' }).map((b) => b.id)).toEqual(['1'])
   })
+  it('searches provider names from origins and via', () => {
+    const item = base({ title: 'Beneficio sem marca no titulo', partner_name: null, origins: [{ provider: 'Nubank', category: 'bank_card' }], via: ['Ultravioleta'] })
+    expect(filterBenefits([item], { category: null, text: 'nubank' })).toEqual([item])
+    expect(filterBenefits([item], { category: null, text: 'ultravioleta' })).toEqual([item])
+  })
   it('combina categoria e texto', () => {
     expect(filterBenefits(list, { category: 'insurance', text: 'farm' }).map((b) => b.id)).toEqual(['3'])
   })

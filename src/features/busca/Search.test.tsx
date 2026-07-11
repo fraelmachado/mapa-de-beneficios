@@ -7,7 +7,8 @@ vi.mock('../auth/AuthProvider', () => ({
   useSession: () => ({ session: { user: { id: 'u1' } }, loading: false }),
 }))
 
-let result: { data: MyBenefit[] | undefined; isLoading: boolean; error: unknown }
+const refetch = vi.fn()
+let result: { data: MyBenefit[] | undefined; isLoading: boolean; error: unknown; refetch: typeof refetch }
 vi.mock('../benefits/useMyBenefits', () => ({ useMyBenefits: () => result }))
 
 const mk = (over: Partial<MyBenefit>): MyBenefit => ({
@@ -19,9 +20,10 @@ const mk = (over: Partial<MyBenefit>): MyBenefit => ({
 import { Search } from './Search'
 
 beforeEach(() => {
+  refetch.mockReset()
   result = {
     data: [mk({ id: '1', title: 'Sala VIP', partner_name: 'Mastercard' }), mk({ id: '2', title: 'Cinema', partner_name: 'Cinemark' })],
-    isLoading: false, error: null,
+    isLoading: false, error: null, refetch,
   }
 })
 
@@ -37,5 +39,26 @@ describe('Search', () => {
     renderWithProviders(<Search />)
     fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'zzz' } })
     expect(screen.getByText(/nada encontrado/i)).toBeInTheDocument()
+  })
+
+  it('clears an active text query', () => {
+    renderWithProviders(<Search />)
+    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'cine' } })
+    fireEvent.click(screen.getByRole('button', { name: /limpar busca/i }))
+    expect(screen.getByRole('searchbox')).toHaveValue('')
+    expect(screen.getByText('Sala VIP')).toBeInTheDocument()
+  })
+
+  it('shows result count', () => {
+    renderWithProviders(<Search />)
+    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'cine' } })
+    expect(screen.getByText(/1 resultado/i)).toBeInTheDocument()
+  })
+
+  it('retries a failed query', () => {
+    result = { data: undefined, isLoading: false, error: new Error('down'), refetch }
+    renderWithProviders(<Search />)
+    fireEvent.click(screen.getByRole('button', { name: /tentar novamente/i }))
+    expect(refetch).toHaveBeenCalledTimes(1)
   })
 })

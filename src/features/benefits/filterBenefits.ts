@@ -10,7 +10,8 @@ export function filterBenefits(items: MyBenefit[], filter: BenefitFilter): MyBen
   return items.filter((b) => {
     if (filter.category && b.category !== filter.category) return false
     if (!q) return true
-    const haystack = `${b.title} ${b.summary} ${b.partner_name ?? ''}`.toLowerCase()
+    const providers = b.origins.map((origin) => origin.provider).join(' ')
+    const haystack = `${b.title} ${b.summary} ${b.partner_name ?? ''} ${providers} ${b.via.join(' ')}`.toLowerCase()
     return haystack.includes(q)
   })
 }
