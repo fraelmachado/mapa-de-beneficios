@@ -1,4 +1,4 @@
-.detail-page { width: 100%; max-width: 680px; margin: 0 auto; padding: var(--s5) var(--s4) var(--s10); display: grid; gap: var(--s5); }
+.detail-page { width: 100%; max-width: 680px; margin: 0 auto; padding: var(--s5) var(--s4) calc(112px + env(safe-area-inset-bottom)); display: grid; gap: var(--s5); }
 .detail-back { width: fit-content; color: var(--ink-2); font-size: var(--fz-sm); font-weight: 700; text-decoration: none; }
 .detail-header { display: grid; gap: var(--s3); }
 .detail-header .tag, .detail-header .chip { width: fit-content; }
