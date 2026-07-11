@@ -26,11 +26,11 @@ describe('OnboardingPage flow', () => {
   it('goes from welcome to method and manual wizard', () => {
     renderWithProviders(<OnboardingPage />, { route: '/onboarding' })
 
-    expect(screen.getByRole('heading', { name: /benefícios que você já tem/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /benefícios esperando por você/i })).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: /começar/i }))
+    fireEvent.click(screen.getByRole('button', { name: /mapear meus benefícios/i }))
 
-    expect(screen.getByRole('heading', { name: /como você quer começar/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /como quer encontrar seus benefícios/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /gmail.*em breve/i })).toBeDisabled()
 
     fireEvent.click(screen.getByRole('button', { name: /adicionar manualmente/i }))
@@ -42,7 +42,7 @@ describe('OnboardingPage flow', () => {
     renderWithProviders(<OnboardingPage />, { route: '/onboarding?mode=edit' })
 
     expect(screen.getByText('Wizard manual real')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /começar/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /mapear meus benefícios/i })).not.toBeInTheDocument()
   })
 
   it('synchronizes the screen when navigating between standard and edit URLs', () => {
@@ -54,7 +54,7 @@ describe('OnboardingPage flow', () => {
       { route: '/onboarding' },
     )
 
-    expect(screen.getByRole('heading', { name: /benefícios que você já tem/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /benefícios esperando por você/i })).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'Abrir edição' }))
 
@@ -62,6 +62,6 @@ describe('OnboardingPage flow', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Sair da edição' }))
 
-    expect(screen.getByRole('heading', { name: /benefícios que você já tem/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /benefícios esperando por você/i })).toBeInTheDocument()
   })
 })

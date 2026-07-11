@@ -15,8 +15,8 @@ test.beforeEach(async ({ page }, testInfo) => {
 
 test('onboarding exposes manual flow and disabled Gmail', async ({ page }, testInfo) => {
   await page.goto('/onboarding')
-  await expect(page.getByRole('heading', { name: /benefícios que você já tem/i })).toBeVisible()
-  await page.getByRole('button', { name: /começar/i }).click()
+  await expect(page.getByRole('heading', { name: /benefícios esperando por você/i })).toBeVisible()
+  await page.getByRole('button', { name: /mapear meus benefícios/i }).click()
   await expect(page.getByRole('button', { name: /gmail.*em breve/i })).toBeDisabled()
   await assertNoHorizontalOverflow(page)
   await page.screenshot({ path: `test-results/${testInfo.project.name}-onboarding.png`, fullPage: true })
