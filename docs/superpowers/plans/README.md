@@ -1,6 +1,6 @@
 # Estado dos planos de implementação
 
-Última auditoria: **2026-07-10**.
+Última auditoria: **2026-07-11**.
 
 Este índice registra o estado consolidado dos planos. Os checklists dentro de cada
 arquivo foram preservados como roteiro histórico de execução; eles não devem ser
@@ -9,9 +9,12 @@ topo de cada plano e esta tabela são as referências de acompanhamento.
 
 ## Evidências da auditoria
 
-- Branches `main` e `develop` no mesmo commit (`00be236`) e sincronizadas com o remoto.
-- Suíte local completa: **64 arquivos e 182 testes aprovados** em 2026-07-10.
-- Build de produção aprovado (`tsc && vite build`) em 2026-07-10.
+- Refs locais sincronizadas com os remotos auditados: `main` em `00be236` e
+  `develop` em `853c8fd`.
+- Suíte local completa: **68 arquivos e 208 testes aprovados** em 2026-07-11.
+- Build de produção aprovado (`tsc && vite build`) em 2026-07-11.
+- Gate visual local: **24/24 cenários Playwright aprovados** em quatro combinações
+  de viewport/tema, com 32 screenshots inspecionados em 2026-07-11.
 - Aplicação de produção respondeu HTTP 200 em `https://mapadebeneficios.com.br/`.
 - O bundle publicado não continha os marcadores do P4/redesign de Discovery; a
   publicação do estado atual do repositório continua pendente de verificação/correção.
@@ -36,6 +39,7 @@ topo de cada plano e esta tabela são as referências de acompanhamento.
 | P3 - Refino visual | Concluído | Publicação atual não reauditada |
 | P4 - Discovery | Concluído | Não identificado no bundle publicado |
 | Redesign de Discovery | Concluído | Não identificado no bundle publicado |
+| Alinhamento dos layouts do App | Implementado localmente (Playwright 24/24) | Publicação não verificada |
 
 ## Próximo gate
 

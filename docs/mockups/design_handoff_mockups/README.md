@@ -81,6 +81,18 @@ conferência e ajustes finos — **não** recrie do zero o que já está pronto.
 - **App (feito):** Painel, Busca, Onboarding (multi-step), Detalhe, Perfil.
 - **Admin (feito):** Login, Home, Fontes/Programas, Benefícios.
 
+### Gate visual do App (2026-07-11)
+
+Os layouts existentes do App estão **alinhados localmente** com os mockups de
+Onboarding, Wizard manual, Painel, Busca, Detalhe e Perfil. O gate Playwright foi
+executado em `390x844` e `1440x900`, nos temas claro e escuro, com **24/24 cenários
+aprovados** e 32 screenshots reais em `test-results/`. A inspeção confirmou o
+bottom nav no mobile, a sidebar no desktop, ausência de overflow/clipping, CTAs
+desobstruídos e Gmail indisponível com o rótulo `Em breve`.
+
+Este status não incorpora os fronts separados de **shell Admin**, **integração
+Gmail** e **Alertas**, que continuam com escopo e validação próprios.
+
 O que realmente falta / está fraco é **uma tela**: `/admin/discovery` (revisão de
 candidatos do P4, hoje um v1 mínimo). **Já existe um mockup dedicado pra ela:**
 `Admin Discovery.dc.html` — use-o como referência principal (ver seção abaixo).

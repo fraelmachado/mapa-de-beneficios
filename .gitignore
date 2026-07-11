@@ -9,3 +9,5 @@ supabase/.temp
 # macOS / artefatos locais
 .DS_Store
 docs/design-system/backup/
+test-results/
+playwright-report/
