@@ -33,7 +33,8 @@ describe('Painel', () => {
       isLoading: false, error: null, refetch,
     }
     renderWithProviders(<Painel />)
-    expect(screen.getByText(/2 benefícios ativos/i)).toBeInTheDocument()
+    expect(screen.getByText('2')).toBeInTheDocument()
+    expect(screen.getByText(/em valor estimado\/ano/i)).toBeInTheDocument()
     expect(screen.getByText('Sala VIP')).toBeInTheDocument()
     expect(screen.getByText('Cinema')).toBeInTheDocument()
   })

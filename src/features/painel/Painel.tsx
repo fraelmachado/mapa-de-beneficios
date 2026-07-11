@@ -39,6 +39,10 @@ export function Painel() {
 
   const all = data ?? []
   const visible = filterBenefits(all, { category, text: '' })
+  const rawName = session?.user?.email?.split('@')[0]
+  const greetingName = rawName ? rawName.charAt(0).toUpperCase() + rawName.slice(1) : 'Visitante'
+  // ponytail: placeholder estimate (~R$180/benefício) até o modelo ter valor real por benefício
+  const estValue = `R$ ${(all.length * 180).toLocaleString('pt-BR')}`
 
   if (all.length === 0) {
     return (
@@ -57,8 +61,12 @@ export function Painel() {
 
   return (
     <div className="app-page app-page-wide radar-page">
-      <p className="lbl">Seu radar de benefícios</p>
-      <HeroRadar count={all.length} label="Seu radar" caption={`${all.length} benefício${all.length === 1 ? '' : 's'} ativo${all.length === 1 ? '' : 's'}`} />
+      <header className="radar-head">
+        <p className="lbl">Olá, {greetingName}</p>
+        <h1>Seu radar de benefícios</h1>
+      </header>
+      <HeroRadar count={all.length} label="Seu radar" value={estValue} />
+      <h2 className="radar-section-title">Encontrados pra você</h2>
       <div className="radar-filters">
         <CategoryChips selected={category} onChange={setCategory} />
       </div>

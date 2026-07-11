@@ -1,8 +1,14 @@
-.radar-page > .lbl { margin-bottom: var(--s2); }
-.hero-radar { padding: var(--s5); border-radius: 18px; background: var(--ink); color: var(--surface); }
-.hero-radar .lbl { margin-bottom: 5px; color: color-mix(in srgb, var(--surface) 78%, transparent); }
-.hero-radar > strong { display: block; font-size: var(--fz-display); line-height: 1; }
-.hero-radar > div { margin-top: var(--s1); font-size: var(--fz-sm); }
+.radar-head { margin-bottom: var(--s4); }
+.radar-head .lbl { margin-bottom: 2px; }
+.radar-head h1 { margin: 0; font-size: var(--fz-h1); font-weight: 800; letter-spacing: -.03em; color: var(--ink); }
+.hero-radar { position: relative; overflow: hidden; padding: var(--s5); border-radius: 18px; color: #fff; background: linear-gradient(120deg, var(--c-airport), var(--c-viagem) 58%, var(--c-seguro)); }
+.hero-radar .lbl { margin-bottom: 6px; color: rgba(255, 255, 255, .85); }
+.hero-radar > strong { display: block; font-size: 42px; font-weight: 800; letter-spacing: -.04em; line-height: 1; }
+.hero-radar > div { position: relative; margin-top: 5px; font-size: 13px; opacity: .94; }
+.hero-radar-orb { position: absolute; border-radius: 50%; }
+.hero-radar-orb-1 { right: -30px; top: -30px; width: 150px; height: 150px; background: rgba(255, 255, 255, .13); }
+.hero-radar-orb-2 { left: -26px; bottom: -40px; width: 120px; height: 120px; background: rgba(255, 255, 255, .10); }
+.radar-section-title { margin: 22px 0 12px; font-size: 18px; font-weight: 700; letter-spacing: -.02em; color: var(--ink); }
 .radar-filters { margin: var(--s5) 0 var(--s3); }
 .radar-loading { display: grid; gap: var(--s4); }
 .radar-empty-mark { width: 96px; height: 96px; display: grid; place-items: center; border-radius: 28px; background: var(--accent-soft); color: var(--accent); font-size: var(--fz-display); font-weight: 800; }
