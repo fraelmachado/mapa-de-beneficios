@@ -4,13 +4,16 @@ import { describe, expect, it } from 'vitest'
 const css = readFileSync('src/features/detalhe/benefit-detail.css', 'utf8')
 
 describe('benefit-detail.css', () => {
-  it('preserva espaço para a bottom nav e a safe area no mobile', () => {
-    const mobileRule = css.match(/^\.detail-page \{[^}]+\}/m)?.[0] ?? ''
+  it('preserva a safe area no fim do conteúdo', () => {
+    const contentRule = css.match(/^\.detail-content \{[^}]+\}/m)?.[0] ?? ''
 
-    expect(mobileRule).toContain('padding: var(--s5) var(--s4) calc(112px + env(safe-area-inset-bottom))')
+    expect(contentRule).toContain('env(safe-area-inset-bottom)')
   })
 
-  it('mantém o padding adequado no desktop', () => {
-    expect(css).toContain('@media (min-width: 960px) { .detail-page { padding: var(--s8); } }')
+  it('usa o gradiente da categoria no hero', () => {
+    const heroRule = css.match(/^\.detail-hero \{[^}]+\}/m)?.[0] ?? ''
+
+    expect(heroRule).toContain('linear-gradient')
+    expect(heroRule).toContain('var(--cat')
   })
 })
