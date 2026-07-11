@@ -18,6 +18,16 @@
 .ob-progress { height: 6px; border-radius: var(--r-pill); background: var(--line); overflow: hidden; margin-bottom: var(--s4); }
 .ob-progress > i { display: block; height: 100%; background: var(--accent); transition: width .25s var(--ease); }
 
+.ob-wiz-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: var(--s4); }
+.ob-econ { display: inline-flex; align-items: center; gap: 9px; padding: 8px 13px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
+.ob-econ-val { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.05; }
+.ob-econ-val > span:first-child { display: inline-flex; align-items: center; gap: 5px; font-size: 15px; font-weight: 800; letter-spacing: -.02em; color: var(--ink); white-space: nowrap; }
+.ob-econ-up { color: var(--ok); font-size: 13px; }
+.ob-econ-cap { font-size: 10.5px; font-weight: 600; color: var(--muted); }
+.ob-segments { display: flex; gap: 5px; margin-bottom: var(--s4); }
+.ob-segments > span { flex: 1; height: 5px; border-radius: 999px; background: var(--line); }
+.ob-segments > span.on { background: var(--accent); }
+
 .ob-title { font-size: var(--fz-h1); font-weight: 700; letter-spacing: -.03em; line-height: var(--lh-tight); margin: var(--s2) 0 var(--s2); }
 .ob-sub { color: var(--muted); font-size: var(--fz-body); line-height: var(--lh-body); margin: 0 0 var(--s5); }
 

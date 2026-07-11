@@ -161,12 +161,29 @@ export function ManualWizard() {
     <div className="ob">
       <div className="ob-scroll">
         <div className="ob-card">
-          <div className="ob-brand">
-            <span className="mk" aria-hidden="true" /> Mapa de Benefícios
+          <div className="ob-wiz-top">
+            {currentStep > 0 ? (
+              <button
+                type="button"
+                className="ob-back-btn"
+                aria-label="Voltar"
+                onClick={() => setStep((s) => Math.max(s - 1, 0))}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+              </button>
+            ) : (
+              <span style={{ width: 38, height: 38 }} />
+            )}
+            <span className="ob-econ">
+              <span className="ob-econ-val">
+                <span>R$ {(selected.size * 180).toLocaleString('pt-BR')} <span className="ob-econ-up" aria-hidden="true">↑</span></span>
+                <span className="ob-econ-cap">economia potencial</span>
+              </span>
+            </span>
           </div>
 
-          <div className="ob-progress">
-            <i style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }} />
+          <div className="ob-segments" aria-hidden="true">
+            {steps.map((s, i) => <span key={s.category} className={i <= currentStep ? 'on' : ''} />)}
           </div>
           <p className="lbl" style={{ margin: 0 }}>
             Passo {currentStep + 1} de {steps.length} · sua carteira
@@ -254,13 +271,6 @@ export function ManualWizard() {
 
       <div className="ob-foot">
         <div className="ob-foot-inner">
-          {currentStep > 0 && (
-            <div className="ob-back">
-              <Button variant="ghost" onClick={() => setStep((currentStep) => Math.max(currentStep - 1, 0))}>
-                Voltar
-              </Button>
-            </div>
-          )}
           <div className="ob-cta">
             <Button onClick={next} disabled={gate === undefined}>
               {isLast ? 'Concluir' : 'Avançar'}
