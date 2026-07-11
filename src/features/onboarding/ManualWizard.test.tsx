@@ -23,8 +23,23 @@ vi.mock('./useSaveSourceRequest', () => ({
   useSaveSourceRequest: () => ({ mutateAsync: requestMutate, isPending: false }),
 }))
 
-let existing: { data: string[] | undefined; isLoading: boolean; error?: unknown }
-vi.mock('./useUserSources', () => ({ useUserSources: () => existing }))
+const refetchSources = vi.fn()
+const refetchExisting = vi.fn()
+let sourceResult: {
+  data: CategoryGroup[] | undefined
+  isLoading: boolean
+  error: unknown
+  refetch: typeof refetchSources
+}
+let existingResult: {
+  data: string[] | undefined
+  isLoading: boolean
+  error: unknown
+  refetch: typeof refetchExisting
+}
+
+vi.mock('./useSources', () => ({ useSources: () => sourceResult }))
+vi.mock('./useUserSources', () => ({ useUserSources: () => existingResult }))
 
 const bankGroup: CategoryGroup = {
   category: 'bank_card',
@@ -43,19 +58,16 @@ const loyaltyGroup: CategoryGroup = {
   ],
 }
 
-let groups: CategoryGroup[]
-vi.mock('./useSources', () => ({
-  useSources: () => ({ data: groups, isLoading: false, error: null }),
-}))
-
 beforeEach(() => {
   navigateMock.mockReset()
   saveMutate.mockReset()
   saveMutate.mockResolvedValue(undefined)
   requestMutate.mockReset()
   requestMutate.mockResolvedValue(undefined)
-  existing = { data: [], isLoading: false, error: null }
-  groups = [bankGroup, loyaltyGroup]
+  refetchSources.mockReset()
+  refetchExisting.mockReset()
+  sourceResult = { data: [bankGroup, loyaltyGroup], isLoading: false, error: null, refetch: refetchSources }
+  existingResult = { data: [], isLoading: false, error: null, refetch: refetchExisting }
 })
 
 import { ManualWizard } from './ManualWizard'
@@ -84,7 +96,7 @@ describe('ManualWizard (wizard híbrido)', () => {
   })
 
   it('mostra só categorias com provedores; Concluir exige responder o gate', () => {
-    groups = [bankGroup]
+    sourceResult.data = [bankGroup]
     renderWithProviders(<ManualWizard />)
     expect(screen.queryByText(/Fidelidade & pontos/)).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /avançar/i })).not.toBeInTheDocument()
@@ -95,7 +107,7 @@ describe('ManualWizard (wizard híbrido)', () => {
   })
 
   it('não conclui sem responder o gate (não salva nem navega)', () => {
-    groups = [bankGroup]
+    sourceResult.data = [bankGroup]
     renderWithProviders(<ManualWizard />)
     fireEvent.click(screen.getByRole('button', { name: /concluir/i })) // desabilitado → no-op
     expect(saveMutate).not.toHaveBeenCalled()
@@ -103,15 +115,15 @@ describe('ManualWizard (wizard híbrido)', () => {
   })
 
   it('modo edição: categoria com item pré-selecionado já aparece como "Tenho"', () => {
-    existing = { data: ['i1'], isLoading: false }
+    existingResult = { ...existingResult, data: ['i1'] }
     renderWithProviders(<ManualWizard />)
     // provedores já visíveis sem clicar em "Tenho"
     expect(screen.getByText('Itaú')).toBeInTheDocument()
   })
 
   it('modo edição: "Não tenho" remove os itens da categoria ao concluir', async () => {
-    existing = { data: ['i1'], isLoading: false }
-    groups = [bankGroup]
+    existingResult = { ...existingResult, data: ['i1'] }
+    sourceResult.data = [bankGroup]
     renderWithProviders(<ManualWizard />)
     expect(screen.getByText('Itaú')).toBeInTheDocument() // pré-selecionado → "Tenho"
     fireEvent.click(screen.getByRole('button', { name: /não tenho/i }))
@@ -121,14 +133,14 @@ describe('ManualWizard (wizard híbrido)', () => {
   })
 
   it('erro ao carregar fontes existentes não salva', () => {
-    existing = { data: undefined, isLoading: false, error: new Error('x') } as unknown as typeof existing
+    existingResult = { ...existingResult, data: undefined, error: new Error('x') }
     renderWithProviders(<ManualWizard />)
-    expect(screen.getByText(/erro ao carregar seus dados/i)).toBeInTheDocument()
+    expect(screen.getByText(/não foi possível carregar seus programas/i)).toBeInTheDocument()
     expect(saveMutate).not.toHaveBeenCalled()
   })
 
   it('busca filtra os provedores por nome dentro da categoria', () => {
-    groups = [{
+    sourceResult.data = [{
       ...bankGroup,
       sources: [
         bankGroup.sources[0],
@@ -154,5 +166,35 @@ describe('ManualWizard (wizard híbrido)', () => {
       expect(requestMutate).toHaveBeenCalledWith({ source_category: 'bank_card', text: 'C6 Bank' }),
     )
     expect(await screen.findByText(/recebemos/i)).toBeInTheDocument()
+  })
+
+  it('shows stable loading and retries both read queries', () => {
+    sourceResult.isLoading = true
+    const view = renderWithProviders(<ManualWizard />)
+    expect(screen.getByLabelText(/carregando seus programas/i)).toBeInTheDocument()
+    view.unmount()
+    sourceResult = { ...sourceResult, isLoading: false, error: new Error('down') }
+    renderWithProviders(<ManualWizard />)
+    fireEvent.click(screen.getByRole('button', { name: /tentar novamente/i }))
+    expect(refetchSources).toHaveBeenCalledTimes(1)
+    expect(refetchExisting).toHaveBeenCalledTimes(1)
+  })
+
+  it('shows an unavailable-catalog state', () => {
+    sourceResult.data = []
+    renderWithProviders(<ManualWizard />)
+    expect(screen.getByText(/nenhum programa disponível/i)).toBeInTheDocument()
+  })
+
+  it('keeps gates and selection after save failure', async () => {
+    sourceResult.data = [bankGroup]
+    saveMutate.mockRejectedValueOnce(new Error('write failed'))
+    renderWithProviders(<ManualWizard />)
+    fireEvent.click(screen.getByRole('button', { name: /^tenho$/i }))
+    const item = screen.getByRole('button', { name: /black/i })
+    fireEvent.click(item)
+    fireEvent.click(screen.getByRole('button', { name: /concluir/i }))
+    expect(await screen.findByText(/não foi possível salvar/i)).toBeInTheDocument()
+    expect(item).toHaveAttribute('aria-pressed', 'true')
   })
 })

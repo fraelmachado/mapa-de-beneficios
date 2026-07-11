@@ -12,6 +12,7 @@ import type { SourceCategory } from '../benefits/types'
 import type { Source } from './types'
 import { Button } from '../../ui/Button'
 import { Input } from '../../ui/Input'
+import { PageState, Skeleton } from '../../ui'
 
 type Gate = 'yes' | 'no' | undefined
 
@@ -49,8 +50,10 @@ function ProviderSection({
 export function ManualWizard() {
   const navigate = useNavigate()
   const { session } = useSession()
-  const { data: existing, isLoading: loadingExisting, error: existingError } = useUserSources(session?.user.id)
-  const { data: groups, isLoading, error } = useSources()
+  const existingQuery = useUserSources(session?.user.id)
+  const sourcesQuery = useSources()
+  const existing = existingQuery.data
+  const groups = sourcesQuery.data
   const [selected, dispatch] = useReducer(selectionReducer, new Set<string>())
   const [step, setStep] = useState(0)
   const [gates, setGates] = useState<Record<SourceCategory, Gate>>({} as Record<SourceCategory, Gate>)
@@ -85,12 +88,18 @@ export function ManualWizard() {
     }
   }, [existing, groups])
 
-  if (isLoading || loadingExisting) return <p className="p-6">Carregando…</p>
-  if (error || existingError) return <p className="p-6 text-red-600">Erro ao carregar seus dados.</p>
+  if (sourcesQuery.isLoading || existingQuery.isLoading) {
+    return <div className="ob-state" aria-label="Carregando seus programas"><Skeleton height="28px" /><Skeleton height="180px" radius="18px" /><Skeleton height="52px" radius="13px" /></div>
+  }
+  if (sourcesQuery.error || existingQuery.error) {
+    return <div className="ob-state"><PageState title="Não foi possível carregar seus programas" action={{ label: 'Tentar novamente', onClick: () => { void sourcesQuery.refetch(); void existingQuery.refetch() } }} /></div>
+  }
   if (saving) return <TransitionScreen />
 
   const steps: CategoryGroup[] = groups ?? []
-  if (steps.length === 0) return <p className="p-6">Nenhuma fonte disponível ainda.</p>
+  if (steps.length === 0) {
+    return <div className="ob-state"><PageState title="Nenhum programa disponível" description="O catálogo ainda não possui programas para esta etapa." /></div>
+  }
   const current = steps[step]
   const isLast = step === steps.length - 1
   const gate = gates[current.category]
