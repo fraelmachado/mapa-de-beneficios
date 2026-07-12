@@ -72,24 +72,18 @@ beforeEach(() => {
 
 import { ManualWizard } from './ManualWizard'
 
-describe('ManualWizard (wizard híbrido)', () => {
-  it('mostra a 1ª categoria; gate "Tenho" revela provedores (chips inline); seleciona e conclui', async () => {
+describe('ManualWizard (grade de provedores)', () => {
+  it('mostra a 1ª categoria, seleciona um provedor e conclui', async () => {
     renderWithProviders(<ManualWizard />)
     expect(screen.getByText(/Passo 1 de 2/i)).toBeInTheDocument()
     expect(screen.getByText(/Bancos & cartões/)).toBeInTheDocument()
-    // provedores escondidos até "Tenho"
-    expect(screen.queryByText('Itaú')).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: /^tenho$/i }))
-    // fim do accordion: o nome do provedor NÃO é mais um botão de expandir,
-    // e a variante já está visível inline (sem clicar para abrir)
+    // provedores visíveis direto, sem gate
     expect(screen.getByText('Itaú')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Itaú' })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /black/i }))
     fireEvent.click(screen.getByRole('button', { name: /avançar/i }))
-    // passo 2: fidelidade — diz "Não tenho" e conclui
+    // passo 2: pula sem selecionar e conclui
     expect(screen.getByText(/Passo 2 de 2/i)).toBeInTheDocument()
     expect(screen.getByText(/Fidelidade & pontos/)).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: /não tenho/i }))
     fireEvent.click(screen.getByRole('button', { name: /concluir/i }))
     await waitFor(() => expect(saveMutate).toHaveBeenCalledWith(expect.arrayContaining(['i1'])))
     // tela de conclusão (Radar montado) antes de ir pro painel
@@ -98,38 +92,36 @@ describe('ManualWizard (wizard híbrido)', () => {
     expect(navigateMock).toHaveBeenCalledWith('/painel')
   })
 
-  it('mostra só categorias com provedores; Concluir exige responder o gate', () => {
+  it('mostra só categorias com provedores; Concluir fica disponível', () => {
     sourceResult.data = [bankGroup]
     renderWithProviders(<ManualWizard />)
     expect(screen.queryByText(/Fidelidade & pontos/)).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /avançar/i })).not.toBeInTheDocument()
-    const concluir = screen.getByRole('button', { name: /concluir/i })
-    expect(concluir).toBeDisabled() // gate ainda não respondido
-    fireEvent.click(screen.getByRole('button', { name: /^tenho$/i }))
-    expect(concluir).toBeEnabled()
+    expect(screen.getByRole('button', { name: /concluir/i })).toBeEnabled()
   })
 
-  it('não conclui sem responder o gate (não salva nem navega)', () => {
+  it('conclui sem seleção salva uma lista vazia', async () => {
     sourceResult.data = [bankGroup]
     renderWithProviders(<ManualWizard />)
-    fireEvent.click(screen.getByRole('button', { name: /concluir/i })) // desabilitado → no-op
-    expect(saveMutate).not.toHaveBeenCalled()
-    expect(navigateMock).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: /concluir/i }))
+    await waitFor(() => expect(saveMutate).toHaveBeenCalledWith([]))
   })
 
-  it('modo edição: categoria com item pré-selecionado já aparece como "Tenho"', () => {
+  it('modo edição: item já salvo aparece marcado', () => {
     existingResult = { ...existingResult, data: ['i1'] }
+    sourceResult.data = [bankGroup]
     renderWithProviders(<ManualWizard />)
-    // provedores já visíveis sem clicar em "Tenho"
     expect(screen.getByText('Itaú')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /black/i })).toHaveAttribute('aria-pressed', 'true')
   })
 
-  it('modo edição: "Não tenho" remove os itens da categoria ao concluir', async () => {
+  it('modo edição: desmarcar o item o remove ao concluir', async () => {
     existingResult = { ...existingResult, data: ['i1'] }
     sourceResult.data = [bankGroup]
     renderWithProviders(<ManualWizard />)
-    expect(screen.getByText('Itaú')).toBeInTheDocument() // pré-selecionado → "Tenho"
-    fireEvent.click(screen.getByRole('button', { name: /não tenho/i }))
+    const item = screen.getByRole('button', { name: /black/i })
+    expect(item).toHaveAttribute('aria-pressed', 'true')
+    fireEvent.click(item) // desmarca
     fireEvent.click(screen.getByRole('button', { name: /concluir/i }))
     await waitFor(() => expect(saveMutate).toHaveBeenCalled())
     expect(saveMutate.mock.calls[0][0]).not.toContain('i1')
@@ -152,7 +144,6 @@ describe('ManualWizard (wizard híbrido)', () => {
       ],
     }]
     renderWithProviders(<ManualWizard />)
-    fireEvent.click(screen.getByRole('button', { name: /^tenho$/i }))
     expect(screen.getByText('Itaú')).toBeInTheDocument()
     expect(screen.getByText('Nubank')).toBeInTheDocument()
     fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'nub' } })
@@ -162,7 +153,6 @@ describe('ManualWizard (wizard híbrido)', () => {
 
   it('"Outro" grava um pedido com a categoria atual', async () => {
     renderWithProviders(<ManualWizard />)
-    fireEvent.click(screen.getByRole('button', { name: /^tenho$/i }))
     fireEvent.change(screen.getByLabelText(/outro/i), { target: { value: 'C6 Bank' } })
     fireEvent.click(screen.getByRole('button', { name: /adicionar/i }))
     await waitFor(() =>
@@ -190,11 +180,10 @@ describe('ManualWizard (wizard híbrido)', () => {
     expect(screen.getByText(/nenhum programa disponível/i)).toBeInTheDocument()
   })
 
-  it('keeps gates and selection after save failure', async () => {
+  it('mantém a seleção após falha ao salvar', async () => {
     sourceResult.data = [bankGroup]
     saveMutate.mockRejectedValueOnce(new Error('write failed'))
     renderWithProviders(<ManualWizard />)
-    fireEvent.click(screen.getByRole('button', { name: /^tenho$/i }))
     const item = screen.getByRole('button', { name: /black/i })
     fireEvent.click(item)
     fireEvent.click(screen.getByRole('button', { name: /concluir/i }))
@@ -206,7 +195,6 @@ describe('ManualWizard (wizard híbrido)', () => {
 
   it('recovers a later step when retry returns a smaller catalog', () => {
     const view = renderWithProviders(<ManualWizard />)
-    fireEvent.click(screen.getByRole('button', { name: /^tenho$/i }))
     fireEvent.click(screen.getByRole('button', { name: /avançar/i }))
     expect(screen.getByText(/passo 2 de 2/i)).toBeInTheDocument()
 

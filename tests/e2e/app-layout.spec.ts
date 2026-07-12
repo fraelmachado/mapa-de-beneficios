@@ -55,10 +55,7 @@ test('manual setup produces a populated radar and navigable detail', async ({ pa
   await expect(page.getByText(/passo 1 de/i)).toBeVisible()
   for (let step = 0; step < 20; step += 1) {
     if (step === 0) {
-      await page.getByRole('button', { name: /^tenho$/i }).click()
-      await page.locator('.ob-provider .chip').first().click()
-    } else {
-      await page.getByRole('button', { name: /n.o tenho/i }).click()
+      await page.locator('.ob-tile').first().click()
     }
     const conclude = page.getByRole('button', { name: /concluir/i })
     if (await conclude.count()) {

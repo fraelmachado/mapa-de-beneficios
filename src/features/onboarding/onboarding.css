@@ -28,6 +28,18 @@
 .ob-segments > span { flex: 1; height: 5px; border-radius: 999px; background: var(--line); }
 .ob-segments > span.on { background: var(--accent); }
 
+.ob-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: var(--s4); }
+.ob-tile { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: 108px; padding: var(--s4) var(--s3); border-radius: 16px; border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); cursor: pointer; font: inherit; color: var(--ink); }
+.ob-tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ob-tile.on { border-color: transparent; }
+.ob-tile.on::after { content: ""; position: absolute; inset: -1px; border: 2px solid var(--accent); border-radius: 16px; box-shadow: 0 0 0 4px var(--accent-soft); pointer-events: none; }
+.ob-tile-check { position: absolute; top: 9px; right: 9px; z-index: 1; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); }
+.ob-tile-logo { display: grid; place-items: center; width: 50px; height: 50px; border-radius: 14px; background: #fff; box-shadow: 0 1px 3px rgba(21, 22, 27, .1), 0 0 0 1px var(--line); color: var(--ink); font-size: 18px; font-weight: 800; overflow: hidden; }
+.ob-tile-logo img { width: 34px; height: 34px; object-fit: contain; }
+.ob-tile-name { max-width: 100%; padding: 0 6px; font-size: 13px; font-weight: 700; color: var(--ink); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ob-tile-sub { margin-top: -6px; font-size: 10px; font-weight: 700; color: var(--accent); text-align: center; }
+.ob-grid-empty { margin: var(--s5) 0; text-align: center; color: var(--muted); font-size: 13px; }
+
 .ob-title { font-size: var(--fz-h1); font-weight: 700; letter-spacing: -.03em; line-height: var(--lh-tight); margin: var(--s2) 0 var(--s2); }
 .ob-sub { color: var(--muted); font-size: var(--fz-body); line-height: var(--lh-body); margin: 0 0 var(--s5); }
 

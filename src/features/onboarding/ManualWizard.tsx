@@ -9,44 +9,9 @@ import { RadarMontado, type SummaryGroup } from './RadarMontado'
 import { useSession } from '../auth/AuthProvider'
 import { useUserSources } from './useUserSources'
 import type { CategoryGroup } from './groupSourcesByCategory'
-import type { SourceCategory } from '../benefits/types'
-import type { Source } from './types'
 import { Button } from '../../ui/Button'
 import { Input } from '../../ui/Input'
 import { PageState, Skeleton } from '../../ui'
-
-type Gate = 'yes' | 'no' | undefined
-
-function ProviderSection({
-  source,
-  selected,
-  onToggle,
-}: {
-  source: Source
-  selected: Set<string>
-  onToggle: (itemId: string) => void
-}) {
-  return (
-    <div className="ob-provider">
-      <div className="ob-prov-head">
-        <span className="ob-prov-name">{source.name}</span>
-      </div>
-      <div className="chips">
-        {source.source_items.map((it) => (
-          <button
-            key={it.id}
-            type="button"
-            onClick={() => onToggle(it.id)}
-            className={'chip' + (selected.has(it.id) ? ' on' : '')}
-            aria-pressed={selected.has(it.id)}
-          >
-            {it.label}
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
 
 export function ManualWizard() {
   const navigate = useNavigate()
@@ -59,7 +24,6 @@ export function ManualWizard() {
   const lastStep = Math.max(steps.length - 1, 0)
   const [selected, dispatch] = useReducer(selectionReducer, new Set<string>())
   const [step, setStep] = useState(0)
-  const [gates, setGates] = useState<Record<SourceCategory, Gate>>({} as Record<SourceCategory, Gate>)
   const [saving, setSaving] = useState(false)
   const [done, setDone] = useState(false)
   const [saveError, setSaveError] = useState(false)
@@ -81,18 +45,11 @@ export function ManualWizard() {
     setStep((currentStep) => Math.min(currentStep, lastStep))
   }, [lastStep, steps.length])
 
-  // Conjunto de item ids existentes (modo edição) para pré-marcar gates "yes".
+  // Pré-marca os itens já salvos (modo edição).
   const inited = useRef(false)
   useEffect(() => {
     if (!inited.current && existing && groups) {
       dispatch({ type: 'set', ids: existing })
-      const existingSet = new Set(existing)
-      const preGates = {} as Record<SourceCategory, Gate>
-      for (const g of groups) {
-        const hasAny = g.sources.some((s) => s.source_items.some((it) => existingSet.has(it.id)))
-        if (hasAny) preGates[g.category] = 'yes'
-      }
-      setGates(preGates)
       inited.current = true
     }
   }, [existing, groups])
@@ -123,23 +80,11 @@ export function ManualWizard() {
   const currentStep = Math.min(step, lastStep)
   const current = steps[currentStep]
   const isLast = currentStep === lastStep
-  const gate = gates[current.category]
 
   const filteredSources = current.sources.filter((s) =>
     s.name.toLowerCase().includes(query.trim().toLowerCase()),
   )
-
-  function setGate(cat: SourceCategory, g: Gate) {
-    setGates((prev) => ({ ...prev, [cat]: g }))
-    // "Não tenho" remove os itens dessa categoria da seleção — senão, no modo
-    // edição, fontes pré-selecionadas continuariam salvas mesmo após o usuário
-    // dizer que não as tem (a UI mentiria e não daria pra remover fontes).
-    if (g === 'no') {
-      const group = steps.find((s) => s.category === cat)
-      const catIds = new Set(group?.sources.flatMap((s) => s.source_items.map((it) => it.id)) ?? [])
-      dispatch({ type: 'set', ids: [...selected].filter((id) => !catIds.has(id)) })
-    }
-  }
+  const tiles = filteredSources.flatMap((s) => s.source_items.map((it) => ({ source: s, item: it })))
 
   async function submitOther() {
     const text = otherText.trim()
@@ -154,7 +99,6 @@ export function ManualWizard() {
   }
 
   async function next() {
-    if (gate === undefined) return // exige responder "Tenho/Não tenho" antes de prosseguir
     if (!isLast) {
       setStep((currentStep) => Math.min(currentStep + 1, lastStep))
       return
@@ -209,72 +153,67 @@ export function ManualWizard() {
           </h1>
           <p className="ob-sub">Marque o que você usa — a gente revela os benefícios escondidos aí.</p>
 
-          <div className="ob-gate">
-            <button
-              type="button"
-              className={'chip' + (gate === 'yes' ? ' on' : '')}
-              aria-pressed={gate === 'yes'}
-              onClick={() => setGate(current.category, 'yes')}
-            >
-              Tenho
-            </button>
-            <button
-              type="button"
-              className={'chip' + (gate === 'no' ? ' on' : '')}
-              aria-pressed={gate === 'no'}
-              onClick={() => setGate(current.category, 'no')}
-            >
-              Não tenho
-            </button>
-          </div>
+          <Input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="buscar nesta categoria…"
+            icon="⌕"
+            ariaLabel="Buscar programa"
+          />
 
-          {gate === 'yes' && (
-            <div>
-              <Input
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="buscar provedor…"
-                icon="⌕"
-                ariaLabel="Buscar provedor"
-              />
-              <div className="ob-providers">
-                {filteredSources.map((s) => (
-                  <ProviderSection
-                    key={s.id}
-                    source={s}
-                    selected={selected}
-                    onToggle={(id) => dispatch({ type: 'toggle', itemId: id })}
-                  />
-                ))}
-              </div>
-              {filteredSources.length === 0 && (
-                <p className="muted" style={{ fontSize: 14 }}>Nenhum provedor encontrado.</p>
-              )}
-
-              <div className="ob-other">
-                <label className="lbl" htmlFor="other" style={{ margin: '0 0 var(--s2)' }}>
-                  Não está na lista? Conta pra gente (Outro)
-                </label>
-                {otherSent ? (
-                  <p className="muted" style={{ fontSize: 14 }}>Recebemos! Vamos avaliar incluir essa fonte. ✓</p>
-                ) : (
-                  <div className="ob-other-row">
-                    <label className="input" style={{ flex: 1, marginBottom: 0 }}>
-                      <input
-                        id="other"
-                        value={otherText}
-                        onChange={(e) => setOtherText(e.target.value)}
-                        placeholder="ex.: C6 Bank"
-                        aria-label="Outro provedor"
-                      />
-                    </label>
-                    <Button onClick={submitOther}>Adicionar</Button>
-                  </div>
-                )}
-              </div>
+          {tiles.length > 0 ? (
+            <div className="ob-grid">
+              {tiles.map(({ source, item }) => {
+                const on = selected.has(item.id)
+                const showSub = item.label.toLowerCase() !== source.name.toLowerCase()
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={'ob-tile' + (on ? ' on' : '')}
+                    aria-pressed={on}
+                    onClick={() => dispatch({ type: 'toggle', itemId: item.id })}
+                  >
+                    {on ? (
+                      <span className="ob-tile-check" aria-hidden="true">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+                      </span>
+                    ) : null}
+                    <span className="ob-tile-logo" aria-hidden="true">
+                      {source.logo_url ? <img src={source.logo_url} alt="" /> : source.name.charAt(0).toUpperCase()}
+                    </span>
+                    <span className="ob-tile-name">{source.name}</span>
+                    {showSub ? <span className="ob-tile-sub">{item.label}</span> : null}
+                  </button>
+                )
+              })}
             </div>
+          ) : (
+            <p className="ob-grid-empty">Nenhum provedor encontrado.</p>
           )}
+
+          <div className="ob-other">
+            <label className="lbl" htmlFor="other" style={{ margin: '0 0 var(--s2)' }}>
+              Não vejo o meu — conta pra gente (Outro)
+            </label>
+            {otherSent ? (
+              <p className="muted" style={{ fontSize: 14 }}>Recebemos! Vamos avaliar incluir essa fonte. ✓</p>
+            ) : (
+              <div className="ob-other-row">
+                <label className="input" style={{ flex: 1, marginBottom: 0 }}>
+                  <input
+                    id="other"
+                    value={otherText}
+                    onChange={(e) => setOtherText(e.target.value)}
+                    placeholder="ex.: C6 Bank"
+                    aria-label="Outro provedor"
+                  />
+                </label>
+                <Button onClick={submitOther}>Adicionar</Button>
+              </div>
+            )}
+          </div>
 
           {saveError && (
             <p role="alert" aria-live="assertive" style={{ fontSize: 14, color: 'var(--warn)', marginTop: 'var(--s3)' }}>
@@ -287,9 +226,7 @@ export function ManualWizard() {
       <div className="ob-foot">
         <div className="ob-foot-inner">
           <div className="ob-cta">
-            <Button onClick={next} disabled={gate === undefined}>
-              {isLast ? 'Concluir' : 'Avançar'}
-            </Button>
+            <Button onClick={next}>{isLast ? 'Concluir' : 'Avançar'}</Button>
           </div>
         </div>
       </div>
