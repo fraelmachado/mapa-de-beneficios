@@ -12,7 +12,8 @@ Spec: `docs/superpowers/specs/2026-07-12-app-flow-gmail-demo-alertas-design.md`.
 
 ## Global Constraints
 
-- Só tokens de `src/ui/ds.css`; **exceção já usada no DS**: `#fff` como tinta sobre superfícies de marca/accent (ex.: `.new`, `HeroRadar`, ícone Gmail) — permitido nesses casos, nunca como cor de superfície neutra.
+- Só tokens de `src/ui/ds.css`. Tinta sobre accent usa `var(--accent-ink)` (nunca `#fff` avulso). Exceção única: logos de marca (ex.: glifo do Gmail) mantêm suas cores oficiais.
+- **Limitação aceita (mock):** o merge de save é read-merge-replace no cliente (`useSaveUserSources` = RPC `replace_user_sources`); uma escrita concorrente entre a leitura e o replace poderia ser sobrescrita. Aceitável no onboarding single-user sem backend novo. `ponytail:` upgrade path = RPC de merge server-side quando o backend existir. Fora de escopo desta etapa.
 - Animações decorativas atrás de `@media (prefers-reduced-motion: reduce)`.
 - Honestidade: nenhuma copy afirma que lemos o e-mail; tudo é "prévia/demonstração".
 - Persistência via `useSaveUserSources` (RPC `replace_user_sources`) — o Gmail salva **união(existentes, incluídos)**; nunca substitui destrutivamente, e só com `useUserSources` carregado.
@@ -244,15 +245,15 @@ export function useAlertPrefs() {
 }
 ```
 
-- [ ] **Step 4: Run green + commit**
+- [ ] **Step 4: Run green + build + commit**
 
 ```bash
-npx vitest run src/features/alertas/useAlertPrefs.test.ts
+npx vitest run src/features/alertas/useAlertPrefs.test.ts && npm run build
 git add src/features/alertas/useAlertPrefs.ts src/features/alertas/useAlertPrefs.test.ts
 git commit -m "feat(alertas): add local alert-prefs storage hook"
 ```
 
-Expected: 6 tests PASS.
+Expected: 6 tests PASS; build 0.
 
 ---
 
@@ -667,10 +668,13 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals())
 
 describe('Vasculhando (reduced-motion)', () => {
-  it('mostra a contagem final e dispara onDone', () => {
+  it('conclui imediatamente, sem animações, e dispara onDone', () => {
     const onDone = vi.fn()
-    renderWithProviders(<Vasculhando count={3} onDone={onDone} />)
+    const { container } = renderWithProviders(<Vasculhando count={3} onDone={onDone} />)
     expect(screen.getByText('3')).toBeInTheDocument()
+    // reduced-motion → estado concluído: sweep/ping não são renderizados
+    expect(container.querySelector('.scan-sweep')).toBeNull()
+    expect(container.querySelector('.scan-ping')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: /ver meus benefícios/i }))
     expect(onDone).toHaveBeenCalledTimes(1)
   })
@@ -844,10 +848,13 @@ describe('RevisarGmail', () => {
     renderWithProviders(<RevisarGmail findings={findings} onDone={vi.fn()} />)
     expect(screen.getByRole('button', { name: /adicionar ao radar/i })).toBeDisabled()
   })
-  it('erro ao carregar existentes mostra retry e não salva', () => {
+  it('erro ao carregar existentes: alerta inline + retry, mantém as escolhas e não salva', () => {
     const refetch = vi.fn()
     existing = { data: undefined, isLoading: false, error: new Error('down'), refetch }
     renderWithProviders(<RevisarGmail findings={findings} onDone={vi.fn()} />)
+    expect(screen.getByRole('button', { name: /nubank ultravioleta/i })).toBeInTheDocument() // lista preservada
+    expect(screen.getByRole('alert')).toHaveTextContent(/não foi possível preparar/i)
+    expect(screen.getByRole('button', { name: /adicionar ao radar/i })).toBeDisabled()
     fireEvent.click(screen.getByRole('button', { name: /tentar novamente/i }))
     expect(refetch).toHaveBeenCalledTimes(1)
     expect(saveMutate).not.toHaveBeenCalled()
@@ -872,7 +879,6 @@ import { useUserSources } from './useUserSources'
 import { useSaveUserSources } from './useSaveUserSources'
 import { useSession } from '../auth/AuthProvider'
 import { Button } from '../../ui/Button'
-import { PageState } from '../../ui'
 import type { Finding } from './demoFindings'
 
 export function RevisarGmail({ findings, onDone, onBack }: { findings: Finding[]; onDone: (included: Finding[]) => void; onBack?: () => void }) {
@@ -883,14 +889,9 @@ export function RevisarGmail({ findings, onDone, onBack }: { findings: Finding[]
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(false)
 
-  if (existingQuery.error) {
-    return (
-      <div className="ob-state">
-        <PageState title="Não foi possível preparar sua prévia" action={{ label: 'Tentar novamente', onClick: () => void existingQuery.refetch() }} />
-      </div>
-    )
-  }
-
+  // Erro ao carregar os existentes NÃO substitui a tela (preserva as escolhas);
+  // vira alerta inline com retry e trava a CTA (não dá pra fazer merge seguro sem eles).
+  const existingError = !!existingQuery.error
   const existingLoading = existingQuery.isLoading || existingQuery.data === undefined
   const includedList = findings.filter((f) => included.has(f.itemId))
   const value = `R$ ${(includedList.length * 180).toLocaleString('pt-BR')}`
@@ -936,6 +937,12 @@ export function RevisarGmail({ findings, onDone, onBack }: { findings: Finding[]
             })}
           </div>
           <p className="review-note">Prévia — nada foi lido do seu e-mail; descartar aqui só ajusta seu radar.</p>
+          {existingError ? (
+            <p role="alert" aria-live="assertive" className="review-error">
+              Não foi possível preparar sua prévia.{' '}
+              <button type="button" className="review-retry" onClick={() => void existingQuery.refetch()}>Tentar novamente</button>
+            </p>
+          ) : null}
           {saveError ? <p role="alert" aria-live="assertive" className="review-error">Não foi possível salvar. Tente de novo.</p> : null}
         </div>
       </div>
@@ -967,9 +974,10 @@ export function RevisarGmail({ findings, onDone, onBack }: { findings: Finding[]
 .review-item-body strong { font-size: 14px; font-weight: 700; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .review-item-body span { font-size: 11.5px; color: var(--muted); }
 .review-check { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--line); color: var(--muted); font-weight: 800; }
-.review-check.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.review-check.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .review-note { margin: var(--s4) 0 0; font-size: 12px; line-height: 1.45; color: var(--ink-2); }
 .review-error { margin: var(--s3) 0 0; font-size: 14px; color: var(--warn); }
+.review-retry { border: 0; background: none; padding: 0; font: inherit; font-weight: 700; color: var(--warn); text-decoration: underline; cursor: pointer; }
 @media (prefers-reduced-motion: reduce) { .review-item { transition: none; } }
 ```
 
@@ -1043,6 +1051,16 @@ it('erro no catálogo não bloqueia o caminho manual', () => {
   fireEvent.click(screen.getByRole('button', { name: /adicionar manualmente/i }))
   expect(screen.getByText('Wizard manual real')).toBeInTheDocument()
 })
+
+it('erro no catálogo ao entrar no Gmail: mostra retry e chama refetch', () => {
+  const refetch = vi.fn()
+  sourcesResult = { ...sourcesResult, data: undefined, error: new Error('down'), refetch }
+  renderWithProviders(<OnboardingPage />, { route: '/onboarding' })
+  fireEvent.click(screen.getByRole('button', { name: /mapear meus benefícios/i }))
+  fireEvent.click(screen.getByRole('button', { name: /conectar gmail.*prévia/i }))
+  fireEvent.click(screen.getByRole('button', { name: /tentar novamente/i }))
+  expect(refetch).toHaveBeenCalledTimes(1)
+})
 ```
 
 - [ ] **Step 2: Run red** → FAIL.
@@ -1061,7 +1079,7 @@ import { RevisarGmail } from './RevisarGmail'
 import { RadarMontado, type SummaryGroup } from './RadarMontado'
 import { useSources } from './useSources'
 import { demoFindings, type Finding } from './demoFindings'
-import { Skeleton } from '../../ui'
+import { PageState, Skeleton } from '../../ui'
 
 type Screen = 'welcome' | 'method' | 'manual' | 'gmail-scan' | 'gmail-review' | 'gmail-done'
 
@@ -1070,6 +1088,7 @@ export function OnboardingPage() {
   const navigate = useNavigate()
   const editing = params.get('mode') === 'edit'
   const [screen, setScreen] = useState<Screen>(editing ? 'manual' : 'welcome')
+  const [gmailFindings, setGmailFindings] = useState<Finding[]>([]) // snapshot congelado do fluxo Gmail
   const [saved, setSaved] = useState<Finding[]>([])
   const sourcesQuery = useSources()
   const groups = sourcesQuery.data ?? []
@@ -1077,10 +1096,16 @@ export function OnboardingPage() {
 
   useEffect(() => { setScreen(editing ? 'manual' : 'welcome') }, [editing])
 
+  // Catálogo vazio no caminho Gmail → wizard manual (D4). Via efeito, nunca setState no render.
+  useEffect(() => {
+    if (screen === 'gmail-scan' && !sourcesQuery.isLoading && !sourcesQuery.error && findings.length === 0) {
+      setScreen('manual')
+    }
+  }, [screen, sourcesQuery.isLoading, sourcesQuery.error, findings.length])
+
   function startGmail() {
-    if (sourcesQuery.isLoading) { setScreen('gmail-scan'); return } // scan mostra loading até resolver
-    if (sourcesQuery.error) { setScreen('gmail-scan'); return }     // scan trata o erro
-    if (findings.length === 0) { setScreen('manual'); return }      // D4
+    // sempre entra no scan; loading/erro/vazio são tratados no próprio estado 'gmail-scan'
+    if (!sourcesQuery.isLoading && !sourcesQuery.error && findings.length === 0) { setScreen('manual'); return } // D4 (atalho no clique)
     setScreen('gmail-scan')
   }
 
@@ -1091,14 +1116,25 @@ export function OnboardingPage() {
       return <div className="ob-state" role="status" aria-label="Preparando sua prévia" aria-busy="true"><Skeleton height="200px" radius="18px" /><Skeleton height="52px" radius="13px" /></div>
     }
     if (sourcesQuery.error) {
-      return <div className="ob-state"><PageStateRetry onRetry={() => void sourcesQuery.refetch()} onBack={() => setScreen('method')} /></div>
+      return (
+        <div className="ob-state">
+          <PageState title="Não foi possível preparar sua prévia" action={{ label: 'Tentar novamente', onClick: () => void sourcesQuery.refetch() }} />
+          <button className="btn ghost" type="button" onClick={() => setScreen('method')}>Voltar</button>
+        </div>
+      )
     }
-    if (findings.length === 0) { setScreen('manual'); return null }
-    return <Vasculhando count={findings.length} onDone={() => setScreen('gmail-review')} onBack={() => setScreen('method')} />
+    if (findings.length === 0) return null // efeito acima redireciona para 'manual'
+    return (
+      <Vasculhando
+        count={findings.length}
+        onDone={() => { setGmailFindings(findings); setScreen('gmail-review') }} // congela o snapshot
+        onBack={() => setScreen('method')}
+      />
+    )
   }
 
   if (screen === 'gmail-review') {
-    return <RevisarGmail findings={findings} onDone={(inc) => { setSaved(inc); setScreen('gmail-done') }} onBack={() => setScreen('method')} />
+    return <RevisarGmail findings={gmailFindings} onDone={(inc) => { setSaved(inc); setScreen('gmail-done') }} onBack={() => setScreen('method')} />
   }
 
   if (screen === 'gmail-done') {
@@ -1114,19 +1150,9 @@ export function OnboardingPage() {
 
   return <WelcomeStep onContinue={() => setScreen('method')} onSkip={() => navigate('/painel')} onLogin={() => navigate('/perfil')} />
 }
-
-function PageStateRetry({ onRetry, onBack }: { onRetry: () => void; onBack: () => void }) {
-  return (
-    <div>
-      <p style={{ margin: '0 0 var(--s3)' }}>Não foi possível preparar sua prévia.</p>
-      <button className="btn" type="button" onClick={onRetry}>Tentar novamente</button>
-      <button className="btn ghost" type="button" onClick={onBack}>Voltar</button>
-    </div>
-  )
-}
 ```
 
-Nota: a Método nunca é bloqueada pelo estado do catálogo (o erro só aparece dentro do estado `'gmail-scan'`), então o caminho manual sempre funciona (resolve o item #10 da revisão). O `PageState` compartilhado pode ser usado no lugar do `PageStateRetry` inline se preferir — manter a API `PageState` de `../../ui` para consistência; se usar `PageState`, importar e trocar o bloco de erro por `<PageState title="Não foi possível preparar sua prévia" action={{ label: 'Tentar novamente', onClick: () => void sourcesQuery.refetch() }} />`.
+Notas: a Método nunca é bloqueada pelo catálogo (erro só aparece dentro de `'gmail-scan'`, com "Voltar" para o Método — resolve #10). `gmailFindings` congela o conjunto na transição scan→review, então `RevisarGmail` e o Radar do Gmail não dessincronizam se `sourcesQuery` reavaliar (#11). O redirect de catálogo-vazio é feito por efeito, sem `setState` durante render.
 
 - [ ] **Step 4: Green + full onboarding suite + build**
 
@@ -1173,22 +1199,33 @@ test('onboarding exposes manual flow and Gmail preview', async ({ page }, testIn
 
 ```ts
 test('gmail preview path: scan → review → radar → alerts → painel', async ({ page }, testInfo) => {
+  const shot = (name: string) => page.screenshot({ path: `test-results/${testInfo.project.name}-${name}.png`, fullPage: true })
   await page.goto('/onboarding')
   await page.getByRole('button', { name: /mapear meus benefícios/i }).click()
   await page.getByRole('button', { name: /conectar gmail.*prévia/i }).click()
-  // Vasculhando conclui → Revisar (prova que o seed tem ≥1 fonte com item; senão cairia no wizard)
-  await page.getByRole('button', { name: /ver meus benefícios/i }).click({ timeout: 10_000 })
-  await expect(page.getByRole('button', { name: /nubank|itaú|.+/i }).first()).toBeVisible()
+  // Vasculhando: espera o CTA de conclusão aparecer
+  const verBeneficios = page.getByRole('button', { name: /ver meus benefícios/i })
+  await expect(verBeneficios).toBeVisible({ timeout: 10_000 })
+  await assertNoHorizontalOverflow(page)
+  await shot('scan')
+  await verBeneficios.click()
+  // Revisar: prova que o seed produziu ≥1 achado (senão teria caído no wizard)
+  await expect(page.getByRole('heading', { name: /revise o que encontramos/i })).toBeVisible()
+  await expect(page.locator('.review-item').first()).toBeVisible()
+  await assertNoHorizontalOverflow(page)
+  await shot('revisar')
   await page.getByRole('button', { name: /adicionar ao radar/i }).click()
+  // Radar montado
   await expect(page.getByRole('heading', { name: /montamos seu radar/i })).toBeVisible({ timeout: 10_000 })
   await assertNoHorizontalOverflow(page)
+  await shot('radar-gmail')
   await page.getByRole('button', { name: /ver meu radar/i }).click()
+  // Alertas: rota de tela cheia, sem sidebar/tabbar
   await expect(page).toHaveURL(/\/alertas/, { timeout: 10_000 })
-  await assertNoHorizontalOverflow(page)
-  // /alertas é tela cheia — sem sidebar/tabbar
   await expect(page.locator('.tabbar')).toHaveCount(0)
   await expect(page.locator('.side')).toHaveCount(0)
-  await page.screenshot({ path: `test-results/${testInfo.project.name}-alertas.png`, fullPage: true })
+  await assertNoHorizontalOverflow(page)
+  await shot('alertas')
   await page.getByRole('button', { name: /ativar alertas/i }).click()
   await expect(page).toHaveURL(/\/painel$/, { timeout: 10_000 })
 })
@@ -1217,6 +1254,8 @@ git commit -m "test(app-ui): cover gmail preview path and alerts in visual gate"
 **Spec coverage:** Método Prévia (T1); storage+recuperação incl. indisponível (T2); Alertas rota/modos/a11y switch+aria-live (T3); Perfil (T4); RadarMontado por-modo (T5); demo set (T6); Vasculhando 2400ms/reduced-motion (T7); Revisar merge+guard+CTA+estados (T8); orquestração Gmail via **Radar montado** + fallback vazio + manual nunca bloqueado (T9); E2E antigo atualizado + Gmail + `/alertas` fora do shell + invariante de seed (T10). Loop de bootstrap vazio: fora de escopo (spec).
 
 **Correções da revisão adversarial do plano:** (1) Gmail agora passa por Radar montado; (2) clique do Gmail nunca é perdido — `startGmail` entra em `gmail-scan` que trata loading/erro; (3) nenhuma task commita vermelho; (4) teste de Vasculhando é determinístico (reduced-motion); (5/6) `aria-live` nos toggles; (7) teste de derivação de `optIn` em ambos os sentidos; (8) teste de `localStorage` indisponível; (9) `#fff` só sobre accent (padrão do DS); (10) erro de catálogo não bloqueia manual; (11) `included` inicializa dos `findings` (estáveis pós-load); (12) `onDone(incluídos: Finding[])` alimenta o Radar montado; (13) dependências de task declaradas; (14) `RadarMontado` marcado inalterado; (15) E2E antigo atualizado + fluxo real; (16) invariante de seed provada pelo E2E; (17) testes de erro/vazio/reduced-motion/rota-sem-shell adicionados.
+
+**Correções da 3ª passada (Codex):** #5 erro de `useUserSources` vira alerta inline (`role="alert"`) + retry preservando escolhas (não substitui a tela); #11 `gmailFindings` congela o snapshot na transição scan→review; setState-in-render eliminado (catálogo-vazio via efeito); #9 `#fff` → `var(--accent-ink)`; Task 2 roda `npm run build`; teste de retry sob erro do catálogo no Gmail; teste reduced-motion agora afirma ausência de `.scan-sweep`/`.scan-ping`; locator E2E específico (`.review-item`) + screenshots de scan/revisar/radar/alertas; spec sincronizada com `gmail-done`; save não-atômico documentado como limitação aceita (fora de escopo).
 
 **Placeholder scan:** sem TBD/TODO; código completo por passo.
 
