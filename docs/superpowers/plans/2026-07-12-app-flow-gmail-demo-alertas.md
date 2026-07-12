@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Completar o Fluxo do App (9/12 → 12/12) adicionando o caminho de descoberta Gmail Prévia (Vasculhando + Revisar Gmail) e a tela de Alertas, tudo visual + mock, sem Gmail nem motor de alertas reais.
+**Goal:** Completar o Fluxo do App (9/12 → 12/12) adicionando o caminho de descoberta Gmail Prévia (Vasculhando + Revisar Gmail → Radar montado) e a tela de Alertas, tudo visual + mock.
 
-**Architecture:** React 18 + React Router + TanStack Query + Supabase. O onboarding é orquestrado por estado em `OnboardingPage`; o caminho Gmail é um scan cosmético que "acha" um subconjunto determinístico do catálogo real e salva a **união** com os programas existentes (não destrutivo). Alertas é uma rota de tela cheia com preferências em `localStorage`.
+**Architecture:** React 18 + React Router + TanStack Query + Supabase. O onboarding é orquestrado por estado em `OnboardingPage`; o caminho Gmail é um scan cosmético que "acha" um subconjunto determinístico do catálogo real, revisa, e salva a **união** com os programas existentes (não destrutivo), passando pelo **Radar montado** (igual ao manual) antes de Alertas. Alertas é rota de tela cheia com preferências em `localStorage`.
 
 **Tech Stack:** React, TypeScript, react-router-dom, @tanstack/react-query, Supabase JS, Vitest + Testing Library, Playwright.
 
@@ -12,69 +12,84 @@ Spec: `docs/superpowers/specs/2026-07-12-app-flow-gmail-demo-alertas-design.md`.
 
 ## Global Constraints
 
-- Só tokens de `src/ui/ds.css` para superfícies/texto/bordas/estados; sem cor hardcoded exceto gradientes de marca já aprovados.
+- Só tokens de `src/ui/ds.css`; **exceção já usada no DS**: `#fff` como tinta sobre superfícies de marca/accent (ex.: `.new`, `HeroRadar`, ícone Gmail) — permitido nesses casos, nunca como cor de superfície neutra.
 - Animações decorativas atrás de `@media (prefers-reduced-motion: reduce)`.
 - Honestidade: nenhuma copy afirma que lemos o e-mail; tudo é "prévia/demonstração".
-- Persistência via `useSaveUserSources` (RPC `replace_user_sources`) — o Gmail salva **união(existentes, incluídos)**; nunca substitui destrutivamente.
-- Valores em R$ = placeholder `nº de programas × 180/ano`, rotulados "estimado".
+- Persistência via `useSaveUserSources` (RPC `replace_user_sources`) — o Gmail salva **união(existentes, incluídos)**; nunca substitui destrutivamente, e só com `useUserSources` carregado.
+- Valores em R$ = placeholder `nº × 180/ano`, rotulados "estimado".
+- Ambos os caminhos (manual e Gmail) terminam em **Radar montado → /alertas?from=onboarding → /painel**.
 - Mobile-first (390×844); desktop aditivo; tema claro e escuro.
-- `npm test` NÃO roda tsc — rodar `npm run build` para checar tipos ao fim de cada task.
+- `npm test` NÃO roda tsc — rodar `npm run build` ao fim de cada task. Cada task termina com suíte e build **verdes**.
 
 ---
 
 ## File Structure
 
 - `src/features/onboarding/OnboardingIntro.tsx` (modificar) — Método: card Gmail "Prévia" + `onGmail`.
-- `src/features/alertas/useAlertPrefs.ts` (criar) — hook `localStorage` `mb-alerts` com recuperação.
-- `src/features/alertas/Alertas.tsx` (criar) — tela de opt-in, modos onboarding/edição.
-- `src/features/alertas/alertas.css` (criar) — estilos da tela + toggles.
+- `src/features/alertas/useAlertPrefs.ts` (criar) — storage `mb-alerts` + recuperação.
+- `src/features/alertas/Alertas.tsx` (criar) — opt-in, modos onboarding/edição, `aria-live`.
+- `src/features/alertas/alertas.css` (criar) — estilos + toggles.
 - `src/features/perfil/Perfil.tsx` (modificar) — linha "Alertas".
-- `src/features/onboarding/RadarMontado.tsx` (modificar) — `onView` já é prop; conteúdo inalterado.
-- `src/features/onboarding/ManualWizard.tsx` (modificar) — `onView` do RadarMontado por modo (edit → /painel; onboarding → /alertas).
+- `src/features/onboarding/ManualWizard.tsx` (modificar) — `onView` do Radar montado por modo (edit → /painel; onboarding → /alertas).
+- `src/features/onboarding/RadarMontado.tsx` (**inalterado**) — já recebe `groups` + `onView` por prop; reutilizado no caminho Gmail via `OnboardingPage`.
 - `src/features/onboarding/demoFindings.ts` (criar) — helper puro D3.
 - `src/features/onboarding/Vasculhando.tsx` (criar) — scan cosmético.
-- `src/features/onboarding/RevisarGmail.tsx` (criar) — revisar achados, merge D1.
-- `src/features/onboarding/OnboardingPage.tsx` (modificar) — estados `gmail-scan`/`gmail-review`, `useSources`, fallback D4, wiring.
-- `src/features/onboarding/onboarding.css` (modificar) — keyframes `mb-sweep`/`mb-ping`/`mb-pop` + estilos das telas.
-- `src/router.tsx` (modificar) — rota `/alertas` (tela cheia).
+- `src/features/onboarding/RevisarGmail.tsx` (criar) — revisar achados, merge D1; `onDone(incluídos)`.
+- `src/features/onboarding/OnboardingPage.tsx` (modificar) — estados Gmail, `useSources`, loading/erro/vazio sem bloquear o manual, Radar montado do Gmail.
+- `src/features/onboarding/onboarding.css` (modificar) — keyframes `mb-sweep`/`mb-ping`/`mb-pop` + estilos scan/review.
+- `src/router.tsx` (modificar) — rota `/alertas` (tela cheia, fora do `AppLayout`).
 - `src/index.css` (modificar) — `@import` de `alertas.css`.
-- `tests/e2e/app-layout.spec.ts` (modificar) — cenário do caminho Gmail.
-- `supabase/seed.sql` (verificar) — invariante ≥1 fonte com ≥1 item na 1ª categoria.
+- `tests/e2e/app-layout.spec.ts` (modificar) — atualizar teste antigo (Gmail "Prévia") + cenário do caminho Gmail.
+
+**Ordem/dependências:** T1 (Método) → T2 (storage) → T3 (Alertas+rota) → T4 (Perfil, **dep. T3**) → T5 (RadarMontado onView, **dep. rota /alertas da T3**) → T6 (helper) → T7 (Vasculhando) → T8 (Revisar, **dep. T6**) → T9 (orquestração, **dep. T1/T6/T7/T8**) → T10 (E2E, **dep. tudo**).
 
 ---
 
 ### Task 1: Método — card Gmail "Prévia"
 
 **Files:**
-- Modify: `src/features/onboarding/OnboardingIntro.tsx`
-- Test: `src/features/onboarding/OnboardingPage.test.tsx` (ajustar), `src/features/onboarding/MethodStep` coberto lá
+- Modify: `src/features/onboarding/OnboardingIntro.tsx`, `src/features/onboarding/OnboardingPage.tsx`
+- Test: `src/features/onboarding/OnboardingPage.test.tsx`
 
 **Interfaces:**
-- Produces: `MethodStep({ onManual: () => void; onBack?: () => void; onGmail: () => void })`. O card Gmail deixa de ser `disabled`, badge vira "Prévia" e `onClick={onGmail}`.
+- Produces: `MethodStep({ onManual: () => void; onBack?: () => void; onGmail: () => void })` — card Gmail sem `disabled`, badge "Prévia", `onClick={onGmail}`.
 
-- [ ] **Step 1: Update the flow test to expect the enabled Gmail preview card**
+- [ ] **Step 1: Update the existing flow test (keeps suite green after impl)**
 
-Em `src/features/onboarding/OnboardingPage.test.tsx`, no teste `goes from welcome to method and manual wizard`, trocar a asserção do Gmail desabilitado:
+Em `OnboardingPage.test.tsx`, no teste `goes from welcome to method and manual wizard`, trocar a asserção do Gmail:
 
 ```tsx
 // ANTES: expect(screen.getByRole('button', { name: /gmail.*em breve/i })).toBeDisabled()
 expect(screen.getByRole('button', { name: /conectar gmail.*prévia/i })).toBeEnabled()
 ```
 
+Adicionar um teste focado do `MethodStep` (import `{ MethodStep }` de `./OnboardingIntro`):
+
+```tsx
+it('MethodStep: card Gmail Prévia dispara onGmail', () => {
+  const onGmail = vi.fn()
+  renderWithProviders(<MethodStep onManual={() => {}} onGmail={onGmail} />, { route: '/onboarding' })
+  const gmail = screen.getByRole('button', { name: /conectar gmail.*prévia/i })
+  expect(gmail).toBeEnabled()
+  fireEvent.click(gmail)
+  expect(onGmail).toHaveBeenCalledTimes(1)
+})
+```
+
 - [ ] **Step 2: Run red**
 
 Run: `npx vitest run src/features/onboarding/OnboardingPage.test.tsx`
-Expected: FAIL (ainda existe "Em breve"/disabled).
+Expected: FAIL (Gmail ainda "Em breve"/disabled; `MethodStep` sem `onGmail`).
 
-- [ ] **Step 3: Enable the Gmail card in `MethodStep`**
+- [ ] **Step 3: Enable the Gmail card**
 
-Em `OnboardingIntro.tsx`, mudar a assinatura de `MethodStep` e o card Gmail:
+Em `OnboardingIntro.tsx`:
 
 ```tsx
 export function MethodStep({ onManual, onBack, onGmail }: { onManual: () => void; onBack?: () => void; onGmail: () => void }) {
 ```
 
-Trocar o `<button ... disabled>` do Gmail por um card clicável (remover `disabled`, badge "Prévia", `onClick={onGmail}`), mantendo `ob-option-gmail`, aurora e twinkles:
+Substituir o `<button ... disabled>` do Gmail por (sem `disabled`, badge "Prévia", `onClick={onGmail}`):
 
 ```tsx
 <button type="button" className="ob-option ob-option-gmail" onClick={onGmail}>
@@ -92,7 +107,7 @@ Trocar o `<button ... disabled>` do Gmail por um card clicável (remover `disabl
         <strong>Conectar Gmail</strong>
         <span className="ob-badge-magic">Prévia</span>
       </span>
-      <p>Uma demonstração de como a descoberta automática vai funcionar — com seus programas do catálogo. Nada é lido do seu e-mail.</p>
+      <p>Uma demonstração de como a descoberta vai funcionar — com seus programas do catálogo. Nada é lido do seu e-mail.</p>
       <span className="ob-tags">
         <span className="ob-tag">Mais rápido</span>
         <span className="ob-tag">Você revisa antes de salvar</span>
@@ -103,12 +118,7 @@ Trocar o `<button ... disabled>` do Gmail por um card clicável (remover `disabl
 </button>
 ```
 
-- [ ] **Step 4: Run green**
-
-Run: `npx vitest run src/features/onboarding/OnboardingPage.test.tsx`
-Expected: o teste do card Gmail passa. (O restante do fluxo pode falhar por falta de `onGmail` no `OnboardingPage` — será ligado na Task 9; se falhar só por isso, seguir.)
-
-Nota: nesta task o `OnboardingPage` ainda passa `onGmail` inexistente. Passar `onGmail={() => {}}` temporário no `OnboardingPage` para compilar:
+Em `OnboardingPage.tsx`, passar um `onGmail` temporário (será substituído na Task 9), mantendo a suíte verde (o teste de fluxo não clica no Gmail):
 
 ```tsx
 if (screen === 'method') {
@@ -116,10 +126,14 @@ if (screen === 'method') {
 }
 ```
 
-- [ ] **Step 5: Build + commit**
+- [ ] **Step 4: Run green + build**
+
+Run: `npx vitest run src/features/onboarding/OnboardingPage.test.tsx && npm run build`
+Expected: **todos** os testes do arquivo PASS; build 0. (Se algo estiver vermelho, corrigir antes de commitar — não commitar vermelho.)
+
+- [ ] **Step 5: Commit**
 
 ```bash
-npm run build
 git add src/features/onboarding/OnboardingIntro.tsx src/features/onboarding/OnboardingPage.tsx src/features/onboarding/OnboardingPage.test.tsx
 git commit -m "feat(onboarding): enable Gmail preview card in method step"
 ```
@@ -133,22 +147,18 @@ git commit -m "feat(onboarding): enable Gmail preview card in method step"
 - Test: `src/features/alertas/useAlertPrefs.test.ts`
 
 **Interfaces:**
-- Produces:
-  - `type AlertPrefs = { v: 1; optIn: boolean; novos: boolean; prazo: boolean; resumo: boolean }`
-  - `const DEFAULT_PREFS: AlertPrefs` = `{ v: 1, optIn: false, novos: true, prazo: true, resumo: false }`
-  - `function readAlertPrefs(): AlertPrefs` — lê `localStorage['mb-alerts']`, com try/catch e checagem de `v===1`; fallback defaults.
-  - `function writeAlertPrefs(p: AlertPrefs): void` — grava; try/catch silencioso.
-  - `function useAlertPrefs(): { prefs: AlertPrefs; set: (patch: Partial<AlertPrefs>) => void }` — estado local inicializado de `readAlertPrefs`, `set` mescla + grava.
+- Produces: `type AlertPrefs = { v: 1; optIn: boolean; novos: boolean; prazo: boolean; resumo: boolean }`; `DEFAULT_PREFS`; `readAlertPrefs()`; `writeAlertPrefs(p)`; `useAlertPrefs()` → `{ prefs, set(patch) }`.
 
 - [ ] **Step 1: Write the failing test**
 
 Create `src/features/alertas/useAlertPrefs.test.ts`:
 
 ```ts
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { readAlertPrefs, writeAlertPrefs, DEFAULT_PREFS } from './useAlertPrefs'
 
 beforeEach(() => localStorage.clear())
+afterEach(() => vi.restoreAllMocks())
 
 describe('alert prefs storage', () => {
   it('returns defaults when nothing stored', () => {
@@ -166,6 +176,14 @@ describe('alert prefs storage', () => {
     localStorage.setItem('mb-alerts', JSON.stringify({ v: 99, optIn: true }))
     expect(readAlertPrefs()).toEqual(DEFAULT_PREFS)
   })
+  it('falls back to defaults when localStorage throws (indisponível)', () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('SecurityError') })
+    expect(readAlertPrefs()).toEqual(DEFAULT_PREFS)
+  })
+  it('write swallows errors when localStorage throws', () => {
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('SecurityError') })
+    expect(() => writeAlertPrefs(DEFAULT_PREFS)).not.toThrow()
+  })
 })
 ```
 
@@ -174,7 +192,7 @@ describe('alert prefs storage', () => {
 Run: `npx vitest run src/features/alertas/useAlertPrefs.test.ts`
 Expected: FAIL (módulo não existe).
 
-- [ ] **Step 3: Implement the hook + storage**
+- [ ] **Step 3: Implement**
 
 Create `src/features/alertas/useAlertPrefs.ts`:
 
@@ -199,13 +217,7 @@ export function readAlertPrefs(): AlertPrefs {
     if (!raw) return DEFAULT_PREFS
     const parsed = JSON.parse(raw)
     if (!parsed || parsed.v !== 1) return DEFAULT_PREFS
-    return {
-      v: 1,
-      optIn: !!parsed.optIn,
-      novos: !!parsed.novos,
-      prazo: !!parsed.prazo,
-      resumo: !!parsed.resumo,
-    }
+    return { v: 1, optIn: !!parsed.optIn, novos: !!parsed.novos, prazo: !!parsed.prazo, resumo: !!parsed.resumo }
   } catch {
     return DEFAULT_PREFS
   }
@@ -215,7 +227,7 @@ export function writeAlertPrefs(p: AlertPrefs): void {
   try {
     localStorage.setItem(KEY, JSON.stringify(p))
   } catch {
-    // storage indisponível — mock, ignora
+    // storage indisponível (mock) — ignora
   }
 }
 
@@ -232,31 +244,28 @@ export function useAlertPrefs() {
 }
 ```
 
-- [ ] **Step 4: Run green**
-
-Run: `npx vitest run src/features/alertas/useAlertPrefs.test.ts`
-Expected: PASS (4 tests).
-
-- [ ] **Step 5: Commit**
+- [ ] **Step 4: Run green + commit**
 
 ```bash
+npx vitest run src/features/alertas/useAlertPrefs.test.ts
 git add src/features/alertas/useAlertPrefs.ts src/features/alertas/useAlertPrefs.test.ts
 git commit -m "feat(alertas): add local alert-prefs storage hook"
 ```
+
+Expected: 6 tests PASS.
 
 ---
 
 ### Task 3: Tela de Alertas + rota `/alertas`
 
 **Files:**
-- Create: `src/features/alertas/Alertas.tsx`
-- Create: `src/features/alertas/alertas.css`
+- Create: `src/features/alertas/Alertas.tsx`, `src/features/alertas/alertas.css`
 - Test: `src/features/alertas/Alertas.test.tsx`
 - Modify: `src/router.tsx`, `src/index.css`
 
 **Interfaces:**
 - Consumes: `useAlertPrefs`, `useSearchParams`, `useNavigate`.
-- Produces: `Alertas()` (rota `/alertas`). Modo por `searchParams.get('from') === 'onboarding'`.
+- Produces: `Alertas()` (rota `/alertas`); modo por `searchParams.get('from') === 'onboarding'`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -275,26 +284,21 @@ vi.mock('react-router-dom', async (orig) => {
 
 import { Alertas } from './Alertas'
 
-beforeEach(() => {
-  localStorage.clear()
-  navigateMock.mockReset()
-})
+beforeEach(() => { localStorage.clear(); navigateMock.mockReset() })
 
 describe('Alertas', () => {
-  it('modo onboarding: "Ativar alertas" grava optIn e vai ao painel', () => {
+  it('onboarding: "Ativar alertas" grava optIn e vai ao painel', () => {
     renderWithProviders(<Alertas />, { route: '/alertas?from=onboarding' })
     fireEvent.click(screen.getByRole('button', { name: /ativar alertas/i }))
     expect(JSON.parse(localStorage.getItem('mb-alerts')!).optIn).toBe(true)
     expect(navigateMock).toHaveBeenCalledWith('/painel')
   })
-
-  it('modo onboarding: "Agora não" grava optIn=false e vai ao painel', () => {
+  it('onboarding: "Agora não" grava optIn=false e vai ao painel', () => {
     renderWithProviders(<Alertas />, { route: '/alertas?from=onboarding' })
     fireEvent.click(screen.getByRole('button', { name: /agora não/i }))
     expect(JSON.parse(localStorage.getItem('mb-alerts')!).optIn).toBe(false)
     expect(navigateMock).toHaveBeenCalledWith('/painel')
   })
-
   it('toggle switch alterna e persiste', () => {
     renderWithProviders(<Alertas />, { route: '/alertas?from=onboarding' })
     const resumo = screen.getByRole('switch', { name: /resumo mensal/i })
@@ -303,12 +307,20 @@ describe('Alertas', () => {
     expect(resumo).toHaveAttribute('aria-checked', 'true')
     expect(JSON.parse(localStorage.getItem('mb-alerts')!).resumo).toBe(true)
   })
-
-  it('modo edição: mostra Voltar (→ perfil), sem "Agora não"; ligar toggle deriva optIn', () => {
+  it('edição: sem "Agora não"; Voltar vai ao perfil; ligar toggle deriva optIn=true', () => {
     renderWithProviders(<Alertas />, { route: '/alertas' })
     expect(screen.queryByRole('button', { name: /agora não/i })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('switch', { name: /resumo mensal/i })) // liga → optIn derivado
+    expect(JSON.parse(localStorage.getItem('mb-alerts')!).optIn).toBe(true)
     fireEvent.click(screen.getByRole('button', { name: /voltar/i }))
     expect(navigateMock).toHaveBeenCalledWith('/perfil')
+  })
+  it('edição: desligar todos os toggles deriva optIn=false', () => {
+    // defaults: novos on, prazo on, resumo off → desligar novos e prazo
+    renderWithProviders(<Alertas />, { route: '/alertas' })
+    fireEvent.click(screen.getByRole('switch', { name: /novos benefícios/i }))
+    fireEvent.click(screen.getByRole('switch', { name: /prazo de expiração/i }))
+    expect(JSON.parse(localStorage.getItem('mb-alerts')!).optIn).toBe(false)
   })
 })
 ```
@@ -342,7 +354,6 @@ export function Alertas() {
 
   function toggle(key: 'novos' | 'prazo' | 'resumo') {
     const next = { ...prefs, [key]: !prefs[key] }
-    // modo edição: optIn derivado dos toggles; onboarding: mantém o valor atual
     const optIn = onboarding ? prefs.optIn : next.novos || next.prazo || next.resumo
     set({ [key]: next[key], optIn })
   }
@@ -365,22 +376,17 @@ export function Alertas() {
 
         <div className="alerts-list">
           {ROWS.map((r) => (
-            <button
-              key={r.key}
-              type="button"
-              role="switch"
-              aria-checked={prefs[r.key]}
-              className={'alerts-row' + (prefs[r.key] ? ' on' : '')}
-              onClick={() => toggle(r.key)}
-            >
-              <span className="alerts-row-text">
-                <strong>{r.title}</strong>
-                <span>{r.desc}</span>
-              </span>
+            <button key={r.key} type="button" role="switch" aria-checked={prefs[r.key]}
+              className={'alerts-row' + (prefs[r.key] ? ' on' : '')} onClick={() => toggle(r.key)}>
+              <span className="alerts-row-text"><strong>{r.title}</strong><span>{r.desc}</span></span>
               <span className="alerts-switch" aria-hidden="true"><span className="alerts-knob" /></span>
             </button>
           ))}
         </div>
+
+        <p className="sr-only" role="status" aria-live="polite">
+          {[prefs.novos && 'Novos benefícios', prefs.prazo && 'Prazo de expiração', prefs.resumo && 'Resumo mensal'].filter(Boolean).join(', ') || 'Nenhum alerta ativo'}
+        </p>
 
         {onboarding ? (
           <div className="alerts-actions">
@@ -394,7 +400,9 @@ export function Alertas() {
 }
 ```
 
-- [ ] **Step 4: Add `alertas.css`**
+(`sr-only` já é global em `ds.css` — usado em `Perfil`.)
+
+- [ ] **Step 4: Add `alertas.css`** (idêntico ao bloco da spec)
 
 Create `src/features/alertas/alertas.css`:
 
@@ -413,7 +421,7 @@ Create `src/features/alertas/alertas.css`:
 .alerts-row-text strong { font-size: 14.5px; font-weight: 700; color: var(--ink); }
 .alerts-row-text span { font-size: 12.5px; color: var(--ink-2); line-height: 1.4; }
 .alerts-switch { flex: none; width: 44px; height: 26px; border-radius: 999px; background: var(--line); position: relative; transition: background .18s var(--ease); }
-.alerts-knob { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: var(--shadow); transition: transform .18s var(--ease); }
+.alerts-knob { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--surface); box-shadow: var(--shadow); transition: transform .18s var(--ease); }
 .alerts-row.on .alerts-switch { background: var(--accent); }
 .alerts-row.on .alerts-knob { transform: translateX(18px); }
 .alerts-actions { margin-top: auto; padding-top: var(--s6); display: grid; gap: var(--s2); }
@@ -421,19 +429,13 @@ Create `src/features/alertas/alertas.css`:
 @media (prefers-reduced-motion: reduce) { .alerts-switch, .alerts-knob { transition: none; } }
 ```
 
-Adicionar em `src/index.css`, junto dos outros `@import` (antes das diretivas `@tailwind`):
-
-```css
-@import './features/alertas/alertas.css';
-```
+Adicionar em `src/index.css` (junto dos outros `@import`): `@import './features/alertas/alertas.css';`
 
 - [ ] **Step 5: Add the route**
 
-Em `src/router.tsx`, importar e adicionar a rota de tela cheia (fora do `AppLayout`, ao lado de `/beneficio/:id`):
+Em `src/router.tsx`, importar `Alertas` e adicionar ao lado de `/beneficio/:id` (tela cheia, fora do `AppLayout`):
 
 ```tsx
-import { Alertas } from './features/alertas/Alertas'
-// ...
   { path: '/beneficio/:id', element: <BenefitDetail /> },
   { path: '/alertas', element: <Alertas /> },
 ```
@@ -446,7 +448,7 @@ git add src/features/alertas/ src/router.tsx src/index.css
 git commit -m "feat(alertas): add alerts opt-in screen and route"
 ```
 
-Expected: 4 tests PASS; build 0.
+Expected: 5 tests PASS; build 0.
 
 ---
 
@@ -456,13 +458,11 @@ Expected: 4 tests PASS; build 0.
 - Modify: `src/features/perfil/Perfil.tsx`
 - Test: `src/features/perfil/Perfil.test.tsx`
 
-**Interfaces:**
-- Consumes: rota `/alertas` (Task 3).
-- Produces: link/linha "Alertas" apontando para `/alertas` na seção "Conta", entre "Editar meus programas" e "Tema".
+**Interfaces:** consome a rota `/alertas` (T3).
 
 - [ ] **Step 1: Write the failing test**
 
-Adicionar em `src/features/perfil/Perfil.test.tsx` (dentro do `describe` existente):
+Adicionar em `Perfil.test.tsx`:
 
 ```tsx
 it('tem uma linha de Alertas apontando para /alertas', () => {
@@ -474,12 +474,11 @@ it('tem uma linha de Alertas apontando para /alertas', () => {
 
 - [ ] **Step 2: Run red**
 
-Run: `npx vitest run src/features/perfil/Perfil.test.tsx`
-Expected: FAIL (sem link de Alertas).
+Run: `npx vitest run src/features/perfil/Perfil.test.tsx` → FAIL.
 
 - [ ] **Step 3: Add the row**
 
-Em `Perfil.tsx`, dentro de `.profile-rows`, entre a linha "Editar meus programas" (`Link` para `/onboarding?mode=edit`) e o botão de Tema, inserir:
+Em `Perfil.tsx`, dentro de `.profile-rows`, entre "Editar meus programas" e o botão Tema:
 
 ```tsx
 <Link className="profile-row" to="/alertas">
@@ -491,9 +490,7 @@ Em `Perfil.tsx`, dentro de `.profile-rows`, entre a linha "Editar meus programas
 </Link>
 ```
 
-(`stroke` já é o objeto de props de SVG definido no topo de `Perfil.tsx`.)
-
-- [ ] **Step 4: Run green + build + commit**
+- [ ] **Step 4: Green + build + commit**
 
 ```bash
 npx vitest run src/features/perfil/Perfil.test.tsx && npm run build
@@ -503,29 +500,27 @@ git commit -m "feat(perfil): add alerts row linking to /alertas"
 
 ---
 
-### Task 5: RadarMontado destino por-caminho (D6)
+### Task 5: RadarMontado destino por-modo (D6) — depende da rota `/alertas` (T3)
 
 **Files:**
 - Modify: `src/features/onboarding/ManualWizard.tsx`
 - Test: `src/features/onboarding/ManualWizard.test.tsx`
 
-**Interfaces:**
-- `RadarMontado` já aceita `onView: () => void` (inalterado).
-- `ManualWizard` detecta edição via `useSearchParams().get('mode') === 'edit'` e passa `onView` = edição → `navigate('/painel')`; onboarding → `navigate('/alertas?from=onboarding')`.
+**Interfaces:** `ManualWizard` detecta `useSearchParams().get('mode') === 'edit'` e passa `onView` = edição → `/painel`; onboarding → `/alertas?from=onboarding`.
 
-- [ ] **Step 1: Update the success-flow test**
+- [ ] **Step 1: Update tests**
 
-Em `ManualWizard.test.tsx`, o teste `mostra a 1ª categoria, seleciona um provedor e conclui` roda SEM `mode=edit` (onboarding). Trocar a asserção final:
+No teste de sucesso (onboarding, sem `mode=edit`), trocar:
 
 ```tsx
 // ANTES: expect(navigateMock).toHaveBeenCalledWith('/painel')
 expect(navigateMock).toHaveBeenCalledWith('/alertas?from=onboarding')
 ```
 
-Adicionar um teste novo para o modo edição:
+Adicionar teste de edição:
 
 ```tsx
-it('modo edição: "Ver meu radar" vai direto ao painel (sem alertas)', async () => {
+it('modo edição: "Ver meu radar" vai direto ao painel', async () => {
   sourceResult.data = [bankGroup]
   renderWithProviders(<ManualWizard />, { route: '/onboarding?mode=edit' })
   fireEvent.click(screen.getByRole('button', { name: /black/i }))
@@ -536,29 +531,26 @@ it('modo edição: "Ver meu radar" vai direto ao painel (sem alertas)', async ()
 })
 ```
 
-- [ ] **Step 2: Run red**
+- [ ] **Step 2: Run red** → `npx vitest run src/features/onboarding/ManualWizard.test.tsx` FAIL.
 
-Run: `npx vitest run src/features/onboarding/ManualWizard.test.tsx`
-Expected: FAIL (ainda navega `/painel` no onboarding).
+- [ ] **Step 3: Implement**
 
-- [ ] **Step 3: Make `onView` mode-aware**
-
-Em `ManualWizard.tsx`, importar `useSearchParams` e computar o destino:
+Em `ManualWizard.tsx`:
 
 ```tsx
 import { useNavigate, useSearchParams } from 'react-router-dom'
-// ... dentro do componente:
+// dentro do componente:
 const [params] = useSearchParams()
 const editing = params.get('mode') === 'edit'
 ```
 
-No render do estado `done`:
+No render `done`:
 
 ```tsx
 return <RadarMontado groups={summaryGroups} onView={() => navigate(editing ? '/painel' : '/alertas?from=onboarding')} />
 ```
 
-- [ ] **Step 4: Run green + build + commit**
+- [ ] **Step 4: Green + build + commit**
 
 ```bash
 npx vitest run src/features/onboarding/ManualWizard.test.tsx && npm run build
@@ -574,9 +566,7 @@ git commit -m "feat(onboarding): route to alerts after onboarding radar, painel 
 - Create: `src/features/onboarding/demoFindings.ts`
 - Test: `src/features/onboarding/demoFindings.test.ts`
 
-**Interfaces:**
-- Consumes: `CategoryGroup[]` (de `groupSourcesByCategory`).
-- Produces: `type Finding = { itemId: string; provider: string; variant: string }` e `function demoFindings(groups: CategoryGroup[]): Finding[]` — 1ª categoria; as **3 primeiras fontes com ≥1 item** (ordem do array, que já vem por `sort_order`); o **primeiro item** de cada.
+**Interfaces:** `type Finding = { itemId: string; provider: string; variant: string }`; `demoFindings(groups: CategoryGroup[]): Finding[]` — 1ª categoria; 3 primeiras fontes com ≥1 item; primeiro item de cada.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -588,19 +578,15 @@ import { demoFindings } from './demoFindings'
 import type { CategoryGroup } from './groupSourcesByCategory'
 
 const g = (over: Partial<CategoryGroup> = {}): CategoryGroup => ({
-  category: 'bank_card',
-  meta: { key: 'bank_card', label: 'Bancos & cartões', icon: '🏦' },
-  sources: [],
-  ...over,
+  category: 'bank_card', meta: { key: 'bank_card', label: 'Bancos & cartões', icon: '🏦' }, sources: [], ...over,
 })
-
 const src = (id: string, name: string, items: { id: string; label: string }[]) => ({
   id, kind: 'card' as const, name, logo_url: null, sort_order: 1, source_category: 'bank_card' as const,
   source_items: items.map((i, idx) => ({ ...i, sort_order: idx + 1 })),
 })
 
 describe('demoFindings', () => {
-  it('pega até 3 fontes da 1ª categoria, primeiro item de cada', () => {
+  it('pega até 3 fontes, primeiro item de cada', () => {
     const groups = [g({ sources: [
       src('s1', 'Nubank', [{ id: 'i1', label: 'Ultravioleta' }, { id: 'i1b', label: 'Gold' }]),
       src('s2', 'Itaú', [{ id: 'i2', label: 'Black' }]),
@@ -613,23 +599,15 @@ describe('demoFindings', () => {
       { itemId: 'i3', provider: 'Inter', variant: 'Prime' },
     ])
   })
-  it('pula fontes sem item e usa o que houver', () => {
-    const groups = [g({ sources: [
-      src('s1', 'SemItem', []),
-      src('s2', 'Itaú', [{ id: 'i2', label: 'Black' }]),
-    ] })]
+  it('pula fontes sem item', () => {
+    const groups = [g({ sources: [src('s1', 'SemItem', []), src('s2', 'Itaú', [{ id: 'i2', label: 'Black' }])] })]
     expect(demoFindings(groups)).toEqual([{ itemId: 'i2', provider: 'Itaú', variant: 'Black' }])
   })
-  it('retorna [] quando não há categorias', () => {
-    expect(demoFindings([])).toEqual([])
-  })
+  it('retorna [] sem categorias', () => { expect(demoFindings([])).toEqual([]) })
 })
 ```
 
-- [ ] **Step 2: Run red**
-
-Run: `npx vitest run src/features/onboarding/demoFindings.test.ts`
-Expected: FAIL (módulo não existe).
+- [ ] **Step 2: Run red** → FAIL.
 
 - [ ] **Step 3: Implement**
 
@@ -638,11 +616,7 @@ Create `src/features/onboarding/demoFindings.ts`:
 ```ts
 import type { CategoryGroup } from './groupSourcesByCategory'
 
-export interface Finding {
-  itemId: string
-  provider: string
-  variant: string
-}
+export interface Finding { itemId: string; provider: string; variant: string }
 
 export function demoFindings(groups: CategoryGroup[]): Finding[] {
   const first = groups[0]
@@ -654,7 +628,7 @@ export function demoFindings(groups: CategoryGroup[]): Finding[] {
 }
 ```
 
-- [ ] **Step 4: Run green + commit**
+- [ ] **Step 4: Green + commit**
 
 ```bash
 npx vitest run src/features/onboarding/demoFindings.test.ts
@@ -668,39 +642,42 @@ git commit -m "feat(onboarding): add deterministic demo findings helper"
 
 **Files:**
 - Create: `src/features/onboarding/Vasculhando.tsx`
-- Modify: `src/features/onboarding/onboarding.css` (keyframes + estilos)
+- Modify: `src/features/onboarding/onboarding.css`
 - Test: `src/features/onboarding/Vasculhando.test.tsx`
 
-**Interfaces:**
-- Produces: `Vasculhando({ count: number; onDone: () => void; onBack?: () => void })`. Faz o count-up até `count` em 2400ms; mostra CTA "Ver meus benefícios →" ao concluir → `onDone`. Com `prefers-reduced-motion`, mostra concluído imediatamente.
+**Interfaces:** `Vasculhando({ count: number; onDone: () => void; onBack?: () => void })`. Count-up até `count` em 2400ms; CTA ao concluir → `onDone`. Com `prefers-reduced-motion`, conclui imediatamente.
 
-- [ ] **Step 1: Write the failing test**
+- [ ] **Step 1: Write the failing test (determinístico via reduced-motion)**
 
 Create `src/features/onboarding/Vasculhando.test.tsx`:
 
 ```tsx
-import { describe, it, expect, vi } from 'vitest'
-import { screen, fireEvent, act } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { screen, fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '../../test/renderWithProviders'
 import { Vasculhando } from './Vasculhando'
 
-describe('Vasculhando', () => {
-  it('conclui e dispara onDone ao clicar em Ver meus benefícios', () => {
-    vi.useFakeTimers()
+// força reduced-motion → componente conclui na hora, sem timers (determinístico)
+beforeEach(() => {
+  vi.stubGlobal('matchMedia', (q: string) => ({
+    matches: q.includes('reduce'), media: q, onchange: null,
+    addEventListener: () => {}, removeEventListener: () => {}, addListener: () => {}, removeListener: () => {}, dispatchEvent: () => false,
+  }))
+})
+afterEach(() => vi.unstubAllGlobals())
+
+describe('Vasculhando (reduced-motion)', () => {
+  it('mostra a contagem final e dispara onDone', () => {
     const onDone = vi.fn()
     renderWithProviders(<Vasculhando count={3} onDone={onDone} />)
-    act(() => { vi.advanceTimersByTime(2500) })
+    expect(screen.getByText('3')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /ver meus benefícios/i }))
     expect(onDone).toHaveBeenCalledTimes(1)
-    vi.useRealTimers()
   })
 })
 ```
 
-- [ ] **Step 2: Run red**
-
-Run: `npx vitest run src/features/onboarding/Vasculhando.test.tsx`
-Expected: FAIL (componente não existe).
+- [ ] **Step 2: Run red** → FAIL.
 
 - [ ] **Step 3: Implement `Vasculhando.tsx`**
 
@@ -755,9 +732,7 @@ export function Vasculhando({ count, onDone, onBack }: { count: number; onDone: 
         <div className="scan-count-label">programas encontrados</div>
         <div className="scan-status" role="status">{done ? 'Pronto!' : LABELS[labelIdx]}</div>
         <div className="scan-progress"><span style={{ width: done ? '100%' : `${Math.round((n / Math.max(count, 1)) * 100)}%` }} /></div>
-        {done ? (
-          <div className="scan-cta mb-rise"><Button onClick={onDone}>Ver meus benefícios →</Button></div>
-        ) : null}
+        {done ? <div className="scan-cta mb-rise"><Button onClick={onDone}>Ver meus benefícios →</Button></div> : null}
       </div>
     </main>
   )
@@ -766,17 +741,14 @@ export function Vasculhando({ count, onDone, onBack }: { count: number; onDone: 
 
 - [ ] **Step 4: Add keyframes + styles to `onboarding.css`**
 
-No bloco de animações compartilhadas de `onboarding.css`, adicionar os keyframes e incluir as classes de scan no guard de reduced-motion:
+No bloco de animações compartilhadas, adicionar (se ainda não existirem — `mb-pop` já existe):
 
 ```css
 @keyframes mb-sweep { to { transform: rotate(360deg) } }
 @keyframes mb-ping { 0% { transform: scale(.6); opacity: .7 } 80%, 100% { transform: scale(2.1); opacity: 0 } }
-@keyframes mb-pop { from { opacity: 0; transform: scale(.4) } 60% { transform: scale(1.18) } to { opacity: 1; transform: scale(1) } }
 ```
 
-(Se `mb-pop` já existir de trabalho anterior, não duplicar.) Atualizar o seletor de reduced-motion existente para incluir `.scan-sweep, .scan-ping, .scan-dot`.
-
-Adicionar os estilos da tela:
+Atualizar o seletor de reduced-motion existente para incluir `.scan-sweep, .scan-ping, .scan-dot`. Adicionar os estilos de `.scan-*` (bloco idêntico ao da spec/plano: `.scan-page`, `.scan-inner`, `.scan-back`, `.scan-radar`, `.scan-sweep`, `.scan-ping`, `.scan-dot(-1/-2/-3)`, `.scan-count`, `.scan-count-label`, `.scan-status`, `.scan-progress`, `.scan-cta`):
 
 ```css
 .scan-page { min-height: 100dvh; display: flex; flex-direction: column; background: var(--bg); }
@@ -785,10 +757,10 @@ Adicionar os estilos da tela:
 .scan-radar { position: relative; width: 200px; height: 200px; margin-bottom: var(--s6); border-radius: 50%; border: 1.5px dashed var(--line-2); }
 .scan-sweep { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, color-mix(in srgb, var(--accent) 34%, transparent), color-mix(in srgb, var(--accent) 4%, transparent) 32%, transparent 60%); animation: mb-sweep 2.6s linear infinite; transform-origin: center; }
 .scan-ping { position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--accent); animation: mb-ping 2.6s var(--ease) infinite; }
-.scan-dot { position: absolute; width: 11px; height: 11px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent); transform: translate(-50%, -50%); animation: mb-pop .45s var(--ease) both; }
-.scan-dot-1 { top: 34%; left: 40%; background: var(--c-airport); }
-.scan-dot-2 { top: 58%; left: 62%; background: var(--c-viagem); animation-delay: .3s; }
-.scan-dot-3 { top: 46%; left: 30%; background: var(--c-cashback); animation-delay: .6s; }
+.scan-dot { position: absolute; width: 11px; height: 11px; border-radius: 50%; transform: translate(-50%, -50%); animation: mb-pop .45s var(--ease) both; }
+.scan-dot-1 { top: 34%; left: 40%; background: var(--c-airport); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-airport) 22%, transparent); }
+.scan-dot-2 { top: 58%; left: 62%; background: var(--c-viagem); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-viagem) 22%, transparent); animation-delay: .3s; }
+.scan-dot-3 { top: 46%; left: 30%; background: var(--c-cashback); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-cashback) 22%, transparent); animation-delay: .6s; }
 .scan-count { font-size: 46px; font-weight: 800; letter-spacing: -.04em; line-height: 1; color: var(--ink); }
 .scan-count-label { margin-top: 6px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 .scan-status { margin-top: 12px; min-height: 20px; font-size: 14px; font-weight: 600; color: var(--accent); }
@@ -798,7 +770,7 @@ Adicionar os estilos da tela:
 .scan-cta .btn { margin: 0; }
 ```
 
-- [ ] **Step 5: Run green + build + commit**
+- [ ] **Step 5: Green + build + commit**
 
 ```bash
 npx vitest run src/features/onboarding/Vasculhando.test.tsx && npm run build
@@ -808,15 +780,14 @@ git commit -m "feat(onboarding): add cosmetic Gmail scan screen"
 
 ---
 
-### Task 8: RevisarGmail — revisar achados + merge não destrutivo (D1/D5)
+### Task 8: RevisarGmail — merge não destrutivo (D1/D5); `onDone(incluídos)`
 
 **Files:**
 - Create: `src/features/onboarding/RevisarGmail.tsx`
+- Modify: `src/features/onboarding/onboarding.css`
 - Test: `src/features/onboarding/RevisarGmail.test.tsx`
 
-**Interfaces:**
-- Consumes: `Finding[]` (Task 6), `useUserSources` (existentes), `useSaveUserSources`, `useSession`.
-- Produces: `RevisarGmail({ findings: Finding[]; onDone: () => void; onBack?: () => void })`. Salva `união(existentes, incluídos)` via `useSaveUserSources`, então `onDone`.
+**Interfaces:** `RevisarGmail({ findings: Finding[]; onDone: (included: Finding[]) => void; onBack?: () => void })`. Salva `união(existentes, incluídos)`; chama `onDone(incluídos)` (o caminho Gmail usa os incluídos para montar o Radar montado).
 
 - [ ] **Step 1: Write the failing test**
 
@@ -828,57 +799,51 @@ import { screen, fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '../../test/renderWithProviders'
 
 vi.mock('../auth/AuthProvider', () => ({ useSession: () => ({ session: { user: { id: 'u1' } }, loading: false }) }))
-
 const saveMutate = vi.fn()
 vi.mock('./useSaveUserSources', () => ({ useSaveUserSources: () => ({ mutateAsync: saveMutate, isPending: false }) }))
-
 let existing: { data: string[] | undefined; isLoading: boolean; error: unknown; refetch: () => void }
 vi.mock('./useUserSources', () => ({ useUserSources: () => existing }))
 
 import { RevisarGmail } from './RevisarGmail'
-
 const findings = [
   { itemId: 'i1', provider: 'Nubank', variant: 'Ultravioleta' },
   { itemId: 'i2', provider: 'Itaú', variant: 'Black' },
 ]
-
 beforeEach(() => {
   saveMutate.mockReset(); saveMutate.mockResolvedValue(undefined)
   existing = { data: [], isLoading: false, error: null, refetch: vi.fn() }
 })
 
 describe('RevisarGmail', () => {
-  it('salva a união de existentes + incluídos e chama onDone', async () => {
+  it('salva a união de existentes + incluídos e chama onDone com os incluídos', async () => {
     existing = { ...existing, data: ['x9'] }
     const onDone = vi.fn()
     renderWithProviders(<RevisarGmail findings={findings} onDone={onDone} />)
     fireEvent.click(screen.getByRole('button', { name: /adicionar ao radar/i }))
     await waitFor(() => expect(saveMutate).toHaveBeenCalledTimes(1))
     expect([...saveMutate.mock.calls[0][0]].sort()).toEqual(['i1', 'i2', 'x9'])
-    await waitFor(() => expect(onDone).toHaveBeenCalled())
+    await waitFor(() => expect(onDone).toHaveBeenCalledWith(findings))
   })
-
-  it('descartar um achado o remove do save', async () => {
-    renderWithProviders(<RevisarGmail findings={findings} onDone={vi.fn()} />)
-    fireEvent.click(screen.getByRole('button', { name: /itaú black/i })) // desmarca
+  it('descartar um achado o remove do save e do onDone', async () => {
+    const onDone = vi.fn()
+    renderWithProviders(<RevisarGmail findings={findings} onDone={onDone} />)
+    fireEvent.click(screen.getByRole('button', { name: /itaú black/i }))
     fireEvent.click(screen.getByRole('button', { name: /adicionar ao radar/i }))
     await waitFor(() => expect(saveMutate).toHaveBeenCalled())
     expect(saveMutate.mock.calls[0][0]).not.toContain('i2')
+    expect(onDone).toHaveBeenCalledWith([findings[0]])
   })
-
   it('CTA desabilitada com 0 incluídos', () => {
     renderWithProviders(<RevisarGmail findings={findings} onDone={vi.fn()} />)
     fireEvent.click(screen.getByRole('button', { name: /nubank ultravioleta/i }))
     fireEvent.click(screen.getByRole('button', { name: /itaú black/i }))
     expect(screen.getByRole('button', { name: /adicionar ao radar/i })).toBeDisabled()
   })
-
   it('CTA desabilitada enquanto existentes carregam', () => {
     existing = { ...existing, data: undefined, isLoading: true }
     renderWithProviders(<RevisarGmail findings={findings} onDone={vi.fn()} />)
     expect(screen.getByRole('button', { name: /adicionar ao radar/i })).toBeDisabled()
   })
-
   it('erro ao carregar existentes mostra retry e não salva', () => {
     const refetch = vi.fn()
     existing = { data: undefined, isLoading: false, error: new Error('down'), refetch }
@@ -887,7 +852,6 @@ describe('RevisarGmail', () => {
     expect(refetch).toHaveBeenCalledTimes(1)
     expect(saveMutate).not.toHaveBeenCalled()
   })
-
   it('mantém a seleção após falha no save', async () => {
     saveMutate.mockRejectedValueOnce(new Error('write'))
     renderWithProviders(<RevisarGmail findings={findings} onDone={vi.fn()} />)
@@ -898,14 +862,9 @@ describe('RevisarGmail', () => {
 })
 ```
 
-- [ ] **Step 2: Run red**
-
-Run: `npx vitest run src/features/onboarding/RevisarGmail.test.tsx`
-Expected: FAIL (componente não existe).
+- [ ] **Step 2: Run red** → FAIL.
 
 - [ ] **Step 3: Implement `RevisarGmail.tsx`**
-
-Create `src/features/onboarding/RevisarGmail.tsx`:
 
 ```tsx
 import { useState } from 'react'
@@ -916,7 +875,7 @@ import { Button } from '../../ui/Button'
 import { PageState } from '../../ui'
 import type { Finding } from './demoFindings'
 
-export function RevisarGmail({ findings, onDone, onBack }: { findings: Finding[]; onDone: () => void; onBack?: () => void }) {
+export function RevisarGmail({ findings, onDone, onBack }: { findings: Finding[]; onDone: (included: Finding[]) => void; onBack?: () => void }) {
   const { session } = useSession()
   const existingQuery = useUserSources(session?.user.id)
   const save = useSaveUserSources()
@@ -933,35 +892,29 @@ export function RevisarGmail({ findings, onDone, onBack }: { findings: Finding[]
   }
 
   const existingLoading = existingQuery.isLoading || existingQuery.data === undefined
-  const value = `R$ ${(included.size * 180).toLocaleString('pt-BR')}`
+  const includedList = findings.filter((f) => included.has(f.itemId))
+  const value = `R$ ${(includedList.length * 180).toLocaleString('pt-BR')}`
 
   function toggle(id: string) {
-    setIncluded((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
+    setIncluded((prev) => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
   }
 
   async function submit() {
-    if (included.size === 0 || existingLoading || saving) return
-    setSaving(true)
-    setSaveError(false)
+    if (includedList.length === 0 || existingLoading || saving) return
+    setSaving(true); setSaveError(false)
     try {
       const merged = new Set<string>([...(existingQuery.data ?? []), ...included])
       await save.mutateAsync([...merged])
-      onDone()
+      onDone(includedList)
     } catch {
-      setSaving(false)
-      setSaveError(true)
+      setSaving(false); setSaveError(true)
     }
   }
 
   return (
     <div className="ob">
       <div className="ob-scroll">
-        <div className="ob-card review-card">
+        <div className="ob-card">
           {onBack ? (
             <button type="button" className="ob-back-btn" aria-label="Voltar" onClick={onBack} style={{ marginBottom: 'var(--s3)' }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
@@ -970,23 +923,18 @@ export function RevisarGmail({ findings, onDone, onBack }: { findings: Finding[]
           <p className="lbl" style={{ color: 'var(--ok)' }}>Descoberta concluída</p>
           <h1 className="ob-title">Revise o que encontramos</h1>
           <p className="review-count">incluídos <b>{value}</b>/ano estimado</p>
-
           <div className="review-list">
             {findings.map((f) => {
               const on = included.has(f.itemId)
               return (
                 <button key={f.itemId} type="button" className={'review-item' + (on ? '' : ' off')} aria-pressed={on} onClick={() => toggle(f.itemId)}>
                   <span className="review-item-mark" aria-hidden="true">{f.provider.charAt(0).toUpperCase()}</span>
-                  <span className="review-item-body">
-                    <strong>{f.provider} {f.variant}</strong>
-                    <span>via {f.provider}</span>
-                  </span>
+                  <span className="review-item-body"><strong>{f.provider} {f.variant}</strong><span>via {f.provider}</span></span>
                   <span className={'review-check' + (on ? ' on' : '')} aria-hidden="true">{on ? '✓' : '+'}</span>
                 </button>
               )
             })}
           </div>
-
           <p className="review-note">Prévia — nada foi lido do seu e-mail; descartar aqui só ajusta seu radar.</p>
           {saveError ? <p role="alert" aria-live="assertive" className="review-error">Não foi possível salvar. Tente de novo.</p> : null}
         </div>
@@ -994,7 +942,7 @@ export function RevisarGmail({ findings, onDone, onBack }: { findings: Finding[]
       <div className="ob-foot">
         <div className="ob-foot-inner">
           <div className="ob-cta">
-            <Button onClick={submit} disabled={included.size === 0 || existingLoading || saving}>
+            <Button onClick={submit} disabled={includedList.length === 0 || existingLoading || saving}>
               {saving ? 'Salvando…' : 'Adicionar ao radar'}
             </Button>
           </div>
@@ -1005,7 +953,7 @@ export function RevisarGmail({ findings, onDone, onBack }: { findings: Finding[]
 }
 ```
 
-- [ ] **Step 4: Add review styles to `onboarding.css`**
+- [ ] **Step 4: Add review styles to `onboarding.css`** (bloco `.review-*` idêntico ao da spec/plano):
 
 ```css
 .review-count { margin: 0 0 var(--s4); font-size: 13px; font-weight: 700; color: var(--ink-2); }
@@ -1022,9 +970,10 @@ export function RevisarGmail({ findings, onDone, onBack }: { findings: Finding[]
 .review-check.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 .review-note { margin: var(--s4) 0 0; font-size: 12px; line-height: 1.45; color: var(--ink-2); }
 .review-error { margin: var(--s3) 0 0; font-size: 14px; color: var(--warn); }
+@media (prefers-reduced-motion: reduce) { .review-item { transition: none; } }
 ```
 
-- [ ] **Step 5: Run green + build + commit**
+- [ ] **Step 5: Green + build + commit**
 
 ```bash
 npx vitest run src/features/onboarding/RevisarGmail.test.tsx && npm run build
@@ -1032,67 +981,75 @@ git add src/features/onboarding/RevisarGmail.tsx src/features/onboarding/Revisar
 git commit -m "feat(onboarding): add Gmail review screen with non-destructive merge"
 ```
 
-Expected: 6 tests PASS; build 0.
+Expected: 6 tests PASS.
 
 ---
 
-### Task 9: OnboardingPage — orquestrar o caminho Gmail (D4)
+### Task 9: OnboardingPage — orquestrar o caminho Gmail (D4), passando por Radar montado
 
 **Files:**
 - Modify: `src/features/onboarding/OnboardingPage.tsx`
 - Test: `src/features/onboarding/OnboardingPage.test.tsx`
 
-**Interfaces:**
-- Consumes: `MethodStep.onGmail`, `useSources`, `demoFindings`, `Vasculhando`, `RevisarGmail`.
-- Produces: estados `'gmail-scan' | 'gmail-review'`. Método (não-edit) `onGmail` → carrega `useSources`; se erro → PageState retry; se `demoFindings` vazio → vai para `'manual'` (D4); senão scan → review → `navigate('/painel')` após save... (o `RadarMontado` não entra no caminho Gmail — ver nota).
+**Interfaces:** estados `'gmail-scan' | 'gmail-review' | 'gmail-done'`. O clique no Gmail (`startGmail`) trata catálogo carregando/erro/vazio **sem bloquear o manual**. Fluxo Gmail: scan → review → **Radar montado** (com os incluídos) → `/alertas?from=onboarding`.
 
-**Nota de fluxo:** O caminho Gmail não passa por `RadarMontado` (esse é do Wizard). Após "Adicionar ao radar" salvar, o Gmail vai direto para `/alertas?from=onboarding` (mesmo destino pós-radar do manual), mantendo Alertas no fim dos dois caminhos.
+- [ ] **Step 1: Add failing tests**
 
-- [ ] **Step 1: Add the failing flow test**
-
-Em `OnboardingPage.test.tsx`, o mock de `ManualWizard` já existe. Adicionar mocks e um teste do caminho Gmail. No topo (após o mock de ManualWizard):
+No `OnboardingPage.test.tsx`, adicionar mocks (garantir que `useNavigate` já está mockado como nos outros; se não, replicar o padrão) e:
 
 ```tsx
-vi.mock('./useSources', () => ({ useSources: () => sourcesResult }))
 let sourcesResult: { data: unknown; isLoading: boolean; error: unknown; refetch: () => void }
-
+vi.mock('./useSources', () => ({ useSources: () => sourcesResult }))
 vi.mock('./Vasculhando', () => ({ Vasculhando: ({ onDone }: { onDone: () => void }) => <button onClick={onDone}>ver meus benefícios</button> }))
-vi.mock('./RevisarGmail', () => ({ RevisarGmail: ({ onDone }: { onDone: () => void }) => <button onClick={onDone}>adicionar ao radar</button> }))
+vi.mock('./RevisarGmail', () => ({ RevisarGmail: ({ onDone }: { onDone: (i: unknown[]) => void }) => <button onClick={() => onDone([{ itemId: 'i1', provider: 'Nubank', variant: 'Ultravioleta' }])}>adicionar ao radar</button> }))
+vi.mock('./RadarMontado', () => ({ RadarMontado: ({ onView }: { onView: () => void }) => <button onClick={onView}>ver meu radar</button> }))
 ```
 
-Inicializar `sourcesResult` num `beforeEach` (adicionar se não houver):
+No `beforeEach`, inicializar catálogo com 1 fonte/1 item:
 
 ```tsx
-beforeEach(() => {
-  sourcesResult = {
-    data: [{ category: 'bank_card', meta: { key: 'bank_card', label: 'Bancos & cartões', icon: '🏦' },
-      sources: [{ id: 's1', kind: 'card', name: 'Nubank', logo_url: null, sort_order: 1, source_category: 'bank_card', source_items: [{ id: 'i1', label: 'Ultravioleta', sort_order: 1 }] }] }],
-    isLoading: false, error: null, refetch: vi.fn(),
-  }
-})
+sourcesResult = {
+  data: [{ category: 'bank_card', meta: { key: 'bank_card', label: 'Bancos & cartões', icon: '🏦' },
+    sources: [{ id: 's1', kind: 'card', name: 'Nubank', logo_url: null, sort_order: 1, source_category: 'bank_card', source_items: [{ id: 'i1', label: 'Ultravioleta', sort_order: 1 }] }] }],
+  isLoading: false, error: null, refetch: vi.fn(),
+}
 ```
 
-Teste:
+Testes:
 
 ```tsx
-it('caminho Gmail: método → vasculhando → revisar → alertas', () => {
+it('caminho Gmail: método → scan → revisar → radar montado → alertas', () => {
   renderWithProviders(<OnboardingPage />, { route: '/onboarding' })
   fireEvent.click(screen.getByRole('button', { name: /mapear meus benefícios/i }))
   fireEvent.click(screen.getByRole('button', { name: /conectar gmail.*prévia/i }))
   fireEvent.click(screen.getByRole('button', { name: /ver meus benefícios/i }))
   fireEvent.click(screen.getByRole('button', { name: /adicionar ao radar/i }))
+  fireEvent.click(screen.getByRole('button', { name: /ver meu radar/i }))
   expect(navigateMock).toHaveBeenCalledWith('/alertas?from=onboarding')
+})
+
+it('catálogo vazio no Gmail cai no wizard manual (D4)', () => {
+  sourcesResult = { ...sourcesResult, data: [] }
+  renderWithProviders(<OnboardingPage />, { route: '/onboarding' })
+  fireEvent.click(screen.getByRole('button', { name: /mapear meus benefícios/i }))
+  fireEvent.click(screen.getByRole('button', { name: /conectar gmail.*prévia/i }))
+  expect(screen.getByText('Wizard manual real')).toBeInTheDocument() // mock do ManualWizard
+})
+
+it('erro no catálogo não bloqueia o caminho manual', () => {
+  sourcesResult = { ...sourcesResult, data: undefined, error: new Error('down') }
+  renderWithProviders(<OnboardingPage />, { route: '/onboarding' })
+  fireEvent.click(screen.getByRole('button', { name: /mapear meus benefícios/i }))
+  fireEvent.click(screen.getByRole('button', { name: /adicionar manualmente/i }))
+  expect(screen.getByText('Wizard manual real')).toBeInTheDocument()
 })
 ```
 
-(Requer `navigateMock` — o arquivo já mocka `useNavigate`? Se não, adicionar o mesmo padrão de mock de `useNavigate` usado em `ManualWizard.test.tsx`.)
+- [ ] **Step 2: Run red** → FAIL.
 
-- [ ] **Step 2: Run red**
+- [ ] **Step 3: Implement orchestration**
 
-Run: `npx vitest run src/features/onboarding/OnboardingPage.test.tsx`
-Expected: FAIL (estados Gmail não existem).
-
-- [ ] **Step 3: Implement orchestration in `OnboardingPage.tsx`**
+Replace `OnboardingPage.tsx`:
 
 ```tsx
 import { useEffect, useState } from 'react'
@@ -1101,129 +1058,139 @@ import { ManualWizard } from './ManualWizard'
 import { MethodStep, WelcomeStep } from './OnboardingIntro'
 import { Vasculhando } from './Vasculhando'
 import { RevisarGmail } from './RevisarGmail'
+import { RadarMontado, type SummaryGroup } from './RadarMontado'
 import { useSources } from './useSources'
-import { demoFindings } from './demoFindings'
-import { PageState, Skeleton } from '../../ui'
+import { demoFindings, type Finding } from './demoFindings'
+import { Skeleton } from '../../ui'
 
-type Screen = 'welcome' | 'method' | 'manual' | 'gmail-scan' | 'gmail-review'
+type Screen = 'welcome' | 'method' | 'manual' | 'gmail-scan' | 'gmail-review' | 'gmail-done'
 
 export function OnboardingPage() {
   const [params] = useSearchParams()
   const navigate = useNavigate()
   const editing = params.get('mode') === 'edit'
   const [screen, setScreen] = useState<Screen>(editing ? 'manual' : 'welcome')
+  const [saved, setSaved] = useState<Finding[]>([])
   const sourcesQuery = useSources()
-  const findings = demoFindings(sourcesQuery.data ?? [])
+  const groups = sourcesQuery.data ?? []
+  const findings = demoFindings(groups)
 
   useEffect(() => { setScreen(editing ? 'manual' : 'welcome') }, [editing])
 
   function startGmail() {
-    // catálogo ainda carregando: espera (mostra scan só com dados prontos)
-    if (sourcesQuery.isLoading) return
-    if (sourcesQuery.error) return // erro tratado no render abaixo
-    if (findings.length === 0) { setScreen('manual'); return } // D4
+    if (sourcesQuery.isLoading) { setScreen('gmail-scan'); return } // scan mostra loading até resolver
+    if (sourcesQuery.error) { setScreen('gmail-scan'); return }     // scan trata o erro
+    if (findings.length === 0) { setScreen('manual'); return }      // D4
     setScreen('gmail-scan')
   }
 
   if (screen === 'manual') return <ManualWizard />
 
   if (screen === 'gmail-scan') {
+    if (sourcesQuery.isLoading) {
+      return <div className="ob-state" role="status" aria-label="Preparando sua prévia" aria-busy="true"><Skeleton height="200px" radius="18px" /><Skeleton height="52px" radius="13px" /></div>
+    }
+    if (sourcesQuery.error) {
+      return <div className="ob-state"><PageStateRetry onRetry={() => void sourcesQuery.refetch()} onBack={() => setScreen('method')} /></div>
+    }
+    if (findings.length === 0) { setScreen('manual'); return null }
     return <Vasculhando count={findings.length} onDone={() => setScreen('gmail-review')} onBack={() => setScreen('method')} />
   }
+
   if (screen === 'gmail-review') {
-    return <RevisarGmail findings={findings} onDone={() => navigate('/alertas?from=onboarding')} onBack={() => setScreen('method')} />
+    return <RevisarGmail findings={findings} onDone={(inc) => { setSaved(inc); setScreen('gmail-done') }} onBack={() => setScreen('method')} />
+  }
+
+  if (screen === 'gmail-done') {
+    const groupsSummary: SummaryGroup[] = saved.length
+      ? [{ label: groups[0]?.meta.label ?? 'Seus programas', items: saved.map((f) => ({ provider: f.provider, variant: f.variant })) }]
+      : []
+    return <RadarMontado groups={groupsSummary} onView={() => navigate('/alertas?from=onboarding')} />
   }
 
   if (screen === 'method') {
-    return (
-      <MethodStep
-        onManual={() => setScreen('manual')}
-        onBack={() => setScreen('welcome')}
-        onGmail={startGmail}
-      />
-    )
+    return <MethodStep onManual={() => setScreen('manual')} onBack={() => setScreen('welcome')} onGmail={startGmail} />
   }
 
+  return <WelcomeStep onContinue={() => setScreen('method')} onSkip={() => navigate('/painel')} onLogin={() => navigate('/perfil')} />
+}
+
+function PageStateRetry({ onRetry, onBack }: { onRetry: () => void; onBack: () => void }) {
   return (
-    <WelcomeStep
-      onContinue={() => setScreen('method')}
-      onSkip={() => navigate('/painel')}
-      onLogin={() => navigate('/perfil')}
-    />
+    <div>
+      <p style={{ margin: '0 0 var(--s3)' }}>Não foi possível preparar sua prévia.</p>
+      <button className="btn" type="button" onClick={onRetry}>Tentar novamente</button>
+      <button className="btn ghost" type="button" onClick={onBack}>Voltar</button>
+    </div>
   )
 }
 ```
 
-Tratar loading/erro do catálogo no Método (D1 owner): quando o usuário clica em Gmail com o catálogo carregando, `startGmail` faz no-op; para dar feedback, exibir estado enquanto `sourcesQuery.isLoading` após clicar. Implementação mínima aceitável para o MVP: como `useSources` é consultado no mount do `OnboardingPage`, ao chegar no Método ele já costuma estar pronto; se `sourcesQuery.error`, o Método renderiza um aviso com retry acima dos cards:
+Nota: a Método nunca é bloqueada pelo estado do catálogo (o erro só aparece dentro do estado `'gmail-scan'`), então o caminho manual sempre funciona (resolve o item #10 da revisão). O `PageState` compartilhado pode ser usado no lugar do `PageStateRetry` inline se preferir — manter a API `PageState` de `../../ui` para consistência; se usar `PageState`, importar e trocar o bloco de erro por `<PageState title="Não foi possível preparar sua prévia" action={{ label: 'Tentar novamente', onClick: () => void sourcesQuery.refetch() }} />`.
 
-```tsx
-if (screen === 'method') {
-  return (
-    <>
-      {sourcesQuery.error ? (
-        <div className="ob-state"><PageState title="Não foi possível carregar o catálogo" action={{ label: 'Tentar novamente', onClick: () => void sourcesQuery.refetch() }} /></div>
-      ) : (
-        <MethodStep onManual={() => setScreen('manual')} onBack={() => setScreen('welcome')} onGmail={startGmail} />
-      )}
-    </>
-  )
-}
-```
-
-(`Skeleton` importado para uso futuro; se não usar, remover do import para não quebrar lint.)
-
-- [ ] **Step 4: Run green + full onboarding suite + build**
+- [ ] **Step 4: Green + full onboarding suite + build**
 
 ```bash
 npx vitest run src/features/onboarding && npm run build
 ```
 
-Expected: todos os testes de onboarding PASS; build 0.
+Expected: todos PASS; build 0.
 
 - [ ] **Step 5: Commit**
 
 ```bash
 git add src/features/onboarding/OnboardingPage.tsx src/features/onboarding/OnboardingPage.test.tsx
-git commit -m "feat(onboarding): orchestrate Gmail preview path (scan -> review -> alerts)"
+git commit -m "feat(onboarding): orchestrate Gmail preview path through radar to alerts"
 ```
 
 ---
 
-### Task 10: Gate visual (Playwright) + invariante de seed
+### Task 10: Gate visual (Playwright) — atualizar antigo + cobrir Gmail + `/alertas`
 
 **Files:**
 - Modify: `tests/e2e/app-layout.spec.ts`
-- Verify: `supabase/seed.sql`
 
-**Interfaces:**
-- Consome o app rodando (dev server) + Supabase local.
+- [ ] **Step 1: Update the stale onboarding test (Gmail agora é "Prévia")**
 
-- [ ] **Step 1: Confirm the seed invariant**
-
-Rodar e conferir que a 1ª categoria tem ≥1 fonte com ≥1 item:
-
-```bash
-grep -iE "insert into (sources|source_items)" supabase/seed.sql | head
-```
-
-Se o seed não tiver nenhuma fonte/variante, adicionar ao menos uma fonte de `bank_card` com uma variante (seguir o formato das inserções existentes no arquivo). Se já houver (esperado), seguir.
-
-- [ ] **Step 2: Add the Gmail-path E2E scenario**
-
-Em `tests/e2e/app-layout.spec.ts`, adicionar um teste (usa os 4 projetos já configurados):
+No teste `onboarding exposes manual flow and disabled Gmail` (que hoje espera Gmail desabilitado), trocar a asserção e o título:
 
 ```ts
-test('gmail preview path reaches alerts and painel', async ({ page }) => {
+test('onboarding exposes manual flow and Gmail preview', async ({ page }, testInfo) => {
+  await page.goto('/onboarding')
+  await expect(page.getByRole('heading', { name: /benefícios esperando por você/i })).toBeVisible()
+  await page.getByRole('button', { name: /mapear meus benefícios/i }).click()
+  await expect(page.getByRole('button', { name: /conectar gmail.*prévia/i })).toBeEnabled()
+  await assertNoHorizontalOverflow(page)
+  await page.screenshot({ path: `test-results/${testInfo.project.name}-onboarding.png`, fullPage: true })
+  await page.getByRole('button', { name: /adicionar manualmente/i }).click()
+  await expect(page.getByText(/passo 1 de/i)).toBeVisible()
+  await assertNoHorizontalOverflow(page)
+  await page.screenshot({ path: `test-results/${testInfo.project.name}-wizard.png`, fullPage: true })
+})
+```
+
+- [ ] **Step 2: Add the Gmail-path scenario (passa por Radar montado + Alertas; prova a invariante de seed)**
+
+```ts
+test('gmail preview path: scan → review → radar → alerts → painel', async ({ page }, testInfo) => {
   await page.goto('/onboarding')
   await page.getByRole('button', { name: /mapear meus benefícios/i }).click()
   await page.getByRole('button', { name: /conectar gmail.*prévia/i }).click()
+  // Vasculhando conclui → Revisar (prova que o seed tem ≥1 fonte com item; senão cairia no wizard)
   await page.getByRole('button', { name: /ver meus benefícios/i }).click({ timeout: 10_000 })
+  await expect(page.getByRole('button', { name: /nubank|itaú|.+/i }).first()).toBeVisible()
   await page.getByRole('button', { name: /adicionar ao radar/i }).click()
+  await expect(page.getByRole('heading', { name: /montamos seu radar/i })).toBeVisible({ timeout: 10_000 })
+  await assertNoHorizontalOverflow(page)
+  await page.getByRole('button', { name: /ver meu radar/i }).click()
   await expect(page).toHaveURL(/\/alertas/, { timeout: 10_000 })
   await assertNoHorizontalOverflow(page)
+  // /alertas é tela cheia — sem sidebar/tabbar
+  await expect(page.locator('.tabbar')).toHaveCount(0)
+  await expect(page.locator('.side')).toHaveCount(0)
+  await page.screenshot({ path: `test-results/${testInfo.project.name}-alertas.png`, fullPage: true })
   await page.getByRole('button', { name: /ativar alertas/i }).click()
   await expect(page).toHaveURL(/\/painel$/, { timeout: 10_000 })
-  await assertNoHorizontalOverflow(page)
 })
 ```
 
@@ -1234,32 +1201,23 @@ npx -y supabase@2.95.0 status
 npm run test:visual
 ```
 
-Expected: todos os cenários PASS (incluindo o novo caminho Gmail) nos 4 projetos; sem overflow.
+Expected: todos os cenários PASS (antigo atualizado + novo Gmail) nos 4 projetos, sem overflow. Se o caminho Gmail cair no wizard em vez de Revisar, o seed não tem fonte na 1ª categoria → ajustar `supabase/seed.sql` e repetir.
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add tests/e2e/app-layout.spec.ts supabase/seed.sql
-git commit -m "test(app-ui): cover gmail preview path in visual gate"
+git add tests/e2e/app-layout.spec.ts
+git commit -m "test(app-ui): cover gmail preview path and alerts in visual gate"
 ```
 
 ---
 
 ## Self-Review
 
-**Spec coverage:**
-- Método Gmail "Prévia" (D8) → Task 1.
-- `useAlertPrefs` schema/recuperação (D-alertas) → Task 2.
-- Alertas rota tela cheia + modos + a11y switch (D7) → Task 3.
-- Perfil linha Alertas → Task 4.
-- RadarMontado destino por-caminho (D6) → Task 5.
-- Conjunto demo determinístico (D3) → Task 6.
-- Vasculhando 2400ms + labels + reduced-motion (D2/D9) → Task 7.
-- Revisar merge não destrutivo + guard de existentes + CTA 0-incluídos + estados de save (D1/D5) → Task 8.
-- Orquestração + fallback catálogo vazio (D4) + owner de `useSources` → Task 9.
-- Gate E2E + invariante de seed → Task 10.
-- Loop de bootstrap vazio: explicitamente fora de escopo (spec) — nenhum task o cobre, por decisão.
+**Spec coverage:** Método Prévia (T1); storage+recuperação incl. indisponível (T2); Alertas rota/modos/a11y switch+aria-live (T3); Perfil (T4); RadarMontado por-modo (T5); demo set (T6); Vasculhando 2400ms/reduced-motion (T7); Revisar merge+guard+CTA+estados (T8); orquestração Gmail via **Radar montado** + fallback vazio + manual nunca bloqueado (T9); E2E antigo atualizado + Gmail + `/alertas` fora do shell + invariante de seed (T10). Loop de bootstrap vazio: fora de escopo (spec).
 
-**Placeholder scan:** sem TBD/TODO; código completo em cada passo.
+**Correções da revisão adversarial do plano:** (1) Gmail agora passa por Radar montado; (2) clique do Gmail nunca é perdido — `startGmail` entra em `gmail-scan` que trata loading/erro; (3) nenhuma task commita vermelho; (4) teste de Vasculhando é determinístico (reduced-motion); (5/6) `aria-live` nos toggles; (7) teste de derivação de `optIn` em ambos os sentidos; (8) teste de `localStorage` indisponível; (9) `#fff` só sobre accent (padrão do DS); (10) erro de catálogo não bloqueia manual; (11) `included` inicializa dos `findings` (estáveis pós-load); (12) `onDone(incluídos: Finding[])` alimenta o Radar montado; (13) dependências de task declaradas; (14) `RadarMontado` marcado inalterado; (15) E2E antigo atualizado + fluxo real; (16) invariante de seed provada pelo E2E; (17) testes de erro/vazio/reduced-motion/rota-sem-shell adicionados.
 
-**Type consistency:** `Finding { itemId, provider, variant }` (Task 6) consumido igual em Task 8 e 9; `MethodStep` ganha `onGmail` em Task 1 e é usado em Task 9; `Vasculhando({count,onDone,onBack})` e `RevisarGmail({findings,onDone,onBack})` idênticos entre Task 7/8 e Task 9; `useAlertPrefs`/`readAlertPrefs`/`writeAlertPrefs` consistentes entre Task 2 e 3.
+**Placeholder scan:** sem TBD/TODO; código completo por passo.
+
+**Type consistency:** `Finding` (T6) idêntico em T8/T9; `onDone(included: Finding[])` (T8) consumido em T9; `SummaryGroup` (de `RadarMontado`) usado em T9; `MethodStep.onGmail` (T1) usado em T9; `Vasculhando({count,onDone,onBack})` e `RevisarGmail({findings,onDone,onBack})` idênticos entre criação e uso.
