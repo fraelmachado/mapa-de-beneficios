@@ -1,0 +1,20 @@
+.alerts-page { min-height: 100dvh; display: flex; flex-direction: column; background: var(--bg); }
+.alerts-inner { flex: 1; width: 100%; max-width: 480px; margin: 0 auto; padding: var(--s8) var(--s5) var(--s6); display: flex; flex-direction: column; }
+.alerts-head { text-align: center; }
+.alerts-head .ob-back-btn { float: left; }
+.alerts-bell { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto var(--s4); border-radius: 20px; background: var(--accent-soft); color: var(--accent); }
+.alerts-head h1 { margin: 0 0 8px; font-size: 25px; font-weight: 800; letter-spacing: -.03em; color: var(--ink); }
+.alerts-head p { margin: 0 0 var(--s6); font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+.alerts-list { display: flex; flex-direction: column; gap: 10px; }
+.alerts-row { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); text-align: left; cursor: pointer; font: inherit; color: var(--ink); }
+.alerts-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.alerts-row-text { flex: 1; display: grid; gap: 2px; min-width: 0; }
+.alerts-row-text strong { font-size: 14.5px; font-weight: 700; color: var(--ink); }
+.alerts-row-text span { font-size: 12.5px; color: var(--ink-2); line-height: 1.4; }
+.alerts-switch { flex: none; width: 44px; height: 26px; border-radius: 999px; background: var(--line); position: relative; transition: background .18s var(--ease); }
+.alerts-knob { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--surface); box-shadow: var(--shadow); transition: transform .18s var(--ease); }
+.alerts-row.on .alerts-switch { background: var(--accent); }
+.alerts-row.on .alerts-knob { transform: translateX(18px); }
+.alerts-actions { margin-top: auto; padding-top: var(--s6); display: grid; gap: var(--s2); }
+.alerts-actions .btn { margin: 0; }
+@media (prefers-reduced-motion: reduce) { .alerts-switch, .alerts-knob { transition: none; } }

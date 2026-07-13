@@ -5,6 +5,7 @@
 @import './features/busca/search.css';
 @import './features/detalhe/benefit-detail.css';
 @import './features/perfil/perfil.css';
+@import './features/alertas/alertas.css';
 
 @tailwind base;
 @tailwind components;
