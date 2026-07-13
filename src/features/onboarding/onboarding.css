@@ -173,7 +173,7 @@
 .ob-option-body { flex: 1; min-width: 0; }
 .ob-option-titles { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-bottom: 4px; }
 .ob-option-titles > strong { font-size: 16px; font-weight: 700; color: var(--ink); white-space: nowrap; }
-.ob-badge-magic { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #fff; background: linear-gradient(100deg, var(--accent), var(--c-pontos)); padding: 3px 8px 3px 6px; border-radius: 7px; white-space: nowrap; }
+.ob-badge-magic { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-ink); background: linear-gradient(100deg, var(--accent), var(--c-pontos)); padding: 3px 8px 3px 6px; border-radius: 7px; white-space: nowrap; }
 .ob-badge-soon { font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); background: transparent; border: 1px solid var(--line); padding: 3px 7px; border-radius: 7px; white-space: nowrap; }
 .ob-option-body > p { margin: 0 0 11px; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
 .ob-tags { display: flex; flex-wrap: wrap; gap: 6px; }
