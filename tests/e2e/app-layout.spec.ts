@@ -13,17 +13,49 @@ test.beforeEach(async ({ page }, testInfo) => {
   await page.addInitScript((theme) => localStorage.setItem('mb-theme', theme), dark ? 'dark' : 'light')
 })
 
-test('onboarding exposes manual flow and disabled Gmail', async ({ page }, testInfo) => {
+test('onboarding exposes manual flow and Gmail preview', async ({ page }, testInfo) => {
   await page.goto('/onboarding')
   await expect(page.getByRole('heading', { name: /benefícios esperando por você/i })).toBeVisible()
   await page.getByRole('button', { name: /mapear meus benefícios/i }).click()
-  await expect(page.getByRole('button', { name: /gmail.*em breve/i })).toBeDisabled()
+  await expect(page.getByRole('button', { name: /conectar gmail.*prévia/i })).toBeEnabled()
   await assertNoHorizontalOverflow(page)
   await page.screenshot({ path: `test-results/${testInfo.project.name}-onboarding.png`, fullPage: true })
   await page.getByRole('button', { name: /adicionar manualmente/i }).click()
   await expect(page.getByText(/passo 1 de/i)).toBeVisible()
   await assertNoHorizontalOverflow(page)
   await page.screenshot({ path: `test-results/${testInfo.project.name}-wizard.png`, fullPage: true })
+})
+
+test('gmail preview path: scan → review → radar → alerts → painel', async ({ page }, testInfo) => {
+  const shot = (name: string) => page.screenshot({ path: `test-results/${testInfo.project.name}-${name}.png`, fullPage: true })
+  await page.goto('/onboarding')
+  await page.getByRole('button', { name: /mapear meus benefícios/i }).click()
+  await page.getByRole('button', { name: /conectar gmail.*prévia/i }).click()
+  // Vasculhando: espera o CTA de conclusão aparecer
+  const verBeneficios = page.getByRole('button', { name: /ver meus benefícios/i })
+  await expect(verBeneficios).toBeVisible({ timeout: 10_000 })
+  await assertNoHorizontalOverflow(page)
+  await shot('scan')
+  await verBeneficios.click()
+  // Revisar: prova que o seed produziu ≥1 achado (senão teria caído no wizard)
+  await expect(page.getByRole('heading', { name: /revise o que encontramos/i })).toBeVisible()
+  await expect(page.locator('.review-item').first()).toBeVisible()
+  await assertNoHorizontalOverflow(page)
+  await shot('revisar')
+  await page.getByRole('button', { name: /adicionar ao radar/i }).click()
+  // Radar montado
+  await expect(page.getByRole('heading', { name: /montamos seu radar/i })).toBeVisible({ timeout: 10_000 })
+  await assertNoHorizontalOverflow(page)
+  await shot('radar-gmail')
+  await page.getByRole('button', { name: /ver meu radar/i }).click()
+  // Alertas: rota de tela cheia, sem sidebar/tabbar
+  await expect(page).toHaveURL(/\/alertas/, { timeout: 10_000 })
+  await expect(page.locator('.tabbar')).toHaveCount(0)
+  await expect(page.locator('.side')).toHaveCount(0)
+  await assertNoHorizontalOverflow(page)
+  await shot('alertas')
+  await page.getByRole('button', { name: /ativar alertas/i }).click()
+  await expect(page).toHaveURL(/\/painel$/, { timeout: 10_000 })
 })
 
 for (const route of ['/painel', '/buscar', '/perfil', '/beneficio/inexistente']) {
