@@ -76,9 +76,30 @@
 @keyframes mb-aurora { 0% { transform: translate(0, 0) scale(1); opacity: .5 } 50% { transform: translate(12px, -8px) scale(1.18); opacity: .85 } 100% { transform: translate(-8px, 6px) scale(1.06); opacity: .55 } }
 @keyframes mb-twinkle { 0%, 100% { opacity: .2; transform: scale(.6) } 50% { opacity: 1; transform: scale(1) } }
 @keyframes mb-pop { from { opacity: 0; transform: scale(.4) } 60% { transform: scale(1.18) } to { opacity: 1; transform: scale(1) } }
+@keyframes mb-sweep { to { transform: rotate(360deg) } }
+@keyframes mb-ping { 0% { transform: scale(.6); opacity: .7 } 80%, 100% { transform: scale(2.1); opacity: 0 } }
 @media (prefers-reduced-motion: reduce) {
-  .mb-bob, .mb-rise, .mb-aurora, .mb-twinkle, .ob-done-check { animation: none !important }
+  .mb-bob, .mb-rise, .mb-aurora, .mb-twinkle, .ob-done-check, .scan-sweep, .scan-ping, .scan-dot { animation: none !important }
 }
+
+/* ---- Vasculhando (scan cosmético) ---- */
+.scan-page { min-height: 100dvh; display: flex; flex-direction: column; background: var(--bg); }
+.scan-inner { flex: 1; width: 100%; max-width: 480px; margin: 0 auto; padding: var(--s8) var(--s5); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; }
+.scan-back { position: absolute; top: var(--s5); left: var(--s5); }
+.scan-radar { position: relative; width: 200px; height: 200px; margin-bottom: var(--s6); border-radius: 50%; border: 1.5px dashed var(--line-2); }
+.scan-sweep { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, color-mix(in srgb, var(--accent) 34%, transparent), color-mix(in srgb, var(--accent) 4%, transparent) 32%, transparent 60%); animation: mb-sweep 2.6s linear infinite; transform-origin: center; }
+.scan-ping { position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--accent); animation: mb-ping 2.6s var(--ease) infinite; }
+.scan-dot { position: absolute; width: 11px; height: 11px; border-radius: 50%; transform: translate(-50%, -50%); animation: mb-pop .45s var(--ease) both; }
+.scan-dot-1 { top: 34%; left: 40%; background: var(--c-airport); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-airport) 22%, transparent); }
+.scan-dot-2 { top: 58%; left: 62%; background: var(--c-viagem); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-viagem) 22%, transparent); animation-delay: .3s; }
+.scan-dot-3 { top: 46%; left: 30%; background: var(--c-cashback); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-cashback) 22%, transparent); animation-delay: .6s; }
+.scan-count { font-size: 46px; font-weight: 800; letter-spacing: -.04em; line-height: 1; color: var(--ink); }
+.scan-count-label { margin-top: 6px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.scan-status { margin-top: 12px; min-height: 20px; font-size: 14px; font-weight: 600; color: var(--accent); }
+.scan-progress { width: min(100%, 280px); height: 6px; margin-top: var(--s5); border-radius: 999px; background: var(--line); overflow: hidden; }
+.scan-progress > span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--c-viagem)); transition: width .25s var(--ease); }
+.scan-cta { width: min(100%, 320px); margin-top: var(--s6); }
+.scan-cta .btn { margin: 0; }
 
 /* ==== Radar montado / conclusão (Tela 07) ==== */
 .ob-done { min-height: 100dvh; display: flex; flex-direction: column; background: var(--bg); }
