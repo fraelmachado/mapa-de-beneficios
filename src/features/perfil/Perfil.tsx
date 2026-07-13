@@ -120,6 +120,14 @@ export function Perfil() {
             <span className="profile-row-chev" aria-hidden="true">›</span>
           </Link>
 
+          <Link className="profile-row" to="/alertas">
+            <span className="profile-row-icon" aria-hidden="true">
+              <svg {...stroke}><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>
+            </span>
+            <span className="profile-row-label">Alertas</span>
+            <span className="profile-row-chev" aria-hidden="true">›</span>
+          </Link>
+
           <button className="profile-row" type="button" aria-pressed={theme === 'dark'} onClick={changeTheme}>
             <span className="profile-row-icon" aria-hidden="true">
               <svg {...stroke}><path d="M12 3a9 9 0 1 0 9 9c-5 0-9-4-9-9Z" /></svg>

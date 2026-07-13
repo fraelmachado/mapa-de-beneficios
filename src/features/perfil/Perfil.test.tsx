@@ -51,6 +51,12 @@ describe('Perfil', () => {
     expect(screen.getByRole('link', { name: /editar meus programas/i })).toHaveAttribute('href', '/onboarding?mode=edit')
   })
 
+  it('tem uma linha de Alertas apontando para /alertas', () => {
+    sessionValue = { session: { user: { id: 'u1', is_anonymous: true, email: null } }, loading: false }
+    renderWithProviders(<Perfil />)
+    expect(screen.getByRole('link', { name: /alertas/i })).toHaveAttribute('href', '/alertas')
+  })
+
   it('mantém o e-mail após falha no envio', async () => {
     sessionValue = { session: { user: { id: 'u1', is_anonymous: true, email: null } }, loading: false }
     linkMutate.mockRejectedValue(new Error('smtp down'))
