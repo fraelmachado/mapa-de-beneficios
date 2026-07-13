@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useSources } from './useSources'
 import { selectionReducer } from './selection'
 import { useSaveUserSources } from './useSaveUserSources'
@@ -15,6 +15,8 @@ import { PageState, Skeleton } from '../../ui'
 
 export function ManualWizard() {
   const navigate = useNavigate()
+  const [params] = useSearchParams()
+  const editing = params.get('mode') === 'edit'
   const { session } = useSession()
   const existingQuery = useUserSources(session?.user.id)
   const sourcesQuery = useSources()
@@ -71,7 +73,7 @@ export function ManualWizard() {
         ),
       }))
       .filter((g) => g.items.length > 0)
-    return <RadarMontado groups={summaryGroups} onView={() => navigate('/painel')} />
+    return <RadarMontado groups={summaryGroups} onView={() => navigate(editing ? '/painel' : '/alertas?from=onboarding')} />
   }
 
   if (steps.length === 0) {

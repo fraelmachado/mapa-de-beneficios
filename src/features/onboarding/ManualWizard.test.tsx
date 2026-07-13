@@ -89,6 +89,16 @@ describe('ManualWizard (grade de provedores)', () => {
     // tela de conclusão (Radar montado) antes de ir pro painel
     const ver = await screen.findByRole('button', { name: /ver meu radar/i }, { timeout: 2500 })
     fireEvent.click(ver)
+    expect(navigateMock).toHaveBeenCalledWith('/alertas?from=onboarding')
+  })
+
+  it('modo edição: "Ver meu radar" vai direto ao painel', async () => {
+    sourceResult.data = [bankGroup]
+    renderWithProviders(<ManualWizard />, { route: '/onboarding?mode=edit' })
+    fireEvent.click(screen.getByRole('button', { name: /black/i }))
+    fireEvent.click(screen.getByRole('button', { name: /concluir/i }))
+    const ver = await screen.findByRole('button', { name: /ver meu radar/i }, { timeout: 2500 })
+    fireEvent.click(ver)
     expect(navigateMock).toHaveBeenCalledWith('/painel')
   })
 
