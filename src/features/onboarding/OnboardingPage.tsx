@@ -17,7 +17,7 @@ export function OnboardingPage() {
 
   if (screen === 'manual') return <ManualWizard />
   if (screen === 'method') {
-    return <MethodStep onManual={() => setScreen('manual')} onBack={() => setScreen('welcome')} />
+    return <MethodStep onManual={() => setScreen('manual')} onBack={() => setScreen('welcome')} onGmail={() => {}} />
   }
 
   return (

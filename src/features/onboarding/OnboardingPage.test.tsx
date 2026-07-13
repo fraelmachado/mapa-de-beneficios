@@ -6,6 +6,7 @@ import { renderWithProviders } from '../../test/renderWithProviders'
 vi.mock('./ManualWizard', () => ({ ManualWizard: () => <div>Wizard manual real</div> }))
 
 import { OnboardingPage } from './OnboardingPage'
+import { MethodStep } from './OnboardingIntro'
 
 function RouteControls() {
   const navigate = useNavigate()
@@ -31,7 +32,7 @@ describe('OnboardingPage flow', () => {
     fireEvent.click(screen.getByRole('button', { name: /mapear meus benefícios/i }))
 
     expect(screen.getByRole('heading', { name: /como quer encontrar seus benefícios/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /gmail.*em breve/i })).toBeDisabled()
+    expect(screen.getByRole('button', { name: /conectar gmail.*prévia/i })).toBeEnabled()
 
     fireEvent.click(screen.getByRole('button', { name: /adicionar manualmente/i }))
 
@@ -63,5 +64,14 @@ describe('OnboardingPage flow', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Sair da edição' }))
 
     expect(screen.getByRole('heading', { name: /benefícios esperando por você/i })).toBeInTheDocument()
+  })
+
+  it('MethodStep: card Gmail Prévia dispara onGmail', () => {
+    const onGmail = vi.fn()
+    renderWithProviders(<MethodStep onManual={() => {}} onGmail={onGmail} />, { route: '/onboarding' })
+    const gmail = screen.getByRole('button', { name: /conectar gmail.*prévia/i })
+    expect(gmail).toBeEnabled()
+    fireEvent.click(gmail)
+    expect(onGmail).toHaveBeenCalledTimes(1)
   })
 })

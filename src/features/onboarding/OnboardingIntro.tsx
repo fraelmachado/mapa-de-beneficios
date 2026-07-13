@@ -106,7 +106,7 @@ function TwinkleStar({ size, style }: { size: number; style: React.CSSProperties
   )
 }
 
-export function MethodStep({ onManual, onBack }: { onManual: () => void; onBack?: () => void }) {
+export function MethodStep({ onManual, onBack, onGmail }: { onManual: () => void; onBack?: () => void; onGmail: () => void }) {
   return (
     <main className="ob-method">
       <div className="ob-method-inner">
@@ -123,7 +123,7 @@ export function MethodStep({ onManual, onBack }: { onManual: () => void; onBack?
           <p>Escolha um método — dá pra mudar depois.</p>
         </div>
         <div className="ob-options">
-          <button type="button" className="ob-option ob-option-gmail" disabled>
+          <button type="button" className="ob-option ob-option-gmail" onClick={onGmail}>
             <span className="ob-option-fx" aria-hidden="true">
               <span className="ob-aurora ob-aurora-1" />
               <span className="ob-aurora ob-aurora-2" />
@@ -136,9 +136,9 @@ export function MethodStep({ onManual, onBack }: { onManual: () => void; onBack?
               <span className="ob-option-body">
                 <span className="ob-option-titles">
                   <strong>Conectar Gmail</strong>
-                  <span className="ob-badge-soon">Em breve</span>
+                  <span className="ob-badge-magic">Prévia</span>
                 </span>
-                <p>Revelamos os benefícios escondidos nos seus e-mails — em segundos, como num passe de mágica.</p>
+                <p>Uma demonstração de como a descoberta vai funcionar — com seus programas do catálogo. Nada é lido do seu e-mail.</p>
                 <span className="ob-tags">
                   <span className="ob-tag">Mais rápido</span>
                   <span className="ob-tag">Você revisa antes de salvar</span>
