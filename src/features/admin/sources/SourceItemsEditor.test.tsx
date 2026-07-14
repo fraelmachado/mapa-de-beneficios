@@ -29,9 +29,19 @@ describe('SourceItemsEditor', () => {
     await waitFor(() => expect(saveItem).toHaveBeenCalledWith(expect.objectContaining({ source_id: 's1', label: 'Platinum' })))
   })
 
-  it('remove uma variante', async () => {
+  it('remove uma variante — confirmação inline (D11), não deleta no 1º clique', async () => {
     render(<SourceItemsEditor sourceId="s1" items={items} />)
     fireEvent.click(screen.getByRole('button', { name: /remover Black/i }))
+    expect(deleteItem).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: /confirmar/i }))
     await waitFor(() => expect(deleteItem).toHaveBeenCalledWith('i1'))
+  })
+
+  it('Cancelar no confirm inline não deleta', () => {
+    render(<SourceItemsEditor sourceId="s1" items={items} />)
+    fireEvent.click(screen.getByRole('button', { name: /remover Black/i }))
+    fireEvent.click(screen.getByRole('button', { name: /cancelar/i }))
+    expect(deleteItem).not.toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: /remover Black/i })).toBeInTheDocument()
   })
 })

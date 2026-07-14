@@ -56,6 +56,41 @@
   color: inherit; text-decoration: none; font-weight: 600; }
 .aa-area:hover { border-color: var(--ink); }
 .aa-area:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- Programas (Task 5): header, avatar, ações de linha, form modal ---------- */
+.aa-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.aa-add-txt { display: none; }
+.aa-add-ic { display: grid; place-items: center; width: 42px; height: 42px; flex: none;
+  border: 0; border-radius: 13px; background: var(--ink); color: var(--surface); cursor: pointer; }
+.aa-avatar { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px;
+  background: var(--surface-2); color: var(--ink); font-size: 13px; font-weight: 800; }
+.aa-act { display: flex; gap: 6px; justify-content: flex-end; }
+.aa-act button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit;
+  font-size: 12.5px; font-weight: 600; padding: 7px 11px; border-radius: 9px; cursor: pointer; white-space: nowrap; }
+.aa-act button:hover { border-color: var(--ink); }
+.aa-act button[aria-label^="remover"] { color: var(--admin-danger-ink); border-color: transparent; background: transparent; }
+
+.aa-fieldlbl { display: block; margin: 0 0 7px; font-size: 11px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--muted); }
+.aa-select { width: 100%; padding: 13px 14px; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--surface); font: inherit; font-size: 15px; color: var(--ink); cursor: pointer;
+  box-sizing: border-box; margin-bottom: var(--s3); }
+.aa-check { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--ink);
+  margin-bottom: var(--s3); cursor: pointer; }
+.aa-more { margin: 2px 0 var(--s3); }
+.aa-more summary { cursor: pointer; list-style: none; font-size: 13px; font-weight: 700; color: var(--ink-2); padding: 6px 0; }
+.aa-more summary::-webkit-details-marker { display: none; }
+.aa-more summary::before { content: '▸'; display: inline-block; margin-right: 6px; transition: transform var(--dur) var(--ease); }
+.aa-more[open] summary::before { transform: rotate(90deg); }
+.aa-more[open] summary { margin-bottom: var(--s2); }
+
+.aa-items { margin-top: var(--s3); padding-top: var(--s3); border-top: 1px solid var(--line); }
+.aa-itemlist { display: flex; flex-direction: column; gap: 6px; margin: 0 0 var(--s3); padding: 0; list-style: none; }
+.aa-itemrow { display: flex; align-items: center; gap: 8px; font-size: 13.5px; padding: 6px 0; }
+.aa-itemdel { margin-left: auto; border: 0; background: none; color: var(--admin-danger-ink); font-size: 16px; line-height: 1; cursor: pointer; padding: 4px 8px; }
+.aa-itemadd { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--s2) var(--s3); }
+.aa-itemadd .input { min-width: 120px; }
+
 @container (min-width: 760px) {
   .aa-shell { display: grid; grid-template-columns: 246px minmax(0, 1fr); } /* minmax(0,…): a 2ª coluna não expande pelo mínimo intrínseco (fix Codex #3) */
   .aa-side { display: flex; flex-direction: column; gap: 6px; position: sticky; top: 0; height: 100dvh;
@@ -72,4 +107,6 @@
     border-bottom: 1px solid var(--line); box-shadow: none; }
   .aa-statgrid { grid-template-columns: repeat(4, 1fr); }
   .aa-areagrid { grid-template-columns: 1fr 1fr; }
+  .aa-add-txt { display: inline-flex; align-items: center; gap: 7px; width: auto; padding: 11px 17px; font-size: 14px; white-space: nowrap; }
+  .aa-add-ic { display: none; }
 }

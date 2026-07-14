@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { Input } from '../../../ui/Input'
+import { Button } from '../../../ui/Button'
 import { useSaveSourceItem, useDeleteSourceItem } from './useSourceItems'
 import type { SourceItemRow } from './types'
 
@@ -8,6 +10,7 @@ export function SourceItemsEditor({ sourceId, items }: { sourceId: string; items
   const [label, setLabel] = useState('')
   const [brand, setBrand] = useState('')
   const [level, setLevel] = useState('')
+  const [confirmingId, setConfirmingId] = useState<string | null>(null)
 
   async function add() {
     if (!label.trim()) return
@@ -22,30 +25,39 @@ export function SourceItemsEditor({ sourceId, items }: { sourceId: string; items
     setLabel(''); setBrand(''); setLevel('')
   }
 
+  async function remove(id: string) {
+    await del.mutateAsync(id)
+    setConfirmingId(null)
+  }
+
   return (
-    <div className="mt-3 rounded-lg border border-slate-100 p-3">
-      <h3 className="mb-2 text-sm font-semibold">Variantes</h3>
-      <ul className="flex flex-col gap-1">
+    <div className="aa-items">
+      <h3 className="aa-fieldlbl">Variantes</h3>
+      <ul className="aa-itemlist">
         {items.map((it) => (
-          <li key={it.id} className="flex items-center gap-2 text-sm">
+          <li key={it.id} className="aa-itemrow">
             <span>{it.label}</span>
-            {it.card_level && <span className="text-xs text-slate-400">{it.card_brand ?? ''} {it.card_level}</span>}
-            <button type="button" aria-label={`remover ${it.label}`} onClick={() => del.mutateAsync(it.id)} className="ml-auto text-red-600">×</button>
+            {it.card_level && <span className="muted">{it.card_brand ?? ''} {it.card_level}</span>}
+            {confirmingId === it.id ? (
+              <span className="aa-act">
+                <button type="button" onClick={() => remove(it.id)}>Confirmar?</button>
+                <button type="button" onClick={() => setConfirmingId(null)}>Cancelar</button>
+              </span>
+            ) : (
+              <button type="button" aria-label={`remover ${it.label}`} onClick={() => setConfirmingId(it.id)} className="aa-itemdel">×</button>
+            )}
           </li>
         ))}
-        {items.length === 0 && <li className="text-xs text-slate-400">Nenhuma variante.</li>}
+        {items.length === 0 && <li className="muted">Nenhuma variante.</li>}
       </ul>
-      <div className="mt-3 flex flex-wrap items-end gap-2">
-        <label className="text-xs">Nova variante
-          <input aria-label="nova variante" value={label} onChange={(e) => setLabel(e.target.value)} className="block rounded border px-2 py-1" />
-        </label>
-        <label className="text-xs">brand
-          <input aria-label="card_brand" value={brand} onChange={(e) => setBrand(e.target.value)} className="block rounded border px-2 py-1" placeholder="VISA" />
-        </label>
-        <label className="text-xs">level
-          <input aria-label="card_level" value={level} onChange={(e) => setLevel(e.target.value)} className="block rounded border px-2 py-1" placeholder="BLACK" />
-        </label>
-        <button type="button" onClick={add} className="rounded bg-slate-700 px-3 py-1 text-sm text-white">Adicionar</button>
+      <div className="aa-itemadd">
+        <label className="aa-fieldlbl" htmlFor="si-label">Nova variante</label>
+        <Input id="si-label" ariaLabel="nova variante" value={label} onChange={(e) => setLabel(e.target.value)} />
+        <label className="aa-fieldlbl" htmlFor="si-brand">brand</label>
+        <Input id="si-brand" ariaLabel="card_brand" value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="VISA" />
+        <label className="aa-fieldlbl" htmlFor="si-level">level</label>
+        <Input id="si-level" ariaLabel="card_level" value={level} onChange={(e) => setLevel(e.target.value)} placeholder="BLACK" />
+        <Button variant="ink" onClick={add}>Adicionar</Button>
       </div>
     </div>
   )

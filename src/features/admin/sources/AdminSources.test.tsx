@@ -1,43 +1,45 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen, fireEvent, waitFor } from '@testing-library/react'
-import { renderWithProviders } from '../../../test/renderWithProviders'
-import type { SourceRow } from './types'
+import { render, screen, fireEvent } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 
-const saveSource = vi.fn()
+const del = vi.fn(() => Promise.resolve())
 vi.mock('./useAdminSources', () => ({
-  useAdminSources: () => ({ data: sources, isLoading: false, error: null }),
-  useSaveSource: () => ({ mutateAsync: saveSource, isPending: false }),
-  useDeleteSource: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useAdminSources: () => ({
+    data: [{ id: 's1', name: 'Nubank', kind: 'card', source_category: 'bank_card', active: true, source_items: [] }],
+    isLoading: false,
+    error: null,
+  }),
+  useSaveSource: () => ({ mutateAsync: vi.fn(() => Promise.resolve('s1')), isPending: false }),
+  useDeleteSource: () => ({ mutateAsync: del, isPending: false }),
 }))
-vi.mock('./useSourceItems', () => ({
-  useSaveSourceItem: () => ({ mutateAsync: vi.fn(), isPending: false }),
-  useDeleteSourceItem: () => ({ mutateAsync: vi.fn(), isPending: false }),
+vi.mock('../discovery/useSourceCandidates', () => ({
+  useSourceCandidates: () => ({ data: [], isLoading: false, error: null }),
 }))
-vi.mock('../upload/ImageUpload', () => ({ ImageUpload: () => <div>upload</div> }))
 
-let sources: SourceRow[]
 import { AdminSources } from './AdminSources'
 
-beforeEach(() => {
-  saveSource.mockReset(); saveSource.mockResolvedValue('new-id')
-  sources = [
-    { id: 's1', kind: 'card', source_category: 'bank_card', name: 'Itaú', logo_url: null, sort_order: 1, active: true,
-      connector_type: null, pluggy_connector_id: null, institution_url: null, primary_color: null, country: 'BR',
-      source_items: [] },
-  ]
-})
+beforeEach(() => del.mockClear())
 
-describe('AdminSources', () => {
-  it('lista as fontes', () => {
-    renderWithProviders(<AdminSources />)
-    expect(screen.getByText('Itaú')).toBeInTheDocument()
+describe('AdminSources — Ativos', () => {
+  it('lista fontes na aba Ativos com pill de categoria', () => {
+    render(
+      <MemoryRouter>
+        <AdminSources />
+      </MemoryRouter>,
+    )
+    expect(screen.getByText('Nubank')).toBeInTheDocument()
+    expect(screen.getByText(/bancos & cartões/i)).toBeInTheDocument()
   })
 
-  it('abre o form de nova fonte e salva', async () => {
-    renderWithProviders(<AdminSources />)
-    fireEvent.click(screen.getByRole('button', { name: /nova fonte/i }))
-    fireEvent.change(screen.getByLabelText(/nome/i), { target: { value: 'Nubank' } })
-    fireEvent.click(screen.getByRole('button', { name: /salvar/i }))
-    await waitFor(() => expect(saveSource).toHaveBeenCalledWith(expect.objectContaining({ name: 'Nubank' })))
+  it('Remover NÃO deleta direto — abre confirmação; confirmar deleta', () => {
+    render(
+      <MemoryRouter>
+        <AdminSources />
+      </MemoryRouter>,
+    )
+    fireEvent.click(screen.getByRole('button', { name: /remover nubank/i }))
+    expect(del).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: /^remover$/i }))
+    expect(del).toHaveBeenCalledWith('s1')
   })
 })

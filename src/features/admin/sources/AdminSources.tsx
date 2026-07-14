@@ -1,51 +1,147 @@
 import { useState } from 'react'
 import { useAdminSources, useSaveSource, useDeleteSource } from './useAdminSources'
+import { useSourceCandidates } from '../discovery/useSourceCandidates'
 import { SourceForm } from './SourceForm'
 import { SourceItemsEditor } from './SourceItemsEditor'
+import { SegmentedControl } from '../../../ui/SegmentedControl'
+import { AdminList } from '../AdminList'
+import { AdminSheet } from '../../../ui/AdminSheet'
+import { ConfirmDelete } from '../ConfirmDelete'
+import { Skeleton } from '../../../ui/Skeleton'
+import { PageState } from '../../../ui/PageState'
+import { ToastHost, useToast } from '../../../ui/Toast'
+import { categoryMeta } from '../../onboarding/categoryMeta'
 import type { SourceInput, SourceRow } from './types'
 
+type Tab = 'pending' | 'active' | 'rejected'
+type Editing = SourceRow | 'new' | { id: string } | null
+
 export function AdminSources() {
+  return (
+    <ToastHost>
+      <AdminSourcesView />
+    </ToastHost>
+  )
+}
+
+function AdminSourcesView() {
   const { data, isLoading, error } = useAdminSources()
   const save = useSaveSource()
   const del = useDeleteSource()
-  const [editing, setEditing] = useState<SourceRow | null | 'new'>(null)
+  const pend = useSourceCandidates('pending')
+  const rej = useSourceCandidates('rejected')
+  const toast = useToast()
 
-  if (isLoading) return <p className="text-slate-500">Carregando…</p>
-  if (error) return <p className="text-red-600">Erro ao carregar fontes.</p>
+  const [tab, setTab] = useState<Tab>('active')
+  const [editing, setEditing] = useState<Editing>(null)
+  const [confirmId, setConfirmId] = useState<string | null>(null)
+
+  if (isLoading) return <Skeleton height="180px" radius="16px" />
+  if (error) return <PageState title="Não foi possível carregar os programas." />
+
+  const rows = data ?? []
 
   async function onSubmit(input: SourceInput) {
-    const current = editing
-    const id = current && current !== 'new' ? current.id : undefined
-    await save.mutateAsync({ ...input, id })
-    setEditing(null)
+    const id = editing && editing !== 'new' ? editing.id : undefined
+    const savedId = await save.mutateAsync({ ...input, id })
+    toast.show('Programa salvo')
+    setEditing({ id: savedId }) // permanece aberto em modo edição; a lista reinvalida e resolve a row completa
   }
 
-  if (editing) {
-    const initial = editing === 'new' ? null : editing
-    return (
-      <div className="flex flex-col gap-3">
-        <h1 className="text-xl font-bold">{initial ? `Editar ${initial.name}` : 'Nova fonte'}</h1>
-        <SourceForm initial={initial} onSubmit={onSubmit} onCancel={() => setEditing(null)} />
-        {initial && <SourceItemsEditor sourceId={initial.id} items={initial.source_items} />}
-      </div>
-    )
+  const resolvedRow: SourceRow | null =
+    editing && editing !== 'new' ? rows.find((s) => s.id === editing.id) ?? null : null
+
+  function cascadeMsg(id: string | null): string {
+    const row = id ? rows.find((s) => s.id === id) : undefined
+    const n = row?.source_items.length ?? 0
+    return n > 0
+      ? `Remove também ${n} ${n === 1 ? 'variante' : 'variantes'} e os vínculos com benefícios.`
+      : 'Remove também os vínculos com benefícios.'
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Fontes</h1>
-        <button type="button" onClick={() => setEditing('new')} className="rounded bg-slate-800 px-3 py-2 text-sm text-white">Nova fonte</button>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--s3)' }}>
+      <div className="aa-head">
+        <div>
+          <p className="aa-eyebrow">Catálogo</p>
+          <h1 className="aa-h1">Programas</h1>
+        </div>
+        <button type="button" className="btn ink aa-add-txt" onClick={() => setEditing('new')}>
+          <PlusIcon /> Novo programa
+        </button>
+        <button type="button" className="aa-add-ic" aria-label="Novo programa" onClick={() => setEditing('new')}>
+          <PlusIcon />
+        </button>
       </div>
-      <ul className="flex flex-col gap-2">
-        {(data ?? []).map((s) => (
-          <li key={s.id} className="flex items-center gap-3 rounded-lg border border-slate-200 p-3">
-            <span className="flex-1">{s.name} <span className="text-xs text-slate-400">({s.kind}{s.active ? '' : ' · inativo'})</span></span>
-            <button type="button" onClick={() => setEditing(s)} className="text-sm text-slate-600">Editar</button>
-            <button type="button" aria-label={`remover ${s.name}`} onClick={() => del.mutateAsync(s.id)} className="text-sm text-red-600">Remover</button>
-          </li>
-        ))}
-      </ul>
+
+      <SegmentedControl
+        ariaLabel="Programas"
+        options={[
+          { label: 'Pendentes', value: 'pending', count: pend.data?.length ?? 0 },
+          { label: 'Ativos', value: 'active', count: rows.length },
+          { label: 'Rejeitados', value: 'rejected', count: rej.data?.length ?? 0 },
+        ]}
+        value={tab}
+        onChange={(v) => setTab(v as Tab)}
+      />
+
+      {tab === 'active' && (
+        <AdminList
+          ariaLabel="Programas ativos"
+          rows={rows}
+          keyOf={(s) => s.id}
+          renderRow={(s) => (
+            <>
+              <span className="aa-avatar">{(s.name.charAt(0) || '·').toUpperCase()}</span>
+              <span className="aa-name">{s.name}</span>
+              <span className="pill">{categoryMeta(s.source_category).label}</span>
+              <span className="aa-act">
+                <button type="button" aria-label={`editar ${s.name}`} onClick={() => setEditing(s)}>
+                  Editar
+                </button>
+                <button type="button" aria-label={`remover ${s.name}`} onClick={() => setConfirmId(s.id)}>
+                  Remover
+                </button>
+              </span>
+            </>
+          )}
+        />
+      )}
+
+      {tab !== 'active' && (
+        <PageState title="Em breve" description="Esta aba será preenchida na Task 6." />
+      )}
+
+      <ConfirmDelete
+        open={!!confirmId}
+        title="Remover item?"
+        message={cascadeMsg(confirmId)}
+        onCancel={() => setConfirmId(null)}
+        onConfirm={async () => {
+          await del.mutateAsync(confirmId!)
+          toast.show('Programa removido')
+          setConfirmId(null)
+        }}
+      />
+
+      <AdminSheet
+        open={!!editing}
+        title={editing === 'new' ? 'Novo programa' : 'Editar programa'}
+        closeOnBackdrop={false}
+        onClose={() => setEditing(null)}
+      >
+        {editing && <SourceForm initial={resolvedRow} onSubmit={onSubmit} onCancel={() => setEditing(null)} />}
+        {resolvedRow && <SourceItemsEditor sourceId={resolvedRow.id} items={resolvedRow.source_items} />}
+      </AdminSheet>
     </div>
+  )
+}
+
+function PlusIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
   )
 }

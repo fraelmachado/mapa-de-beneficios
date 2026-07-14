@@ -1,4 +1,6 @@
 import { useState, type FormEvent } from 'react'
+import { Input } from '../../../ui/Input'
+import { Button } from '../../../ui/Button'
 import { ImageUpload } from '../upload/ImageUpload'
 import type { SourceInput, SourceRow } from './types'
 import type { SourceKind } from '../../onboarding/types'
@@ -48,47 +50,52 @@ export function SourceForm({
   }
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-3 rounded-lg border border-slate-200 p-4">
-      <label className="text-sm font-medium" htmlFor="s-name">Nome</label>
-      <input id="s-name" required value={name} onChange={(e) => setName(e.target.value)} className="rounded border px-2 py-1" />
+    <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column' }}>
+      <label className="aa-fieldlbl" htmlFor="s-name">Nome</label>
+      <Input id="s-name" required value={name} onChange={(e) => setName(e.target.value)} />
 
-      <label className="text-sm font-medium" htmlFor="s-kind">Tipo (kind)</label>
-      <select id="s-kind" value={kind} onChange={(e) => setKind(e.target.value as SourceKind)} className="rounded border px-2 py-1">
+      <label className="aa-fieldlbl" htmlFor="s-kind">Tipo (kind)</label>
+      <select id="s-kind" className="aa-select" value={kind} onChange={(e) => setKind(e.target.value as SourceKind)}>
         {KINDS.map((k) => <option key={k} value={k}>{k}</option>)}
       </select>
 
-      <label className="text-sm font-medium" htmlFor="s-cat">Categoria</label>
-      <select id="s-cat" value={sourceCategory} onChange={(e) => setSourceCategory(e.target.value as SourceCategory)} className="rounded border px-2 py-1">
+      <label className="aa-fieldlbl" htmlFor="s-cat">Categoria</label>
+      <select id="s-cat" className="aa-select" value={sourceCategory} onChange={(e) => setSourceCategory(e.target.value as SourceCategory)}>
         {SOURCE_CATEGORY_META.map((c) => <option key={c.key} value={c.key}>{c.icon} {c.label}</option>)}
       </select>
 
-      <label className="text-sm font-medium" htmlFor="s-order">Ordem</label>
-      <input id="s-order" type="number" value={sortOrder} onChange={(e) => setSortOrder(Number(e.target.value))} className="rounded border px-2 py-1" />
-
-      <label className="flex items-center gap-2 text-sm">
+      <label className="aa-check">
         <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} /> Ativo
       </label>
 
-      <span className="text-sm font-medium">Logo</span>
-      <ImageUpload folder="sources" value={logoUrl} onChange={setLogoUrl} />
+      <details className="aa-more">
+        <summary>Mais opções</summary>
 
-      <fieldset className="mt-2 rounded border border-slate-100 p-3">
-        <legend className="text-xs text-slate-500">Open Finance / Pluggy</legend>
-        <label className="text-sm font-medium" htmlFor="s-ct">connector_type</label>
-        <input id="s-ct" value={connectorType} onChange={(e) => setConnectorType(e.target.value)} className="mb-2 w-full rounded border px-2 py-1" placeholder="PERSONAL_BANK / TELECOMMUNICATION / DIGITAL_ECONOMY" />
-        <label className="text-sm font-medium" htmlFor="s-pid">pluggy_connector_id</label>
-        <input id="s-pid" type="number" value={pluggyId} onChange={(e) => setPluggyId(e.target.value)} className="mb-2 w-full rounded border px-2 py-1" />
-        <label className="text-sm font-medium" htmlFor="s-iu">institution_url</label>
-        <input id="s-iu" value={institutionUrl} onChange={(e) => setInstitutionUrl(e.target.value)} className="mb-2 w-full rounded border px-2 py-1" />
-        <label className="text-sm font-medium" htmlFor="s-pc">primary_color</label>
-        <input id="s-pc" value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)} className="mb-2 w-full rounded border px-2 py-1" placeholder="#0f172a" />
-        <label className="text-sm font-medium" htmlFor="s-country">country</label>
-        <input id="s-country" value={country} onChange={(e) => setCountry(e.target.value)} className="w-full rounded border px-2 py-1" />
-      </fieldset>
+        <label className="aa-fieldlbl" htmlFor="s-order">Ordem</label>
+        <Input id="s-order" type="number" value={String(sortOrder)} onChange={(e) => setSortOrder(Number(e.target.value))} />
 
-      <div className="mt-2 flex gap-2">
-        <button type="submit" className="rounded bg-slate-800 px-4 py-2 text-white">Salvar</button>
-        <button type="button" onClick={onCancel} className="rounded border px-4 py-2">Cancelar</button>
+        <span className="aa-fieldlbl">Logo</span>
+        <ImageUpload folder="sources" value={logoUrl} onChange={setLogoUrl} />
+
+        <label className="aa-fieldlbl" htmlFor="s-ct">connector_type</label>
+        <Input id="s-ct" value={connectorType} onChange={(e) => setConnectorType(e.target.value)} placeholder="PERSONAL_BANK / TELECOMMUNICATION / DIGITAL_ECONOMY" />
+
+        <label className="aa-fieldlbl" htmlFor="s-pid">pluggy_connector_id</label>
+        <Input id="s-pid" type="number" value={pluggyId} onChange={(e) => setPluggyId(e.target.value)} />
+
+        <label className="aa-fieldlbl" htmlFor="s-iu">institution_url</label>
+        <Input id="s-iu" value={institutionUrl} onChange={(e) => setInstitutionUrl(e.target.value)} />
+
+        <label className="aa-fieldlbl" htmlFor="s-pc">primary_color</label>
+        <Input id="s-pc" value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)} placeholder="#0f172a" />
+
+        <label className="aa-fieldlbl" htmlFor="s-country">country</label>
+        <Input id="s-country" value={country} onChange={(e) => setCountry(e.target.value)} />
+      </details>
+
+      <div className="aa-dialog-actions">
+        <Button variant="ghost" type="button" onClick={onCancel}>Cancelar</Button>
+        <Button variant="ink" type="submit">Salvar</Button>
       </div>
     </form>
   )
