@@ -33,10 +33,11 @@ describe('AdminGuard', () => {
     expect(navigateMock).toHaveBeenCalledWith('/admin/login', { replace: true })
   })
 
-  it('mostra carregando enquanto verifica', () => {
+  it('mostra esqueleto de carregamento enquanto verifica', () => {
     sessionValue = { session: { user: { id: 'a' } }, loading: false }
     adminResult = { data: undefined, isLoading: true, error: null }
-    renderWithProviders(<AdminGuard />)
-    expect(screen.getByText(/verificando acesso/i)).toBeInTheDocument()
+    const { container } = renderWithProviders(<AdminGuard />)
+    expect(container.querySelector('.aa-main')).toBeInTheDocument()
+    expect(screen.queryByText('conteúdo-admin')).not.toBeInTheDocument()
   })
 })

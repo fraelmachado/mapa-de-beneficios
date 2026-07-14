@@ -9,7 +9,7 @@ import { Perfil } from './features/perfil/Perfil'
 import { Alertas } from './features/alertas/Alertas'
 import { AdminLogin } from './features/admin/AdminLogin'
 import { AdminGuard } from './features/admin/AdminGuard'
-import { AdminLayout } from './features/admin/AdminLayout'
+import { AdminAppShell } from './features/admin/AdminAppShell'
 import { AdminHome } from './features/admin/AdminHome'
 import { AdminSources } from './features/admin/sources/AdminSources'
 import { AdminBenefits } from './features/admin/benefits/AdminBenefits'
@@ -33,7 +33,7 @@ export const router = createBrowserRouter([
     element: <AdminGuard />,
     children: [
       {
-        element: <AdminLayout />,
+        element: <AdminAppShell />,
         children: [
           { path: '/admin', element: <AdminHome /> },
           { path: '/admin/sources', element: <AdminSources /> },
