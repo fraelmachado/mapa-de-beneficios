@@ -15,6 +15,10 @@ vi.mock('./useAdminSources', () => ({
 vi.mock('../discovery/useSourceCandidates', () => ({
   useSourceCandidates: () => ({ data: [], isLoading: false, error: null }),
 }))
+vi.mock('../discovery/useDiscovery', () => ({
+  useRejectCandidate: () => ({ mutate: vi.fn() }),
+  useReconsiderCandidate: () => ({ mutate: vi.fn() }),
+}))
 
 import { AdminSources } from './AdminSources'
 

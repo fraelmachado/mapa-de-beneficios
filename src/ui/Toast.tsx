@@ -50,8 +50,8 @@ function ToastItemView({ item, onDismiss }: { item: ToastItem; onDismiss: (id: n
   )
 }
 
+// ponytail: fora de um <ToastHost> (ex.: tela renderizada isolada em teste), show() vira no-op
+// em vez de derrubar a árvore — o host real é montado uma vez em AdminAppShell.
 export function useToast(): ToastContextValue {
-  const ctx = useContext(ToastContext)
-  if (!ctx) throw new Error('useToast deve ser usado dentro de <ToastHost>')
-  return ctx
+  return useContext(ToastContext) ?? { show: () => {} }
 }

@@ -1,31 +1,63 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import './discovery.css'
 import { CandidateTree } from './CandidateTree'
 import { jobStatusMeta } from './discoveryMeta'
+import { useCandidateSubtree } from './useSourceCandidates'
 import {
   useCreateJob, useDiscoveryJobs, useJobCandidates, usePromoteCandidate, useRejectCandidate,
 } from './useDiscovery'
 
 export function AdminDiscovery() {
+  const [params] = useSearchParams()
+  const fp = params.get('fp')
+
   const jobs = useDiscoveryJobs()
   const createJob = useCreateJob()
   const [brief, setBrief] = useState('')
   const [selected, setSelected] = useState<string | null>(null)
   const candidates = useJobCandidates(selected)
   const promote = usePromoteCandidate(selected)
+  const promoteFp = usePromoteCandidate(null)
   const reject = useRejectCandidate()
+  const subtree = useCandidateSubtree(fp)
 
   const jobList = jobs.data ?? []
   const selectedJob = jobList.find((j) => j.id === selected) ?? null
 
-  return (
-    <div className="dv-root">
+  const header = (
+    <>
       <p style={{ margin: '0 0 3px', fontSize: 11, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--muted)' }}>
         Catálogo
       </p>
       <h1 style={{ margin: 0, fontSize: 'var(--fz-h1)', fontWeight: 800, letterSpacing: '-.03em' }}>
         Discovery
       </h1>
+    </>
+  )
+
+  // Drill-in: veio de "Revisar" na aba Pendentes — mostra só a subárvore desse fingerprint, cross-job.
+  if (fp) {
+    return (
+      <div className="dv-root">
+        {header}
+        <p className="dv-sub">Candidato selecionado. Aprove ou rejeite nó a nó, em cascata.</p>
+        {subtree.isLoading ? (
+          <div className="dv-empty">Carregando…</div>
+        ) : (
+          <CandidateTree
+            candidates={subtree.data ?? []}
+            onPromote={(id) => promoteFp.mutate(id)}
+            onReject={(id) => reject.mutate({ candidateId: id, reason: '' })}
+          />
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <div className="dv-root">
+      {header}
       <p className="dv-sub">
         Revise os candidatos propostos pelo agente antes de entrarem no catálogo. O agente nunca
         publica sozinho; nada entra no catálogo sem a sua aprovação.
