@@ -1,6 +1,9 @@
 /* Redesign /admin/discovery. Scoped .dv-* classes use ds.css tokens. */
 
-.dv-root { container-type: inline-size; color: var(--ink); }
+/* Sem container-type próprio: dentro do AdminAppShell, .dv-root fica num track de grid
+   minmax(0,1fr) e um container-type aninhado colapsa a coluna a 0 no desktop. As @container
+   queries abaixo resolvem contra o .aa-root (mesmo breakpoint 760px). */
+.dv-root { color: var(--ink); }
 
 .dv-sub { margin: 0 0 22px; font-size: 13.5px; color: var(--ink-2); max-width: 60ch; line-height: 1.5; }
 .dv-sublbl { margin: 0 0 10px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
