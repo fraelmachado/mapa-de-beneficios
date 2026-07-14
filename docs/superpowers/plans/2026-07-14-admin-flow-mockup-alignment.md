@@ -171,6 +171,8 @@ export function useReconsiderCandidate() {
   --admin-side-hover: #1b1d22;
   --admin-line: var(--line);
   --admin-backdrop: color-mix(in srgb, #0f1013 46%, transparent);
+  --admin-danger-bg: #b42318;   /* branco sobre este vermelho = ~6:1 (AA) nos dois temas */
+  --admin-danger-ink: #ffffff;
 ```
 
 - [ ] **Step 9: Polyfill `<dialog>`.** Em `src/test-setup.ts`, ao final:
@@ -278,7 +280,8 @@ Run → PASS. (Foco-preso/Escape reais ficam pro Playwright — D12.)
 .aa-grip { width: 40px; height: 4px; border-radius: 999px; background: var(--line); margin: 0 auto 12px; }
 .aa-dialog-title { margin: 0 0 12px; font-size: 18px; font-weight: 800; letter-spacing: -.02em; }
 .aa-dialog-actions { display: flex; gap: 10px; margin-top: 16px; }
-.btn.danger { background: var(--warn); color: var(--accent-ink); }
+/* Botão destrutivo com contraste AA (≥4.5:1) nos dois temas — não usar --warn+--accent-ink (fix Codex #8). */
+.btn.danger { background: var(--admin-danger-bg); color: var(--admin-danger-ink); }
 @container (min-width: 760px) {
   .aa-dialog { width: 440px; border-radius: 20px; margin: auto; }
   .aa-dialog.aa-wide { width: 520px; }
@@ -405,7 +408,7 @@ Create `StatGrid.tsx`: `<div className="aa-statgrid">{stats.map(s => <div classN
 .aa-root { container-type: inline-size; }
 .aa-shell { min-height: 100dvh; background: var(--bg); }
 .aa-side { display: none; }
-.aa-main { padding: 18px 16px 92px; max-width: 720px; margin: 0 auto; }
+.aa-main { padding: 18px 16px 92px; max-width: 720px; margin: 0 auto; min-width: 0; }
 .aa-tabbar { position: fixed; inset: auto 0 0 0; display: flex; justify-content: space-around;
   gap: 4px; padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); background: var(--surface);
   border-top: 1px solid var(--line); z-index: 20; }
@@ -426,7 +429,7 @@ Create `StatGrid.tsx`: `<div className="aa-statgrid">{stats.map(s => <div classN
 .aa-stat-v { font-size: 26px; font-weight: 800; letter-spacing: -.03em; color: var(--ink); }
 .aa-stat-k { margin-top: 2px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
 @container (min-width: 760px) {
-  .aa-shell { display: grid; grid-template-columns: 246px 1fr; }
+  .aa-shell { display: grid; grid-template-columns: 246px minmax(0, 1fr); } /* minmax(0,…): a 2ª coluna não expande pelo mínimo intrínseco (fix Codex #3) */
   .aa-side { display: flex; flex-direction: column; gap: 6px; position: sticky; top: 0; height: 100dvh;
     padding: 20px 14px; background: var(--admin-side-bg); color: var(--admin-side-ink); }
   .aa-side .aa-navbtn { color: var(--admin-side-ink); }
@@ -742,7 +745,7 @@ export async function loginAdmin(page: Page) {
 }
 ```
 
-- [ ] **Step 4: Spec e2e.** Create `tests/e2e/admin-layout.spec.ts` reusando o `beforeEach` de tema do `app-layout.spec.ts`: login → `/admin` (StatGrid visível, sem overflow); `/admin/sources` (3 tabs `role="tab"`; desktop `.aa-side` visível + `.aa-tabbar` oculta; mobile o inverso); abrir "Novo programa" → `dialog[open]` visível; **foco preso (D12):** afirmar que o foco entrou no dialog (`await expect(page.locator('dialog[open]')).toBeFocused()` ou que `dialog[open] :focus` existe); `page.keyboard.press('Escape')` fecha **e o foco volta ao botão "Novo programa"** (`await expect(page.getByRole('button', { name: /novo programa/i })).toBeFocused()`); `/admin/benefits` (toolbar + lista); `/admin/discovery`. `assertNoHorizontalOverflow` + screenshot por tela. (Ver `app-layout.spec.ts` para o padrão dos 4 projetos.)
+- [ ] **Step 4: Spec e2e.** Create `tests/e2e/admin-layout.spec.ts` reusando o `beforeEach` de tema do `app-layout.spec.ts`: login → `/admin` (StatGrid visível, sem overflow); `/admin/sources` (3 tabs `role="tab"`; desktop `.aa-side` visível + `.aa-tabbar` oculta; mobile o inverso); abrir "Novo programa" → `dialog[open]` visível; **foco preso (D12):** afirmar que o foco entrou no dialog (`dialog[open] :focus` existe); **focus-trap:** pressionar `Tab` várias vezes (ex.: 6×) e afirmar que `document.activeElement` permanece dentro de `dialog[open]` (`await expect(page.evaluate(() => document.querySelector('dialog[open]')?.contains(document.activeElement))).resolves.toBe(true)`) — comportamento nativo do `showModal()`; `page.keyboard.press('Escape')` fecha **e o foco volta ao botão "Novo programa"** (`await expect(page.getByRole('button', { name: /novo programa/i })).toBeFocused()`); `/admin/benefits` (toolbar + lista); `/admin/discovery`. `assertNoHorizontalOverflow` + screenshot por tela. (Ver `app-layout.spec.ts` para o padrão dos 4 projetos.)
 
 - [ ] **Step 5: Incluir o spec do admin no gate + rodar.** Editar `package.json`: `test:visual` passa a rodar TODO o diretório e2e — `"test:visual": "playwright test"` (assim `admin-layout.spec.ts` entra no gate junto do `app-layout.spec.ts`). Run: `npx -y supabase@2.95.0 db reset` (admin+seed limpos) e `npm run test:visual`. Expected: todos os cenários (app + admin) PASS nos 4 projetos, sem overflow.
 
