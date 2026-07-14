@@ -91,6 +91,9 @@
 .aa-itemadd { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--s2) var(--s3); }
 .aa-itemadd .input { min-width: 120px; }
 
+/* ---------- Benefícios (Task 7): origem "Misto" neutra (D6) ---------- */
+.pill.mixed { color: var(--muted); background: color-mix(in srgb, var(--muted) 14%, var(--surface)); }
+
 @container (min-width: 760px) {
   .aa-shell { display: grid; grid-template-columns: 246px minmax(0, 1fr); } /* minmax(0,…): a 2ª coluna não expande pelo mínimo intrínseco (fix Codex #3) */
   .aa-side { display: flex; flex-direction: column; gap: 6px; position: sticky; top: 0; height: 100dvh;

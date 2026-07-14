@@ -4,7 +4,24 @@ import { useSaveBenefitSources } from './useBenefitSources'
 import { useAdminSources } from '../sources/useAdminSources'
 import { BenefitForm } from './BenefitForm'
 import { BenefitLocationsEditor } from './BenefitLocationsEditor'
+import { AdminList } from '../AdminList'
+import { AdminSheet } from '../../../ui/AdminSheet'
+import { ConfirmDelete } from '../ConfirmDelete'
+import { Skeleton } from '../../../ui/Skeleton'
+import { PageState } from '../../../ui/PageState'
+import { Input } from '../../../ui/Input'
+import { Chip } from '../../../ui/Chip'
+import { useToast } from '../../../ui/Toast'
+import { CATEGORIES, type BenefitCategory } from '../../benefits/types'
 import type { BenefitInput, BenefitRow } from './types'
+
+const BENEFIT_SOURCE_LABEL = { issuer: 'Emissor', card_network: 'Bandeira', partner: 'Parceiro', mixed: 'Misto' } as const
+const BENEFIT_SOURCE_CLS = { issuer: 'iss', card_network: 'brand', partner: 'part', mixed: 'mixed' } as const
+const isNew = (createdAt: string) => Date.now() - new Date(createdAt).getTime() < 14 * 86_400_000
+const fonteNames = (b: BenefitRow) => b.benefit_sources.map((s) => s.source_items?.sources?.name).filter(Boolean).join(', ')
+const categoryLabel = (k: BenefitCategory) => CATEGORIES.find((c) => c.key === k)?.label ?? k
+
+type Editing = BenefitRow | 'new' | { id: string } | null
 
 export function AdminBenefits() {
   const { data, isLoading, error } = useAdminBenefits()
@@ -12,45 +29,129 @@ export function AdminBenefits() {
   const save = useSaveBenefit()
   const saveLinks = useSaveBenefitSources()
   const del = useDeleteBenefit()
-  const [editing, setEditing] = useState<BenefitRow | null | 'new'>(null)
+  const toast = useToast()
 
-  if (isLoading) return <p className="text-slate-500">Carregando…</p>
-  if (error) return <p className="text-red-600">Erro ao carregar benefícios.</p>
+  const [query, setQuery] = useState('')
+  const [cat, setCat] = useState<BenefitCategory | null>(null)
+  const [editing, setEditing] = useState<Editing>(null)
+  const [confirmId, setConfirmId] = useState<string | null>(null)
+
+  if (isLoading) return <Skeleton height="180px" radius="16px" />
+  if (error) return <PageState title="Não foi possível carregar os benefícios." />
+
+  const rows = data ?? []
+  const filtered = rows.filter(
+    (b) => b.title.toLowerCase().includes(query.toLowerCase()) && (!cat || b.category === cat),
+  )
 
   async function onSubmit(payload: { input: BenefitInput; sourceItemIds: string[] }) {
-    const current = editing
-    const id = current && current !== 'new' ? current.id : undefined
+    const cur = editing
+    const id = cur && cur !== 'new' ? cur.id : undefined
     const savedId = await save.mutateAsync({ ...payload.input, id })
     await saveLinks.mutateAsync({ benefitId: savedId, sourceItemIds: payload.sourceItemIds })
-    setEditing(null)
+    toast.show('Benefício salvo')
+    setEditing({ id: savedId }) // permanece aberto em modo edição; a lista reinvalida e resolve a row completa
   }
 
-  if (editing) {
-    const initial = editing === 'new' ? null : editing
-    return (
-      <div className="flex flex-col gap-3">
-        <h1 className="text-xl font-bold">{initial ? `Editar ${initial.title}` : 'Novo benefício'}</h1>
-        <BenefitForm initial={initial} sources={sources ?? []} onSubmit={onSubmit} onCancel={() => setEditing(null)} />
-        {initial && <BenefitLocationsEditor benefitId={initial.id} locations={initial.benefit_locations} />}
-      </div>
-    )
-  }
+  const resolvedRow: BenefitRow | null =
+    editing && editing !== 'new' ? rows.find((b) => b.id === editing.id) ?? null : null
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Benefícios</h1>
-        <button type="button" onClick={() => setEditing('new')} className="rounded bg-slate-800 px-3 py-2 text-sm text-white">Novo benefício</button>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--s3)' }}>
+      <div className="aa-head">
+        <div>
+          <p className="aa-eyebrow">Catálogo</p>
+          <h1 className="aa-h1">Benefícios</h1>
+        </div>
+        <button type="button" className="btn ink aa-add-txt" onClick={() => setEditing('new')}>
+          <PlusIcon /> Novo benefício
+        </button>
+        <button type="button" className="aa-add-ic" aria-label="Novo benefício" onClick={() => setEditing('new')}>
+          <PlusIcon />
+        </button>
       </div>
-      <ul className="flex flex-col gap-2">
-        {(data ?? []).map((b) => (
-          <li key={b.id} className="flex items-center gap-3 rounded-lg border border-slate-200 p-3">
-            <span className="flex-1">{b.title} <span className="text-xs text-slate-400">({b.category}{b.active ? '' : ' · inativo'})</span></span>
-            <button type="button" onClick={() => setEditing(b)} className="text-sm text-slate-600">Editar</button>
-            <button type="button" aria-label={`remover ${b.title}`} onClick={() => del.mutateAsync(b.id)} className="text-sm text-red-600">Remover</button>
-          </li>
+
+      <Input className="aa-search" placeholder="Buscar benefício" value={query} onChange={(e) => setQuery(e.target.value)} />
+      <div className="chips">
+        {CATEGORIES.map((c) => (
+          <Chip key={c.key} active={cat === c.key} onClick={() => setCat(cat === c.key ? null : c.key)}>
+            {c.emoji} {c.label}
+          </Chip>
         ))}
-      </ul>
+      </div>
+
+      <AdminList
+        ariaLabel="Benefícios"
+        rows={filtered}
+        keyOf={(b) => b.id}
+        renderRow={(b) => (
+          <>
+            <span className="aa-name">
+              {b.title}
+              {isNew(b.created_at) && <span className="new">novo</span>}
+            </span>
+            <span className="aa-meta">
+              <span className="tag">{categoryLabel(b.category)}</span>
+              {b.benefit_source && (
+                <span className={`pill ${BENEFIT_SOURCE_CLS[b.benefit_source]}`}>
+                  {BENEFIT_SOURCE_LABEL[b.benefit_source]}
+                </span>
+              )}
+              <span className="aa-fonte">{fonteNames(b)}</span>
+            </span>
+            <span className="aa-act">
+              <button type="button" aria-label={`editar ${b.title}`} onClick={() => setEditing(b)}>
+                Editar
+              </button>
+              <button type="button" aria-label={`remover ${b.title}`} onClick={() => setConfirmId(b.id)}>
+                Remover
+              </button>
+            </span>
+          </>
+        )}
+      />
+
+      <ConfirmDelete
+        open={!!confirmId}
+        title="Remover item?"
+        message="Remove também os locais e vínculos deste benefício."
+        onCancel={() => setConfirmId(null)}
+        onConfirm={async () => {
+          await del.mutateAsync(confirmId!)
+          toast.show('Benefício removido')
+          setConfirmId(null)
+        }}
+      />
+
+      <AdminSheet
+        open={!!editing}
+        title={editing === 'new' ? 'Novo benefício' : 'Editar benefício'}
+        closeOnBackdrop={false}
+        wide
+        onClose={() => setEditing(null)}
+      >
+        {editing && (
+          <BenefitForm
+            initial={resolvedRow}
+            sources={sources ?? []}
+            saving={save.isPending || saveLinks.isPending}
+            error={save.error?.message ?? null}
+            onSubmit={onSubmit}
+            onCancel={() => setEditing(null)}
+          >
+            {resolvedRow && <BenefitLocationsEditor benefitId={resolvedRow.id} locations={resolvedRow.benefit_locations} />}
+          </BenefitForm>
+        )}
+      </AdminSheet>
     </div>
+  )
+}
+
+function PlusIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
   )
 }

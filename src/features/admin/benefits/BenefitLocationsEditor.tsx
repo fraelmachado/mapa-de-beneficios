@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { Input } from '../../../ui/Input'
+import { Button } from '../../../ui/Button'
 import { useSaveBenefitLocation, useDeleteBenefitLocation } from './useBenefitLocations'
 import type { BenefitLocationRow } from './types'
 
@@ -10,6 +12,7 @@ export function BenefitLocationsEditor({ benefitId, locations }: { benefitId: st
   const [lng, setLng] = useState('')
   const [city, setCity] = useState('')
   const [uf, setUf] = useState('')
+  const [confirmingId, setConfirmingId] = useState<string | null>(null)
 
   async function add() {
     if (!name.trim() || lat === '' || lng === '') return
@@ -27,36 +30,43 @@ export function BenefitLocationsEditor({ benefitId, locations }: { benefitId: st
     setName(''); setLat(''); setLng(''); setCity(''); setUf('')
   }
 
+  async function remove(id: string) {
+    await del.mutateAsync(id)
+    setConfirmingId(null)
+  }
+
   return (
-    <div className="mt-3 rounded-lg border border-slate-100 p-3">
-      <h3 className="mb-2 text-sm font-semibold">Locais (geo)</h3>
-      <ul className="flex flex-col gap-1">
+    <div className="aa-items">
+      <h3 className="aa-fieldlbl">Locais (geo)</h3>
+      <ul className="aa-itemlist">
         {locations.map((l) => (
-          <li key={l.id} className="flex items-center gap-2 text-sm">
+          <li key={l.id} className="aa-itemrow">
             <span>{l.name}</span>
-            <span className="text-xs text-slate-400">{l.lat}, {l.lng}{l.city ? ` · ${l.city}` : ''}</span>
-            <button type="button" aria-label={`remover ${l.name}`} onClick={() => del.mutateAsync(l.id)} className="ml-auto text-red-600">×</button>
+            <span className="muted">{l.lat}, {l.lng}{l.city ? ` · ${l.city}` : ''}</span>
+            {confirmingId === l.id ? (
+              <span className="aa-act">
+                <button type="button" onClick={() => remove(l.id)}>Confirmar?</button>
+                <button type="button" onClick={() => setConfirmingId(null)}>Cancelar</button>
+              </span>
+            ) : (
+              <button type="button" aria-label={`remover ${l.name}`} onClick={() => setConfirmingId(l.id)} className="aa-itemdel">×</button>
+            )}
           </li>
         ))}
-        {locations.length === 0 && <li className="text-xs text-slate-400">Nenhum local.</li>}
+        {locations.length === 0 && <li className="muted">Nenhum local.</li>}
       </ul>
-      <div className="mt-3 flex flex-wrap items-end gap-2">
-        <label className="text-xs">Nome do local
-          <input aria-label="nome do local" value={name} onChange={(e) => setName(e.target.value)} className="block rounded border px-2 py-1" />
-        </label>
-        <label className="text-xs">lat
-          <input aria-label="lat" value={lat} onChange={(e) => setLat(e.target.value)} className="block w-24 rounded border px-2 py-1" />
-        </label>
-        <label className="text-xs">lng
-          <input aria-label="lng" value={lng} onChange={(e) => setLng(e.target.value)} className="block w-24 rounded border px-2 py-1" />
-        </label>
-        <label className="text-xs">cidade
-          <input aria-label="cidade" value={city} onChange={(e) => setCity(e.target.value)} className="block rounded border px-2 py-1" />
-        </label>
-        <label className="text-xs">uf
-          <input aria-label="uf" value={uf} onChange={(e) => setUf(e.target.value)} className="block w-16 rounded border px-2 py-1" />
-        </label>
-        <button type="button" onClick={add} className="rounded bg-slate-700 px-3 py-1 text-sm text-white">Adicionar local</button>
+      <div className="aa-itemadd">
+        <label className="aa-fieldlbl" htmlFor="bl-name">nome do local</label>
+        <Input id="bl-name" ariaLabel="nome do local" value={name} onChange={(e) => setName(e.target.value)} />
+        <label className="aa-fieldlbl" htmlFor="bl-lat">lat</label>
+        <Input id="bl-lat" ariaLabel="lat" value={lat} onChange={(e) => setLat(e.target.value)} />
+        <label className="aa-fieldlbl" htmlFor="bl-lng">lng</label>
+        <Input id="bl-lng" ariaLabel="lng" value={lng} onChange={(e) => setLng(e.target.value)} />
+        <label className="aa-fieldlbl" htmlFor="bl-city">cidade</label>
+        <Input id="bl-city" ariaLabel="cidade" value={city} onChange={(e) => setCity(e.target.value)} />
+        <label className="aa-fieldlbl" htmlFor="bl-uf">uf</label>
+        <Input id="bl-uf" ariaLabel="uf" value={uf} onChange={(e) => setUf(e.target.value)} />
+        <Button variant="ink" onClick={add}>Adicionar local</Button>
       </div>
     </div>
   )

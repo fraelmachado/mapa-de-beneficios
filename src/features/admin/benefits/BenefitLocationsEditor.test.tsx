@@ -21,7 +21,7 @@ beforeEach(() => {
 })
 
 describe('BenefitLocationsEditor', () => {
-  it('lista, adiciona e remove locais', async () => {
+  it('lista e adiciona um local', async () => {
     render(<BenefitLocationsEditor benefitId="b1" locations={locations} />)
     expect(screen.getByText('GRU T2')).toBeInTheDocument()
     fireEvent.change(screen.getByLabelText(/nome do local/i), { target: { value: 'Loja Centro' } })
@@ -29,7 +29,21 @@ describe('BenefitLocationsEditor', () => {
     fireEvent.change(screen.getByLabelText(/^lng/i), { target: { value: '-46.6' } })
     fireEvent.click(screen.getByRole('button', { name: /adicionar local/i }))
     await waitFor(() => expect(saveLoc).toHaveBeenCalledWith(expect.objectContaining({ benefit_id: 'b1', name: 'Loja Centro', lat: -23.5, lng: -46.6 })))
+  })
+
+  it('remove um local — confirmação inline (D11), não deleta no 1º clique', async () => {
+    render(<BenefitLocationsEditor benefitId="b1" locations={locations} />)
     fireEvent.click(screen.getByRole('button', { name: /remover GRU T2/i }))
+    expect(delLoc).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: /confirmar/i }))
     await waitFor(() => expect(delLoc).toHaveBeenCalledWith('l1'))
+  })
+
+  it('Cancelar no confirm inline não deleta', () => {
+    render(<BenefitLocationsEditor benefitId="b1" locations={locations} />)
+    fireEvent.click(screen.getByRole('button', { name: /remover GRU T2/i }))
+    fireEvent.click(screen.getByRole('button', { name: /cancelar/i }))
+    expect(delLoc).not.toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: /remover GRU T2/i })).toBeInTheDocument()
   })
 })
