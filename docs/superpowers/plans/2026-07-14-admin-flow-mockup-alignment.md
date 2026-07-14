@@ -185,7 +185,9 @@ if (typeof HTMLDialogElement !== 'undefined' && !HTMLDialogElement.prototype.sho
 }
 ```
 
-- [ ] **Step 10: Build + commit.** Run: `npx vitest run src/features/admin/discovery && npm run build` (build DEVE passar isolado — `BenefitInput` corrigido garante isso). Commit:
+- [ ] **Step 9.5: Atualizar fixtures existentes p/ o build fechar isolado (fix Codex).** Como `rejection_reason`/`benefit_source`/`created_at` viram campos obrigatórios do tipo e o `tsconfig` inclui todo `src`, patchar as fixtures tipadas já existentes ANTES do build: em `src/features/admin/discovery/CandidateTree.test.tsx` adicionar `rejection_reason: null` ao candidato da fixture; em `src/features/admin/benefits/AdminBenefits.test.tsx` adicionar `benefit_source: null, created_at: new Date().toISOString()` e ajustar cada item de `benefit_sources` para incluir `source_items: null`. (Tasks 6/7 reescrevem esses testes; aqui é só manter o build verde.)
+
+- [ ] **Step 10: Build + commit.** Run: `npx vitest run src/features/admin/discovery && npm run build` (build DEVE passar isolado — `BenefitInput` corrigido + fixtures patchadas garantem isso). Commit:
 ```bash
 git add supabase/migrations/0017_discovery_rejection_reason.sql src/features/admin/discovery/ src/features/admin/benefits/ src/lib/database.types.ts src/ui/ds.css src/test-setup.ts
 git commit -m "feat(admin): data foundation — rejection_reason, source-candidate/subtree hooks, benefit SELECT, tokens, dialog polyfill"
@@ -195,7 +197,7 @@ git commit -m "feat(admin): data foundation — rejection_reason, source-candida
 
 ## Task 2: Primitivos estendidos + AdminSheet + Toast + ConfirmDelete
 
-**Files:** Modify `src/ui/{Button,Input,SegmentedControl}.tsx`; Create `src/ui/AdminSheet.tsx` (+test), `src/ui/Toast.tsx` (+test), `src/features/admin/ConfirmDelete.tsx` (+test), `src/features/admin/admin.css` (base do overlay).
+**Files:** Modify `src/ui/{Button,Input,SegmentedControl}.tsx`, `src/index.css` (import do admin.css); Create `src/ui/AdminSheet.tsx` (+test), `src/ui/Toast.tsx` (+test), `src/features/admin/ConfirmDelete.tsx` (+test), `src/features/admin/admin.css` (base do overlay).
 
 **Interfaces (Produces):** `Button` aceita `className?`,`ariaLabel?`; `Input` aceita `id?`,`required?`,`disabled?`,`className?`; `SegmentedOption` aceita `count?:number`; `<AdminSheet open title onClose wide? closeOnBackdrop?>`; `useToast()`+`<ToastHost/>`; `<ConfirmDelete open title message onConfirm onCancel/>`.
 
@@ -268,7 +270,7 @@ export function AdminSheet({ open, title, onClose, wide, closeOnBackdrop = true,
 ```
 Run → PASS. (Foco-preso/Escape reais ficam pro Playwright — D12.)
 
-- [ ] **Step 6: CSS base do overlay.** Create `src/features/admin/admin.css` com o bloco de `.aa-dialog`/backdrop (importado em `src/index.css`):
+- [ ] **Step 6: CSS base do overlay + carregar o CSS.** Adicionar `@import './features/admin/admin.css';` em `src/index.css` (junto dos outros `@import` de feature). Create `src/features/admin/admin.css` com o bloco de `.aa-dialog`/backdrop:
 ```css
 .aa-dialog { border: 0; padding: 20px; max-width: 100%; width: 100%; background: var(--surface); color: var(--ink);
   border-radius: 22px 22px 0 0; margin: auto auto 0; box-shadow: var(--shadow-lg); }
@@ -276,7 +278,7 @@ Run → PASS. (Foco-preso/Escape reais ficam pro Playwright — D12.)
 .aa-grip { width: 40px; height: 4px; border-radius: 999px; background: var(--line); margin: 0 auto 12px; }
 .aa-dialog-title { margin: 0 0 12px; font-size: 18px; font-weight: 800; letter-spacing: -.02em; }
 .aa-dialog-actions { display: flex; gap: 10px; margin-top: 16px; }
-.btn.danger { background: var(--warn); color: #fff; }
+.btn.danger { background: var(--warn); color: var(--accent-ink); }
 @container (min-width: 760px) {
   .aa-dialog { width: 440px; border-radius: 20px; margin: auto; }
   .aa-dialog.aa-wide { width: 520px; }
@@ -415,8 +417,10 @@ Create `StatGrid.tsx`: `<div className="aa-statgrid">{stats.map(s => <div classN
   background: var(--accent); color: var(--accent-ink); font-size: 11px; font-weight: 800;
   display: inline-grid; place-items: center; }
 .aa-list { display: flex; flex-direction: column; gap: 8px; }
-.aa-lrow { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; align-items: center;
+.aa-lrow { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px 12px; align-items: center; min-width: 0;
   padding: 12px 13px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow); }
+.aa-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.aa-meta, .aa-robo, .aa-fonte { min-width: 0; }
 .aa-statgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .aa-stat { padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
 .aa-stat-v { font-size: 26px; font-weight: 800; letter-spacing: -.03em; color: var(--ink); }
@@ -432,8 +436,8 @@ Create `StatGrid.tsx`: `<div className="aa-statgrid">{stats.map(s => <div classN
   .aa-brand { padding: 8px 12px 16px; font-weight: 800; }
   .aa-tabbar { display: none; }
   .aa-main { padding: 32px 40px; max-width: none; }
-  .aa-list { gap: 0; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--surface); }
-  .aa-lrow { grid-template-columns: minmax(0,1fr) 150px 110px 170px; border: 0; border-radius: 0;
+  .aa-list { gap: 0; border: 1px solid var(--line); border-radius: 16px; overflow-x: auto; background: var(--surface); }
+  .aa-lrow { grid-template-columns: minmax(0,1fr) minmax(0,150px) minmax(0,110px) minmax(0,170px); min-width: 0; border: 0; border-radius: 0;
     border-bottom: 1px solid var(--line); box-shadow: none; }
   .aa-statgrid { grid-template-columns: repeat(4, 1fr); }
 }
@@ -630,7 +634,8 @@ Run → FAIL.
 
 - [ ] **Step 2: Abas Pendentes/Rejeitados.** Na `AdminSources`, para `tab==='pending'|'rejected'`:
   - Se `useSourceCandidates(tab).error` → `<PageState title="Discovery indisponível" />` (D13, não quebra).
-  - `<AdminList ariaLabel={...} rows={cands} keyOf={c=>c.id} renderRow={c => (<><span className="aa-name">{c.payload.name ?? c.fingerprint}</span><span className="aa-robo">{hostOf(c.provenance.source_url)} · visto há {relTime(c.created_at)}{c.provenance.verification_status ? <span className="pill">{c.provenance.verification_status}</span> : null}</span><span className="aa-act">{tab==='pending' ? (<><button onClick={()=>navigate(`/admin/discovery?fp=${c.fingerprint}`)}>Revisar</button><button onClick={()=>setRejecting(c.id)}>Rejeitar</button></>) : (<><span className="aa-reason">{c.rejection_reason}</span><button onClick={()=>reconsider.mutate({candidateId:c.id})}>Reconsiderar</button></>)}</span></>)} />`
+  - Acessar `payload`/`provenance` (que são `Record<string, unknown>`) via acessores tipados no topo do arquivo: `const pname = (c: DiscoveryCandidate) => (c.payload as { name?: string }).name ?? c.fingerprint`; `const psrc = (c: DiscoveryCandidate) => (c.provenance as { source_url?: string }).source_url ?? ''`; `const pverif = (c: DiscoveryCandidate) => (c.provenance as { verification_status?: string }).verification_status`. Copy conforme D5: **"visto pela 1ª vez há"**.
+  - `<AdminList ariaLabel={...} rows={cands} keyOf={c=>c.id} renderRow={c => (<><span className="aa-name">{pname(c)}</span><span className="aa-robo">{hostOf(psrc(c))} · visto pela 1ª vez há {relTime(c.created_at)}{pverif(c) ? <span className="pill">{pverif(c)}</span> : null}</span><span className="aa-act">{tab==='pending' ? (<><button onClick={()=>navigate(`/admin/discovery?fp=${c.fingerprint}`)}>Revisar</button><button onClick={()=>setRejecting(c.id)}>Rejeitar</button></>) : (<><span className="aa-reason">{c.rejection_reason}</span><button onClick={()=>reconsider.mutate({candidateId:c.id})}>Reconsiderar</button></>)}</span></>)} />`
   - `hostOf`/`relTime` = helpers locais puros (com teste unitário simples).
   - `<RejectDialog open={!!rejecting} onClose={()=>setRejecting(null)} onConfirm={(reason)=>{ reject.mutate({candidateId:rejecting!, reason}); setRejecting(null) }} />`.
 
@@ -664,7 +669,8 @@ const fonteNames = (b: BenefitRow) => b.benefit_sources.map((s) => s.source_item
 //   <span className="aa-fonte">{fonteNames(b)}</span></span>
 //   <span className="aa-act"><button aria-label={`editar ${b.title}`} onClick={()=>setEditing(b)}>Editar</button>
 //   <button aria-label={`remover ${b.title}`} onClick={()=>setConfirmId(b.id)}>Remover</button></span></>)} />
-// <ConfirmDelete .../> e <AdminSheet open={!!editing} closeOnBackdrop={false} wide title=…><BenefitForm .../></AdminSheet>
+// <ConfirmDelete open={!!confirmId} title="Remover item?" message="Remove também os locais e vínculos deste benefício." onCancel=… onConfirm=… /> (D11: aviso de cascade)
+// e <AdminSheet open={!!editing} closeOnBackdrop={false} wide title=…><BenefitForm .../></AdminSheet>
 ```
 `categoryLabel` reusa `CATEGORIES` de `benefits/types`. `.pill.mixed` novo no `admin.css`: `.pill.mixed { color: var(--muted); background: color-mix(in srgb, var(--muted) 14%, var(--surface)); }` (D6 — estilo neutro pro Misto).
 
@@ -676,7 +682,7 @@ const fonteNames = (b: BenefitRow) => b.benefit_sources.map((s) => s.source_item
 
 ## Task 8: Gate visual Playwright do admin + global-setup
 
-**Files:** Modify `playwright.config.ts`, `tests/e2e/app-layout.spec.ts` (extrair helper); Create `tests/e2e/helpers.ts`, `tests/e2e/global-setup.ts`, `tests/e2e/admin.helpers.ts`, `tests/e2e/admin-layout.spec.ts`.
+**Files:** Modify `playwright.config.ts`, `package.json` (script `test:visual`), `tests/e2e/app-layout.spec.ts` (extrair helper); Create `tests/e2e/helpers.ts`, `tests/e2e/global-setup.ts`, `tests/e2e/admin.helpers.ts`, `tests/e2e/admin-layout.spec.ts`.
 
 - [ ] **Step 1: Extrair helper compartilhado.** Create `tests/e2e/helpers.ts`:
 ```ts
@@ -713,6 +719,10 @@ export default async function globalSetup() {
     }
   }
   if (!id) throw new Error('global-setup: não foi possível resolver o usuário admin')
+  if (!created.data?.user?.id) { // já existia: garante a senha conhecida (idempotência entre execuções)
+    const pw = await admin.auth.admin.updateUserById(id, { password: ADMIN_PASSWORD })
+    if (pw.error) throw pw.error
+  }
   const upd = await admin.from('profiles').update({ is_admin: true }).eq('id', id)
   if (upd.error) throw upd.error
 }
@@ -732,9 +742,9 @@ export async function loginAdmin(page: Page) {
 }
 ```
 
-- [ ] **Step 4: Spec e2e.** Create `tests/e2e/admin-layout.spec.ts` reusando o `beforeEach` de tema do `app-layout.spec.ts`: login → `/admin` (StatGrid visível, sem overflow); `/admin/sources` (3 tabs `role="tab"`; desktop `.aa-side` visível + `.aa-tabbar` oculta; mobile o inverso); abrir "Novo programa" → `dialog[open]` visível, `page.keyboard.press('Escape')` fecha (D12); `/admin/benefits` (toolbar + lista); `/admin/discovery`. `assertNoHorizontalOverflow` + screenshot por tela. (Ver `app-layout.spec.ts` para o padrão dos 4 projetos.)
+- [ ] **Step 4: Spec e2e.** Create `tests/e2e/admin-layout.spec.ts` reusando o `beforeEach` de tema do `app-layout.spec.ts`: login → `/admin` (StatGrid visível, sem overflow); `/admin/sources` (3 tabs `role="tab"`; desktop `.aa-side` visível + `.aa-tabbar` oculta; mobile o inverso); abrir "Novo programa" → `dialog[open]` visível; **foco preso (D12):** afirmar que o foco entrou no dialog (`await expect(page.locator('dialog[open]')).toBeFocused()` ou que `dialog[open] :focus` existe); `page.keyboard.press('Escape')` fecha **e o foco volta ao botão "Novo programa"** (`await expect(page.getByRole('button', { name: /novo programa/i })).toBeFocused()`); `/admin/benefits` (toolbar + lista); `/admin/discovery`. `assertNoHorizontalOverflow` + screenshot por tela. (Ver `app-layout.spec.ts` para o padrão dos 4 projetos.)
 
-- [ ] **Step 5: Rodar o gate.** Run: `npx -y supabase@2.95.0 db reset` (garante admin+seed limpos) e `npm run test:visual`. Expected: todos os cenários (app + admin) PASS nos 4 projetos, sem overflow.
+- [ ] **Step 5: Incluir o spec do admin no gate + rodar.** Editar `package.json`: `test:visual` passa a rodar TODO o diretório e2e — `"test:visual": "playwright test"` (assim `admin-layout.spec.ts` entra no gate junto do `app-layout.spec.ts`). Run: `npx -y supabase@2.95.0 db reset` (admin+seed limpos) e `npm run test:visual`. Expected: todos os cenários (app + admin) PASS nos 4 projetos, sem overflow.
 
 - [ ] **Step 6: Commit.** `git add playwright.config.ts tests/e2e/ && git commit -m "test(admin): e2e visual gate + idempotent admin global-setup across 4 projects"`
 
@@ -744,5 +754,5 @@ export async function loginAdmin(page: Page) {
 - **Ordem obrigatória:** 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8. Cada task fecha com build verde isolado.
 - **Cada task roda `npm run build`** (único type-check).
 - **`supabase db reset`** entre execuções se testes de integração poluírem o catálogo local.
-- **Migrations 0014–0017** entram em prod só no deploy `develop→main` (D13) — fora do escopo deste plano; UI degrada com graça se ausentes.
+- **Migrations 0014–0017 (D13) — checklist de release `develop→main`:** a implementação (código/UI) está no escopo deste plano; a **aplicação das migrations em produção** é um passo obrigatório do deploy `develop→main` (aplicar 0014, 0015, 0016, 0017 no Supabase de prod ANTES/junto do deploy do `web`). Enquanto não aplicadas, a UI degrada com graça (abas de discovery mostram "indisponível", sem quebrar). Registrar este checklist no PR/deploy de Spec 2.
 - **Cobertura D1–D14:** D1/D2/D3/D5 (T1+T6), D4 (T1+T6), D6 (T1+T7, incl. `.pill.mixed`), D7 (T5+T7), D8 (T1+T4+T7), D9 (T3 CSS concreto), D10 (T2 AdminSheet+AdminNav próprio), D11 (T2 ConfirmDelete + confirm inline em T5/T7), D12 (T8 Playwright + polyfill T1), D13 (degradação em T3/T5/T6), D14 (T1 tokens).
