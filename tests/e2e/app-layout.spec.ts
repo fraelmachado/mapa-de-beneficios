@@ -1,12 +1,5 @@
-import { test, expect, type Page } from '@playwright/test'
-
-async function assertNoHorizontalOverflow(page: Page) {
-  const dimensions = await page.evaluate(() => ({
-    scroll: document.documentElement.scrollWidth,
-    client: document.documentElement.clientWidth,
-  }))
-  expect(dimensions.scroll).toBeLessThanOrEqual(dimensions.client)
-}
+import { test, expect } from '@playwright/test'
+import { assertNoHorizontalOverflow } from './helpers'
 
 test.beforeEach(async ({ page }, testInfo) => {
   const dark = testInfo.project.name.endsWith('dark')

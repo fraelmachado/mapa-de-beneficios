@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test": "vitest run --exclude 'tests/e2e/**'",
     "test:e2e": "playwright test",
-    "test:visual": "playwright test tests/e2e/app-layout.spec.ts",
+    "test:visual": "playwright test",
     "test:watch": "vitest",
     "gen:types": "npx -y supabase@2.95.0 gen types typescript --local > src/lib/database.types.ts",
     "discover": "npx tsx scripts/discovery/discover.ts"
