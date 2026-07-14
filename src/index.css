@@ -6,6 +6,7 @@
 @import './features/detalhe/benefit-detail.css';
 @import './features/perfil/perfil.css';
 @import './features/alertas/alertas.css';
+@import './features/admin/admin.css';
 
 @tailwind base;
 @tailwind components;

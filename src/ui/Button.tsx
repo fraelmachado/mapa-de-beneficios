@@ -9,6 +9,8 @@ export interface ButtonProps {
   onClick?: (e: React.MouseEvent) => void
   /** Ícone opcional à esquerda do rótulo. */
   icon?: React.ReactNode
+  className?: string
+  ariaLabel?: string
 }
 
 export function Button({
@@ -18,10 +20,14 @@ export function Button({
   type = 'button',
   onClick,
   icon,
+  className,
+  ariaLabel,
 }: ButtonProps) {
-  const cls = 'btn' + (variant === 'ink' ? ' ink' : variant === 'ghost' ? ' ghost' : '')
+  const cls = ['btn', variant === 'ink' ? 'ink' : variant === 'ghost' ? 'ghost' : '', className]
+    .filter(Boolean)
+    .join(' ')
   return (
-    <button className={cls} type={type} disabled={disabled} onClick={onClick}>
+    <button className={cls} type={type} disabled={disabled} onClick={onClick} aria-label={ariaLabel}>
       {icon ?? null}
       {children}
     </button>

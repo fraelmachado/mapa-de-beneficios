@@ -1,6 +1,7 @@
 export interface SegmentedOption {
   label: string
   value: string
+  count?: number
 }
 
 export interface SegmentedControlProps {
@@ -24,6 +25,7 @@ export function SegmentedControl({ options = [], value, onChange, ariaLabel }: S
           onClick={onChange ? () => onChange(opt.value) : undefined}
         >
           {opt.label}
+          {typeof opt.count === 'number' ? <span className="n">{opt.count}</span> : null}
         </button>
       ))}
     </div>

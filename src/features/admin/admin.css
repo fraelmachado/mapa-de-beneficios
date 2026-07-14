@@ -1,0 +1,20 @@
+.aa-dialog { border: 0; padding: 20px; max-width: 100%; width: 100%; background: var(--surface); color: var(--ink);
+  border-radius: 22px 22px 0 0; margin: auto auto 0; box-shadow: var(--shadow-lg); }
+.aa-dialog::backdrop { background: var(--admin-backdrop); }
+.aa-grip { width: 40px; height: 4px; border-radius: 999px; background: var(--line); margin: 0 auto 12px; }
+.aa-dialog-title { margin: 0 0 12px; font-size: 18px; font-weight: 800; letter-spacing: -.02em; }
+.aa-dialog-actions { display: flex; gap: 10px; margin-top: 16px; }
+/* Botão destrutivo com contraste AA (≥4.5:1) nos dois temas — não usar --warn+--accent-ink (fix Codex #8). */
+.btn.danger { background: var(--admin-danger-bg); color: var(--admin-danger-ink); }
+@container (min-width: 760px) {
+  .aa-dialog { width: 440px; border-radius: 20px; margin: auto; }
+  .aa-dialog.aa-wide { width: 520px; }
+  .aa-grip { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) { .aa-dialog[open] { animation: aa-in .18s var(--ease); } }
+@keyframes aa-in { from { opacity: 0; transform: translateY(8px); } }
+
+.aa-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 1000;
+  background: var(--ink); color: var(--surface); border-radius: var(--r-sm); padding: 12px 18px;
+  font-size: 13.5px; font-weight: 600; box-shadow: var(--shadow-lg); max-width: calc(100% - 32px); }
+@media (prefers-reduced-motion: no-preference) { .aa-toast { animation: aa-in .18s var(--ease); } }
