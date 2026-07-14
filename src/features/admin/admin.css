@@ -1,3 +1,8 @@
+.aa-login { min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: 24px;
+  background: radial-gradient(circle at 50% -10%, color-mix(in srgb, var(--accent) 16%, transparent), var(--bg) 60%); }
+.aa-login-card { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: var(--s3);
+  padding: 28px 24px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: var(--shadow-lg); }
+.aa-login-foot { margin: 0; text-align: center; font-size: 12px; }
 .aa-dialog { border: 0; padding: 20px; max-width: 100%; width: 100%; background: var(--surface); color: var(--ink);
   border-radius: 22px 22px 0 0; margin: auto auto 0; box-shadow: var(--shadow-lg); }
 .aa-dialog::backdrop { background: var(--admin-backdrop); }
@@ -43,6 +48,14 @@
 .aa-stat { padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
 .aa-stat-v { font-size: 26px; font-weight: 800; letter-spacing: -.03em; color: var(--ink); }
 .aa-stat-k { margin-top: 2px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.aa-eyebrow { margin: 0 0 2px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.aa-h1 { font-size: var(--fz-h1); font-weight: 700; letter-spacing: -.03em; margin: 0; }
+.aa-areagrid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.aa-area { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 16px;
+  border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow);
+  color: inherit; text-decoration: none; font-weight: 600; }
+.aa-area:hover { border-color: var(--ink); }
+.aa-area:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @container (min-width: 760px) {
   .aa-shell { display: grid; grid-template-columns: 246px minmax(0, 1fr); } /* minmax(0,…): a 2ª coluna não expande pelo mínimo intrínseco (fix Codex #3) */
   .aa-side { display: flex; flex-direction: column; gap: 6px; position: sticky; top: 0; height: 100dvh;
@@ -58,4 +71,5 @@
   .aa-lrow { grid-template-columns: minmax(0,1fr) minmax(0,150px) minmax(0,110px) minmax(0,170px); min-width: 0; border: 0; border-radius: 0;
     border-bottom: 1px solid var(--line); box-shadow: none; }
   .aa-statgrid { grid-template-columns: repeat(4, 1fr); }
+  .aa-areagrid { grid-template-columns: 1fr 1fr; }
 }
