@@ -29,9 +29,11 @@ export interface BenefitRow {
   action_url: string | null
   action_label: string | null
   active: boolean
-  benefit_sources: { source_item_id: string }[]
+  benefit_source: 'issuer' | 'card_network' | 'partner' | 'mixed' | null
+  created_at: string
+  benefit_sources: { source_item_id: string; source_items: { sources: { name: string } | null } | null }[]
   benefit_locations: BenefitLocationRow[]
 }
 
-export type BenefitInput = Omit<BenefitRow, 'id' | 'benefit_sources' | 'benefit_locations'>
+export type BenefitInput = Omit<BenefitRow, 'id' | 'benefit_sources' | 'benefit_locations' | 'benefit_source' | 'created_at'>
 export type BenefitLocationInput = Omit<BenefitLocationRow, 'id'>

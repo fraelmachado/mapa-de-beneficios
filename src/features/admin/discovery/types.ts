@@ -21,6 +21,7 @@ export interface DiscoveryCandidate {
   match_status: DiscoveryMatchStatus
   matched_id: string | null
   review_status: DiscoveryReviewStatus
+  rejection_reason: string | null
   promoted_id: string | null
   created_at: string
 }

@@ -64,6 +64,15 @@
 
   /* tipografia base */
   --font: 'Onest', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+
+  /* admin chrome (sidebar escura fixa nos dois temas) */
+  --admin-side-bg: #0f1013;
+  --admin-side-ink: #e7e8ec;
+  --admin-side-hover: #1b1d22;
+  --admin-line: var(--line);
+  --admin-backdrop: color-mix(in srgb, #0f1013 46%, transparent);
+  --admin-danger-bg: #b42318;   /* branco sobre este vermelho = ~6:1 (AA) nos dois temas */
+  --admin-danger-ink: #ffffff;
 }
 
 /* ---------- Dark mode ----------
@@ -85,6 +94,15 @@
   --warn-line: #4A3A1E;
   --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 30px -18px rgba(0,0,0,.7);
   --shadow-lg: 0 2px 8px rgba(0,0,0,.5), 0 28px 56px -28px rgba(0,0,0,.8);
+
+  /* admin chrome (sidebar escura fixa nos dois temas) */
+  --admin-side-bg: #0f1013;
+  --admin-side-ink: #e7e8ec;
+  --admin-side-hover: #1b1d22;
+  --admin-line: var(--line);
+  --admin-backdrop: color-mix(in srgb, #0f1013 46%, transparent);
+  --admin-danger-bg: #b42318;
+  --admin-danger-ink: #ffffff;
 }
 
 /* ---------- Reset / base ---------- */

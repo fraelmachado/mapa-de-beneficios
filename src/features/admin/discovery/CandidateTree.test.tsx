@@ -6,7 +6,7 @@ import type { DiscoveryCandidate } from './types'
 const base = (over: Partial<DiscoveryCandidate>): DiscoveryCandidate => ({
   id: 'x', job_id: 'j', entity_type: 'source', fingerprint: 'fp', parent_fingerprint: null,
   payload: {}, provenance: {}, match_status: 'new', matched_id: null, review_status: 'pending',
-  promoted_id: null, created_at: '', ...over,
+  rejection_reason: null, promoted_id: null, created_at: '', ...over,
 })
 
 const tree: DiscoveryCandidate[] = [

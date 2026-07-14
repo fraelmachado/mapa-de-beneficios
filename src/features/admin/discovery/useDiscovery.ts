@@ -54,21 +54,39 @@ export function usePromoteCandidate(jobId: string | null) {
       qc.invalidateQueries({ queryKey: ['discovery_candidates', jobId] })
       qc.invalidateQueries({ queryKey: ['admin_benefits'] })
       qc.invalidateQueries({ queryKey: ['admin_sources'] })
+      qc.invalidateQueries({ queryKey: ['candidate_subtree'] })
+      qc.invalidateQueries({ queryKey: ['source_candidates'] })
     },
   })
 }
 
-export function useRejectCandidate(jobId: string | null) {
+export function useRejectCandidate() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (candidateId: string) => {
-      const { error } = await supabase
-        .from('discovery_candidates')
-        .update({ review_status: 'rejected' } as never)
-        .eq('id', candidateId)
+    mutationFn: async ({ candidateId, reason }: { candidateId: string; reason: string }) => {
+      const { error } = await supabase.from('discovery_candidates')
+        .update({ review_status: 'rejected', rejection_reason: reason } as never).eq('id', candidateId)
       if (error) throw error
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['discovery_candidates', jobId] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['source_candidates'] })
+      qc.invalidateQueries({ queryKey: ['discovery_candidates'] })
+      qc.invalidateQueries({ queryKey: ['candidate_subtree'] })
+    },
+  })
+}
+export function useReconsiderCandidate() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ candidateId }: { candidateId: string }) => {
+      const { error } = await supabase.from('discovery_candidates')
+        .update({ review_status: 'pending', rejection_reason: null } as never).eq('id', candidateId)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['source_candidates'] })
+      qc.invalidateQueries({ queryKey: ['discovery_candidates'] })
+    },
   })
 }
 

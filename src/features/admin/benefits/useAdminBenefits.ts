@@ -3,7 +3,7 @@ import { supabase } from '../../../lib/supabase'
 import type { BenefitInput, BenefitRow } from './types'
 
 const SELECT =
-  'id, title, summary, category, scope, uf, steps, partner_name, valid_until, image_url, action_url, action_label, active, benefit_sources(source_item_id), benefit_locations(id, benefit_id, name, lat, lng, address, city, uf, radius_m, active)'
+  'id, title, summary, category, scope, uf, steps, partner_name, valid_until, image_url, action_url, action_label, active, benefit_source, created_at, benefit_sources(source_item_id, source_items(sources(name))), benefit_locations(id, benefit_id, name, lat, lng, address, city, uf, radius_m, active)'
 
 export function useAdminBenefits() {
   return useQuery({

@@ -305,6 +305,7 @@ export type Database = {
           promoted_at: string | null
           promoted_id: string | null
           provenance: Json
+          rejection_reason: string | null
           review_status: Database["public"]["Enums"]["discovery_review_status"]
           reviewed_by: string | null
         }
@@ -321,6 +322,7 @@ export type Database = {
           promoted_at?: string | null
           promoted_id?: string | null
           provenance?: Json
+          rejection_reason?: string | null
           review_status?: Database["public"]["Enums"]["discovery_review_status"]
           reviewed_by?: string | null
         }
@@ -337,6 +339,7 @@ export type Database = {
           promoted_at?: string | null
           promoted_id?: string | null
           provenance?: Json
+          rejection_reason?: string | null
           review_status?: Database["public"]["Enums"]["discovery_review_status"]
           reviewed_by?: string | null
         }

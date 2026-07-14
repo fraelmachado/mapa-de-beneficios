@@ -13,7 +13,7 @@ export function AdminDiscovery() {
   const [selected, setSelected] = useState<string | null>(null)
   const candidates = useJobCandidates(selected)
   const promote = usePromoteCandidate(selected)
-  const reject = useRejectCandidate(selected)
+  const reject = useRejectCandidate()
 
   const jobList = jobs.data ?? []
   const selectedJob = jobList.find((j) => j.id === selected) ?? null
@@ -79,7 +79,7 @@ export function AdminDiscovery() {
             <CandidateTree
               candidates={candidates.data ?? []}
               onPromote={(id) => promote.mutate(id)}
-              onReject={(id) => reject.mutate(id)}
+              onReject={(id) => reject.mutate({ candidateId: id, reason: '' })}
             />
           )}
         </>
