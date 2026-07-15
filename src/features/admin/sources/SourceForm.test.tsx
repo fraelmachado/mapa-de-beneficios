@@ -24,4 +24,13 @@ describe('SourceForm', () => {
       }),
     )
   })
+
+  it('saving desabilita o Salvar (anti duplo-submit) e saveError mostra alerta', () => {
+    const { rerender } = render(<SourceForm initial={null} onSubmit={vi.fn()} onCancel={() => {}} saving />)
+    expect(screen.getByRole('button', { name: /salvando/i })).toBeDisabled()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    rerender(<SourceForm initial={null} onSubmit={vi.fn()} onCancel={() => {}} saveError />)
+    expect(screen.getByRole('alert')).toHaveTextContent(/não foi possível salvar/i)
+    expect(screen.getByRole('button', { name: /^salvar$/i })).toBeEnabled()
+  })
 })

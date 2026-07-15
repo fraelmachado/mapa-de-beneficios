@@ -13,10 +13,14 @@ export function SourceForm({
   initial,
   onSubmit,
   onCancel,
+  saving = false,
+  saveError = false,
 }: {
   initial: SourceRow | null
   onSubmit: (input: SourceInput) => void
   onCancel: () => void
+  saving?: boolean
+  saveError?: boolean
 }) {
   const [name, setName] = useState(initial?.name ?? '')
   const [kind, setKind] = useState<SourceKind>(initial?.kind ?? 'card')
@@ -93,9 +97,15 @@ export function SourceForm({
         <Input id="s-country" value={country} onChange={(e) => setCountry(e.target.value)} />
       </details>
 
+      {saveError && (
+        <p role="alert" style={{ color: 'var(--warn)', fontSize: 14, margin: 'var(--s2) 0 0' }}>
+          Não foi possível salvar. Tente de novo.
+        </p>
+      )}
+
       <div className="aa-dialog-actions">
-        <Button variant="ghost" type="button" onClick={onCancel}>Cancelar</Button>
-        <Button variant="ink" type="submit">Salvar</Button>
+        <Button variant="ghost" type="button" onClick={onCancel} disabled={saving}>Cancelar</Button>
+        <Button variant="ink" type="submit" disabled={saving}>{saving ? 'Salvando…' : 'Salvar'}</Button>
       </div>
     </form>
   )

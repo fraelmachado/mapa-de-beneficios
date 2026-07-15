@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAdminSources, useSaveSource, useDeleteSource } from './useAdminSources'
 import { useSourceCandidates } from '../discovery/useSourceCandidates'
 import { useRejectCandidate, useReconsiderCandidate } from '../discovery/useDiscovery'
+import { verificationLabel } from '../discovery/discoveryMeta'
 import { SourceForm } from './SourceForm'
 import { SourceItemsEditor } from './SourceItemsEditor'
 import { RejectDialog } from './RejectDialog'
@@ -57,6 +58,7 @@ export function AdminSources() {
   const [editing, setEditing] = useState<Editing>(null)
   const [confirmId, setConfirmId] = useState<string | null>(null)
   const [rejecting, setRejecting] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState(false)
 
   if (isLoading) return <Skeleton height="180px" radius="16px" />
   if (error) return <PageState title="Não foi possível carregar os programas." />
@@ -64,10 +66,15 @@ export function AdminSources() {
   const rows = data ?? []
 
   async function onSubmit(input: SourceInput) {
+    setSaveError(false)
     const id = editing && editing !== 'new' ? editing.id : undefined
-    const savedId = await save.mutateAsync({ ...input, id })
-    toast.show('Programa salvo')
-    setEditing({ id: savedId }) // permanece aberto em modo edição; a lista reinvalida e resolve a row completa
+    try {
+      const savedId = await save.mutateAsync({ ...input, id })
+      toast.show('Programa salvo')
+      setEditing({ id: savedId }) // permanece aberto em modo edição; a lista reinvalida e resolve a row completa
+    } catch {
+      setSaveError(true)
+    }
   }
 
   const resolvedRow: SourceRow | null =
@@ -143,7 +150,7 @@ export function AdminSources() {
                 <span className="aa-name">{pname(c)}</span>
                 <span className="aa-robo">
                   {hostOf(psrc(c))} · visto pela 1ª vez há {relTime(c.created_at)}
-                  {pverif(c) ? <span className="pill">{pverif(c)}</span> : null}
+                  {verificationLabel(pverif(c)) ? <span className="pill">{verificationLabel(pverif(c))}</span> : null}
                 </span>
                 <span className="aa-act">
                   <button type="button" onClick={() => navigate(`/admin/discovery?fp=${c.fingerprint}`)}>
@@ -208,9 +215,9 @@ export function AdminSources() {
         open={!!editing}
         title={editing === 'new' ? 'Novo programa' : 'Editar programa'}
         closeOnBackdrop={false}
-        onClose={() => setEditing(null)}
+        onClose={() => { setEditing(null); setSaveError(false) }}
       >
-        {editing && <SourceForm initial={resolvedRow} onSubmit={onSubmit} onCancel={() => setEditing(null)} />}
+        {editing && <SourceForm initial={resolvedRow} onSubmit={onSubmit} onCancel={() => { setEditing(null); setSaveError(false) }} saving={save.isPending} saveError={saveError} />}
         {resolvedRow && <SourceItemsEditor sourceId={resolvedRow.id} items={resolvedRow.source_items} />}
       </AdminSheet>
     </div>
