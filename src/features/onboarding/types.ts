@@ -6,6 +6,10 @@ export interface SourceItem {
   id: string
   label: string
   sort_order: number
+  /** nº de benefícios ativos ligados a este tier (para a sheet do wizard) */
+  benefitCount?: number
+  /** soma do valor estimado dos benefícios deste tier, em BRL */
+  estValueBrl?: number
 }
 
 export interface Source {

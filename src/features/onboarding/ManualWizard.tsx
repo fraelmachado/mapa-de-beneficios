@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef, useState } from 'react'
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useSources } from './useSources'
 import { selectionReducer } from './selection'
@@ -9,9 +9,43 @@ import { RadarMontado, type SummaryGroup } from './RadarMontado'
 import { useSession } from '../auth/AuthProvider'
 import { useUserSources } from './useUserSources'
 import type { CategoryGroup } from './groupSourcesByCategory'
+import type { Source } from './types'
+import { formatBRL } from '../benefits/estimatedValue'
 import { Button } from '../../ui/Button'
 import { Input } from '../../ui/Input'
 import { PageState, Skeleton } from '../../ui'
+
+// Copy curado por categoria (mockup Tela 06): eyebrow motivacional + pergunta natural.
+const WIZ_COPY: Record<string, { eyebrow: string; question: string }> = {
+  bank_card: { eyebrow: 'Seu tesouro escondido', question: 'Quais cartões você tem?' },
+  carrier: { eyebrow: 'Quase lá', question: 'Qual sua operadora de celular?' },
+  health: { eyebrow: 'Cuidando de você', question: 'Plano de saúde ou odonto?' },
+  corporate_benefits: { eyebrow: 'Benefício da empresa', question: 'Tem cartão multibenefícios?' },
+  loyalty: { eyebrow: 'Pontos que rendem', question: 'Programas de fidelidade e pontos?' },
+  retail: { eyebrow: 'Quase lá', question: 'Assinaturas e streaming?' },
+  mall: { eyebrow: 'Perto de você', question: 'Shoppings que você frequenta?' },
+}
+
+const SearchIcon = (
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <circle cx="11" cy="11" r="7" />
+    <line x1="21" y1="21" x2="16.5" y2="16.5" />
+  </svg>
+)
+
+// tier "Mais completo": mais benefícios, desempate por maior valor estimado.
+function recommendedItemId(items: Source['source_items']): string {
+  let bestId = ''
+  let bestScore = -1
+  for (const it of items) {
+    const score = (it.benefitCount ?? 0) * 1e6 + (it.estValueBrl ?? 0)
+    if (score > bestScore) {
+      bestScore = score
+      bestId = it.id
+    }
+  }
+  return bestId
+}
 
 export function ManualWizard() {
   const navigate = useNavigate()
@@ -32,14 +66,19 @@ export function ManualWizard() {
   const save = useSaveUserSources()
   const saveRequest = useSaveSourceRequest()
   const [query, setQuery] = useState('')
+  const [otherOpen, setOtherOpen] = useState(false)
   const [otherText, setOtherText] = useState('')
   const [otherSent, setOtherSent] = useState(false)
+  const [sheetSourceId, setSheetSourceId] = useState<string | null>(null)
+  const [unsure, setUnsure] = useState<Set<string>>(new Set())
 
-  // resetar busca/Outro ao trocar de etapa
+  // resetar busca/sheet/Outro ao trocar de etapa
   useEffect(() => {
     setQuery('')
+    setOtherOpen(false)
     setOtherText('')
     setOtherSent(false)
+    setSheetSourceId(null)
   }, [step])
 
   useEffect(() => {
@@ -56,6 +95,15 @@ export function ManualWizard() {
     }
   }, [existing, groups])
 
+  // Economia potencial = soma real do valor estimado dos tiers selecionados (todas as etapas).
+  const economia = useMemo(() => {
+    let total = 0
+    for (const g of steps)
+      for (const s of g.sources)
+        for (const it of s.source_items) if (selected.has(it.id)) total += it.estValueBrl ?? 0
+    return total
+  }, [steps, selected])
+
   if (sourcesQuery.isLoading || existingQuery.isLoading) {
     return <div className="ob-state" role="status" aria-label="Carregando seus programas" aria-busy="true"><Skeleton height="28px" /><Skeleton height="180px" radius="18px" /><Skeleton height="52px" radius="13px" /></div>
   }
@@ -68,9 +116,13 @@ export function ManualWizard() {
     const summaryGroups: SummaryGroup[] = steps
       .map((g) => ({
         label: g.meta.label,
-        items: g.sources.flatMap((s) =>
-          s.source_items.filter((it) => selected.has(it.id)).map((it) => ({ provider: s.name, variant: it.label })),
-        ),
+        items: g.sources
+          .filter((s) => s.source_items.some((it) => selected.has(it.id)))
+          .map((s) => {
+            const chosen = s.source_items.find((it) => selected.has(it.id))
+            const variant = unsure.has(s.id) ? 'A confirmar' : chosen?.label ?? s.name
+            return { provider: s.name, variant }
+          }),
       }))
       .filter((g) => g.items.length > 0)
     return <RadarMontado groups={summaryGroups} onView={() => navigate(editing ? '/painel' : '/alertas?from=onboarding')} />
@@ -82,11 +134,24 @@ export function ManualWizard() {
   const currentStep = Math.min(step, lastStep)
   const current = steps[currentStep]
   const isLast = currentStep === lastStep
+  const copy = WIZ_COPY[current.category] ?? { eyebrow: 'Mais uma etapa', question: `Você tem ${current.meta.label}?` }
 
-  const filteredSources = current.sources.filter((s) =>
-    s.name.toLowerCase().includes(query.trim().toLowerCase()),
+  const brands = current.sources.filter(
+    (s) => s.source_items.length > 0 && s.name.toLowerCase().includes(query.trim().toLowerCase()),
   )
-  const tiles = filteredSources.flatMap((s) => s.source_items.map((it) => ({ source: s, item: it })))
+
+  const sheetBrand = sheetSourceId ? current.sources.find((s) => s.id === sheetSourceId) ?? null : null
+
+  function pickTier(brand: Source, itemId: string, markUnsure = false) {
+    dispatch({ type: 'pickTier', siblingIds: brand.source_items.map((it) => it.id), itemId })
+    setUnsure((prev) => {
+      const next = new Set(prev)
+      if (markUnsure) next.add(brand.id)
+      else next.delete(brand.id)
+      return next
+    })
+    setSheetSourceId(null)
+  }
 
   async function submitOther() {
     const text = otherText.trim()
@@ -137,22 +202,18 @@ export function ManualWizard() {
             )}
             <span className="ob-econ">
               <span className="ob-econ-val">
-                <span>R$ {(selected.size * 180).toLocaleString('pt-BR')} <span className="ob-econ-up" aria-hidden="true">↑</span></span>
+                <span>{formatBRL(economia)} <span className="ob-econ-up" aria-hidden="true">↑</span></span>
                 <span className="ob-econ-cap">economia potencial</span>
               </span>
             </span>
           </div>
 
-          <div className="ob-segments" aria-hidden="true">
+          <div className="ob-segments" role="group" aria-label={`Passo ${currentStep + 1} de ${steps.length}`}>
             {steps.map((s, i) => <span key={s.category} className={i <= currentStep ? 'on' : ''} />)}
           </div>
-          <p className="lbl" style={{ margin: 0 }}>
-            Passo {currentStep + 1} de {steps.length} · sua carteira
-          </p>
 
-          <h1 className="ob-title">
-            Você tem {current.meta.icon} {current.meta.label}?
-          </h1>
+          <p className="ob-eyebrow">{copy.eyebrow}</p>
+          <h1 className="ob-title">{copy.question}</h1>
           <p className="ob-sub">Marque o que você usa — a gente revela os benefícios escondidos aí.</p>
 
           <Input
@@ -160,22 +221,30 @@ export function ManualWizard() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="buscar nesta categoria…"
-            icon="⌕"
+            icon={SearchIcon}
             ariaLabel="Buscar programa"
           />
 
-          {tiles.length > 0 ? (
+          {brands.length > 0 ? (
             <div className="ob-grid">
-              {tiles.map(({ source, item }) => {
-                const on = selected.has(item.id)
-                const showSub = item.label.toLowerCase() !== source.name.toLowerCase()
+              {brands.map((brand) => {
+                const multi = brand.source_items.length > 1
+                const chosen = brand.source_items.find((it) => selected.has(it.id))
+                const on = !!chosen
+                const isUnsure = unsure.has(brand.id)
+                const sub = multi ? (isUnsure ? 'A confirmar' : chosen?.label ?? '') : ''
                 return (
                   <button
-                    key={item.id}
+                    key={brand.id}
                     type="button"
                     className={'ob-tile' + (on ? ' on' : '')}
                     aria-pressed={on}
-                    onClick={() => dispatch({ type: 'toggle', itemId: item.id })}
+                    aria-haspopup={multi ? 'dialog' : undefined}
+                    onClick={() =>
+                      multi
+                        ? setSheetSourceId(brand.id)
+                        : dispatch({ type: 'toggle', itemId: brand.source_items[0].id })
+                    }
                   >
                     {on ? (
                       <span className="ob-tile-check" aria-hidden="true">
@@ -183,10 +252,10 @@ export function ManualWizard() {
                       </span>
                     ) : null}
                     <span className="ob-tile-logo" aria-hidden="true">
-                      {source.logo_url ? <img src={source.logo_url} alt="" /> : source.name.charAt(0).toUpperCase()}
+                      {brand.logo_url ? <img src={brand.logo_url} alt="" /> : brand.name.charAt(0).toUpperCase()}
                     </span>
-                    <span className="ob-tile-name">{source.name}</span>
-                    {showSub ? <span className="ob-tile-sub">{item.label}</span> : null}
+                    <span className="ob-tile-name">{brand.name}</span>
+                    {sub ? <span className="ob-tile-sub">{sub}</span> : null}
                   </button>
                 )
               })}
@@ -195,27 +264,39 @@ export function ManualWizard() {
             <p className="ob-grid-empty">Nenhum provedor encontrado.</p>
           )}
 
-          <div className="ob-other">
-            <label className="lbl" htmlFor="other" style={{ margin: '0 0 var(--s2)' }}>
-              Não vejo o meu — conta pra gente (Outro)
-            </label>
-            {otherSent ? (
-              <p className="muted" style={{ fontSize: 14 }}>Recebemos! Vamos avaliar incluir essa fonte. ✓</p>
-            ) : (
-              <div className="ob-other-row">
-                <label className="input" style={{ flex: 1, marginBottom: 0 }}>
-                  <input
-                    id="other"
-                    value={otherText}
-                    onChange={(e) => setOtherText(e.target.value)}
-                    placeholder="ex.: C6 Bank"
-                    aria-label="Outro provedor"
-                  />
-                </label>
-                <Button onClick={submitOther}>Adicionar</Button>
-              </div>
-            )}
-          </div>
+          <button
+            type="button"
+            className="ob-notfound"
+            aria-expanded={otherOpen}
+            onClick={() => setOtherOpen((v) => !v)}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+            Não vejo o meu
+          </button>
+
+          {otherOpen ? (
+            <div className="ob-other">
+              <label className="lbl" htmlFor="other" style={{ margin: '0 0 var(--s2)' }}>
+                Conta pra gente — a gente avalia incluir (Outro)
+              </label>
+              {otherSent ? (
+                <p className="muted" style={{ fontSize: 14 }}>Recebemos! Vamos avaliar incluir essa fonte. ✓</p>
+              ) : (
+                <div className="ob-other-row">
+                  <label className="input" style={{ flex: 1, marginBottom: 0 }}>
+                    <input
+                      id="other"
+                      value={otherText}
+                      onChange={(e) => setOtherText(e.target.value)}
+                      placeholder="ex.: C6 Bank"
+                      aria-label="Outro provedor"
+                    />
+                  </label>
+                  <Button onClick={submitOther}>Adicionar</Button>
+                </div>
+              )}
+            </div>
+          ) : null}
 
           {saveError && (
             <p role="alert" aria-live="assertive" style={{ fontSize: 14, color: 'var(--warn)', marginTop: 'var(--s3)' }}>
@@ -228,10 +309,70 @@ export function ManualWizard() {
       <div className="ob-foot">
         <div className="ob-foot-inner">
           <div className="ob-cta">
-            <Button onClick={next}>{isLast ? 'Concluir' : 'Avançar'}</Button>
+            <Button onClick={next}>{isLast ? 'Concluir' : 'Continuar'}</Button>
           </div>
         </div>
+        {!isLast ? (
+          <button type="button" className="ob-skip" onClick={next}>Pular esta etapa</button>
+        ) : null}
       </div>
+
+      {sheetBrand ? (
+        <div className="ob-sheet" role="dialog" aria-modal="true" aria-label={`Qual o seu ${sheetBrand.name}?`}>
+          <div className="ob-sheet-scrim" onClick={() => setSheetSourceId(null)} aria-hidden="true" />
+          <div className="ob-sheet-panel">
+            <div className="ob-sheet-grip" aria-hidden="true" />
+            <h3 className="ob-sheet-title">Qual o seu {sheetBrand.name}?</h3>
+            <p className="ob-sheet-sub">Os benefícios mudam conforme a versão. Escolha a sua para o radar acertar.</p>
+            <div className="ob-sheet-list">
+              {sheetBrand.source_items.map((it) => {
+                const isRec = it.id === recommendedItemId(sheetBrand.source_items)
+                const picked = selected.has(it.id) && !unsure.has(sheetBrand.id)
+                return (
+                  <button
+                    key={it.id}
+                    type="button"
+                    className={'ob-sheet-item' + (picked ? ' on' : '')}
+                    aria-pressed={picked}
+                    onClick={() => pickTier(sheetBrand, it.id)}
+                  >
+                    <span className="ob-sheet-item-main">
+                      <span className="ob-sheet-item-head">
+                        <span className="ob-sheet-item-name">{it.label}</span>
+                        {isRec && (it.benefitCount ?? 0) > 0 ? <span className="ob-sheet-badge">Mais completo</span> : null}
+                      </span>
+                      <span className="ob-sheet-item-meta">
+                        {it.benefitCount ? `${it.benefitCount} benefício${it.benefitCount > 1 ? 's' : ''}` : 'Benefícios em breve'}
+                      </span>
+                    </span>
+                    <span className="ob-sheet-item-side">
+                      {it.estValueBrl ? (
+                        <span className="ob-sheet-item-est"><span className="ob-sheet-approx">≈</span>{formatBRL(it.estValueBrl)}<span className="ob-sheet-year">/ano</span></span>
+                      ) : null}
+                      <span className="ob-sheet-radio" aria-hidden="true" />
+                    </span>
+                  </button>
+                )
+              })}
+              <button
+                type="button"
+                className="ob-sheet-unsure"
+                onClick={() => pickTier(sheetBrand, recommendedItemId(sheetBrand.source_items), true)}
+              >
+                <span>
+                  <span className="ob-sheet-unsure-title">Não tenho certeza</span>
+                  <span className="ob-sheet-unsure-sub">Mostramos o potencial e você confirma depois</span>
+                </span>
+                <span className="ob-sheet-chevron" aria-hidden="true">›</span>
+              </button>
+            </div>
+            <div className="ob-sheet-hint">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c1 8 4 11 12 12-8 1-11 4-12 12-1-8-4-11-12-12 8-1 11-4 12-12Z" /></svg>
+              <p>Conectando o Gmail, descobrimos sua versão exata automaticamente — sem precisar escolher.</p>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }
