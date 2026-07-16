@@ -68,7 +68,7 @@ export function Perfil() {
 
       <section className="profile-identity">
         <span className="profile-avatar" aria-hidden="true">
-          {(user?.email ?? 'V').charAt(0).toUpperCase()}
+          {(isAnon ? 'Visitante' : user?.email || 'V').charAt(0).toUpperCase()}
         </span>
         <div className="profile-identity-info">
           <strong>{isAnon ? 'Visitante' : user?.email}</strong>
@@ -91,6 +91,7 @@ export function Perfil() {
               <p>Sua conta é temporária. Adicione um e-mail para não perder seus benefícios ao trocar de aparelho.</p>
               <label className="lbl" htmlFor="email">E-mail</label>
               <label className="input">
+                <svg {...stroke} aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5" /><path d="m3 7 9 6 9-6" /></svg>
                 <input
                   id="email"
                   type="email"
