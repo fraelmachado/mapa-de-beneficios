@@ -14,7 +14,7 @@ test('onboarding exposes manual flow and Gmail preview', async ({ page }, testIn
   await assertNoHorizontalOverflow(page)
   await page.screenshot({ path: `test-results/${testInfo.project.name}-onboarding.png`, fullPage: true })
   await page.getByRole('button', { name: /adicionar manualmente/i }).click()
-  await expect(page.getByText(/passo 1 de/i)).toBeVisible()
+  await expect(page.getByRole('group', { name: /passo 1 de/i })).toBeVisible()
   await assertNoHorizontalOverflow(page)
   await page.screenshot({ path: `test-results/${testInfo.project.name}-wizard.png`, fullPage: true })
 })
@@ -77,17 +77,25 @@ for (const route of ['/painel', '/buscar', '/perfil', '/beneficio/inexistente'])
 
 test('manual setup produces a populated radar and navigable detail', async ({ page }, testInfo) => {
   await page.goto('/onboarding?mode=edit')
-  await expect(page.getByText(/passo 1 de/i)).toBeVisible()
+  await expect(page.getByRole('group', { name: /passo 1 de/i })).toBeVisible()
   for (let step = 0; step < 20; step += 1) {
     if (step === 0) {
+      // 1 card por marca: multi-tier abre a sheet → escolhe o tier "Mais completo"
+      // (garante benefícios no radar); marca single seleciona direto.
       await page.locator('.ob-tile').first().click()
+      const sheet = page.getByRole('dialog')
+      if (await sheet.count()) {
+        const rec = sheet.locator('.ob-sheet-item').filter({ hasText: /mais completo/i })
+        if (await rec.count()) await rec.first().click()
+        else await sheet.locator('.ob-sheet-item').first().click()
+      }
     }
     const conclude = page.getByRole('button', { name: /concluir/i })
     if (await conclude.count()) {
       await conclude.click()
       break
     }
-    await page.getByRole('button', { name: /avan.ar/i }).click()
+    await page.getByRole('button', { name: /continuar/i }).click()
   }
   // tela de conclusão (Radar montado) → Ver meu radar
   await page.getByRole('button', { name: /ver meu radar/i }).click()
