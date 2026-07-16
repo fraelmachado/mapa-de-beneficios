@@ -1,6 +1,6 @@
 # Estado dos planos de implementação
 
-Última auditoria: **2026-07-11**.
+Última auditoria: **2026-07-16**.
 
 Este índice registra o estado consolidado dos planos. Os checklists dentro de cada
 arquivo foram preservados como roteiro histórico de execução; eles não devem ser
@@ -9,15 +9,19 @@ topo de cada plano e esta tabela são as referências de acompanhamento.
 
 ## Evidências da auditoria
 
-- Refs locais sincronizadas com os remotos auditados: `main` em `00be236` e
-  `develop` em `853c8fd`.
-- Suíte local completa: **68 arquivos e 208 testes aprovados** em 2026-07-11.
-- Build de produção aprovado (`tsc && vite build`) em 2026-07-11.
-- Gate visual local: **24/24 cenários Playwright aprovados** em quatro combinações
-  de viewport/tema, com 32 screenshots inspecionados em 2026-07-11.
-- Aplicação de produção respondeu HTTP 200 em `https://mapadebeneficios.com.br/`.
-- O bundle publicado não continha os marcadores do P4/redesign de Discovery; a
-  publicação do estado atual do repositório continua pendente de verificação/correção.
+- `main` local sincronizado com `origin/main` em `c57b56b` (0 commits à frente/atrás).
+- Suíte local completa: **81 arquivos e 256 testes aprovados** em 2026-07-16.
+- Build de produção aprovado (`tsc && vite build`) em 2026-07-16.
+- Aplicação de produção respondeu **HTTP 200** em `https://mapadebeneficios.com.br/`.
+- **Publicação resolvida:** o auto-deploy no push voltou a funcionar. O último
+  commit que afeta o front — `776c9d2` (wizard Tela 06) — está publicado
+  (`status: done`, `triggerType: push`, 2026-07-16 18:06 UTC). `c57b56b` (HEAD)
+  altera apenas `seed.sql` (dados, já aplicados em prod via pg-meta), sem novo
+  bundle. Logo o bundle no ar contém P4/Discovery e todas as frentes abaixo.
+- **Não reauditado nesta rodada:** smoke funcional em browser (catálogo/wizard/admin
+  renderizando) e o conteúdo dos dados em prod — a sonda REST anon não os enxerga
+  por RLS (esperado). Os dados constam como aplicados via pg-meta nas mensagens de
+  commit, sem reauditoria independente.
 
 ## Resumo
 
@@ -27,7 +31,7 @@ topo de cada plano e esta tabela são as referências de acompanhamento.
 | M2 - Onboarding inicial | Concluído | Coberto pelo deploy do M5 |
 | M3 - Painel | Concluído | Coberto pelo deploy do M5 |
 | M4 - Perfil + PWA | Concluído | Coberto pelo deploy do M5 |
-| M5 - Deploy Dokploy | Artefatos concluídos | Infra ativa; sincronização do bundle atual pendente |
+| M5 - Deploy Dokploy | Concluído | Infra ativa; auto-deploy no push funcionando; bundle atual no ar |
 | M6a - Fundação admin | Concluído | Aplicação em produção não reauditada |
 | M6b - Admin de fontes | Concluído | Aplicação em produção não reauditada |
 | M6c - Admin de benefícios | Concluído | Aplicação em produção não reauditada |
@@ -37,12 +41,23 @@ topo de cada plano e esta tabela são as referências de acompanhamento.
 | P2 - Reskin v3 | Concluído | Publicação atual não reauditada |
 | P3 - Onboarding híbrido | Concluído | Publicação atual não reauditada |
 | P3 - Refino visual | Concluído | Publicação atual não reauditada |
-| P4 - Discovery | Concluído | Não identificado no bundle publicado |
-| Redesign de Discovery | Concluído | Não identificado no bundle publicado |
-| Alinhamento dos layouts do App | Implementado localmente (Playwright 24/24) | Publicação não verificada |
+| P4 - Discovery | Concluído | No bundle publicado (776c9d2); fluxo admin não re-smoke-testado |
+| Redesign de Discovery | Concluído | No bundle publicado (776c9d2); fluxo admin não re-smoke-testado |
+| Alinhamento dos layouts do App | Concluído | No bundle publicado (776c9d2) |
+| Fluxo do App: Gmail Prévia + Alertas | Concluído | No bundle publicado (776c9d2) |
+| Alinhamento do fluxo Admin aos mockups | Concluído | No bundle publicado (776c9d2) |
+| Paridade total com mockups + catálogo por tier | Concluído (só spec, sem plano) | Front no bundle (776c9d2); dados via pg-meta, não reauditados |
 
 ## Próximo gate
 
-Reparar ou confirmar o auto-deploy do Dokploy, publicar o commit atual de `main` e
-executar um smoke test de produção para P4/Discovery. Depois disso, atualizar este
-índice e os dois planos de Discovery para `produção verificada`.
+O gate anterior (reparar auto-deploy + publicar `main`) está **resolvido**: auto-deploy
+voltou a disparar e o bundle atual está no ar. Restam dois passos, um operacional e um
+de produto:
+
+1. **Smoke funcional em produção** (opcional, para fechar `produção verificada`):
+   drivar o app num browser e confirmar que catálogo, wizard por-marca e o fluxo
+   admin/Discovery renderizam no ar — a única lacuna de verificação que sobra.
+2. **Decisão de produto:** com 12/12 telas + catálogo completo publicados, o escopo
+   mock/cosmético acabou. O próximo marco é a bifurcação: continuar cosmético ou
+   iniciar **ingestão real** (Open Finance/Pluggy, scan de Gmail de verdade). Ainda
+   não há plano escrito para isso — é o próximo a nascer se o caminho for esse.
