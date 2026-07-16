@@ -46,6 +46,10 @@ export function toPassProps(b: MyBenefit): PassProps {
     const cat = b.origins[0]?.category
     if (cat && provider) originLabel = `${SOURCE_CAT_LABEL[cat]} · ${provider}`
   }
+  // badge "Assinatura" p/ benefícios de assinatura/streaming/operadora (mockup Tela 04),
+  // quando não for "novo" (isNew tem precedência no topo do card)
+  const originCat = b.origins[0]?.category
+  const tag = originCat === 'retail' || originCat === 'carrier' ? 'Assinatura' : undefined
   return {
     title: b.title,
     via: b.via[0] ?? provider,
@@ -53,6 +57,7 @@ export function toPassProps(b: MyBenefit): PassProps {
     category: categoryToDsCat(b.category),
     originType,
     originLabel,
+    tag,
     isNew: isRecentlyAdded(b.created_at),
   }
 }
