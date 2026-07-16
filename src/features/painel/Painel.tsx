@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useSession } from '../auth/AuthProvider'
 import { useMyBenefits } from '../benefits/useMyBenefits'
 import { filterBenefits } from '../benefits/filterBenefits'
+import { sumValue, formatBRL } from '../benefits/estimatedValue'
 import { BenefitCard } from '../benefits/BenefitCard'
 import { CategoryChips } from '../benefits/CategoryChips'
 import { HeroRadar } from '../../ui/HeroRadar'
@@ -41,8 +42,7 @@ export function Painel() {
   const visible = filterBenefits(all, { category, text: '' })
   const rawName = session?.user?.email?.split('@')[0]
   const greetingName = rawName ? rawName.charAt(0).toUpperCase() + rawName.slice(1) : 'Visitante'
-  // ponytail: placeholder estimate (~R$180/benefício) até o modelo ter valor real por benefício
-  const estValue = `R$ ${(all.length * 180).toLocaleString('pt-BR')}`
+  const estValue = formatBRL(sumValue(all))
 
   if (all.length === 0) {
     return (

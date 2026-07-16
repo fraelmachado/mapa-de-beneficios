@@ -6,6 +6,7 @@ import { Alert } from '../../ui/Alert'
 import { PageState } from '../../ui/PageState'
 import { Skeleton } from '../../ui/Skeleton'
 import { categoryToDsCat } from '../benefits/toPassProps'
+import { formatBRL } from '../benefits/estimatedValue'
 import { CATEGORIES } from '../benefits/types'
 import type { CSSProperties } from 'react'
 import './benefit-detail.css'
@@ -67,6 +68,9 @@ export function BenefitDetail() {
             <h1>{benefit.title}</h1>
             {benefit.via.length > 0 ? <div><span className="detail-hero-via">via&nbsp;<b>{benefit.via.join(', ')}</b></span></div> : null}
             {benefit.summary ? <p>{benefit.summary}</p> : null}
+            {benefit.estimated_value_brl != null ? (
+              <div className="detail-hero-value">valor estimado <b>≈ {formatBRL(benefit.estimated_value_brl)}</b><span>/ano</span></div>
+            ) : null}
           </div>
         </div>
       </div>

@@ -9,6 +9,9 @@
 .detail-hero-body h1 { margin: 14px 0 8px; font-size: clamp(24px, 6vw, 30px); font-weight: 800; line-height: 1.12; letter-spacing: -.03em; overflow-wrap: anywhere; }
 .detail-hero-via { display: inline-flex; align-items: center; gap: 5px; margin-bottom: 10px; padding: 5px 12px; border-radius: 999px; background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .22); font-size: 12.5px; }
 .detail-hero-body > p { margin: 0; font-size: 14px; line-height: 1.5; color: rgba(255, 255, 255, .92); }
+.detail-hero-value { display: inline-flex; align-items: baseline; gap: 7px; margin-top: 16px; padding: 10px 16px; border-radius: 14px; background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .22); font-size: 13px; color: rgba(255, 255, 255, .92); }
+.detail-hero-value b { font-size: 18px; font-weight: 800; letter-spacing: -.01em; color: #fff; }
+.detail-hero-value span { font-size: 12px; color: rgba(255, 255, 255, .8); }
 
 .detail-content { max-width: 680px; margin: 0 auto; padding: var(--s6) var(--s5) calc(var(--s10) + env(safe-area-inset-bottom)); display: grid; gap: var(--s5); }
 .detail-content section > .lbl { margin-bottom: var(--s2); }

@@ -37,6 +37,7 @@ export interface MyBenefit {
   source_name: string | null
   observed_at: string | null
   benefit_source: BenefitSourceKind | null
+  estimated_value_brl: number | null
   origins: BenefitOrigin[]
   networks: BenefitNetwork[]
   via: string[]

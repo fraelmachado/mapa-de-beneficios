@@ -1,5 +1,6 @@
 import { useSession } from '../auth/AuthProvider'
 import { useMyBenefits } from '../benefits/useMyBenefits'
+import { benefitValue, sumValue, formatBRL } from '../benefits/estimatedValue'
 import { Button } from '../../ui/Button'
 
 export interface SummaryGroup {
@@ -9,11 +10,17 @@ export interface SummaryGroup {
 
 export function RadarMontado({ groups, onView }: { groups: SummaryGroup[]; onView: () => void }) {
   const { session } = useSession()
-  const { data } = useMyBenefits(session?.user.id)
-  const benefitCount = (data ?? []).length
+  const benefits = useMyBenefits(session?.user.id).data ?? []
+  const benefitCount = benefits.length
   const programsCount = groups.reduce((n, g) => n + g.items.length, 0)
-  // ponytail: valor estimado é placeholder (~R$180/benefício) até haver valor real no modelo
-  const value = `R$ ${(benefitCount * 180).toLocaleString('pt-BR')}`
+  const value = formatBRL(sumValue(benefits))
+  // valor por programa = soma dos benefícios atribuídos àquele provedor (via origins)
+  const valueByProvider = new Map<string, number>()
+  for (const b of benefits) {
+    for (const o of b.origins) {
+      valueByProvider.set(o.provider, (valueByProvider.get(o.provider) ?? 0) + benefitValue(b))
+    }
+  }
 
   return (
     <div className="ob-done">
@@ -57,7 +64,7 @@ export function RadarMontado({ groups, onView }: { groups: SummaryGroup[]; onVie
                         <strong>{it.provider}</strong>
                         <span>{it.variant}</span>
                       </span>
-                      <span className="ob-done-prog-est"><span>≈</span> R$ 180<span>/ano</span></span>
+                      <span className="ob-done-prog-est"><span>≈</span> {formatBRL(valueByProvider.get(it.provider) ?? 0)}<span>/ano</span></span>
                     </div>
                   ))}
                 </div>

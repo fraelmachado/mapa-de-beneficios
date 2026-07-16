@@ -7,7 +7,7 @@ import type { MyBenefit } from './types'
 const b: MyBenefit = {
   id: 'b1', title: 'Sala VIP em Guarulhos', summary: 'Acesso gratuito', category: 'travel',
   scope: 'pontual', uf: null, steps: null, partner_name: 'Mastercard', valid_until: null,
-  image_url: null, action_url: null, action_label: null, created_at: '', source_url: null, source_name: null, observed_at: null, benefit_source: null, origins: [], networks: [], via: ['Black/Infinite'],
+  image_url: null, action_url: null, action_label: null, created_at: '', source_url: null, source_name: null, observed_at: null, benefit_source: null, estimated_value_brl: null, origins: [], networks: [], via: ['Black/Infinite'],
 }
 
 describe('BenefitCard', () => {

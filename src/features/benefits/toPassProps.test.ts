@@ -6,7 +6,7 @@ const base: MyBenefit = {
   id: '1', title: 'Sala VIP GRU', summary: '2 acessos/mês', category: 'airport',
   scope: 'national', uf: null, steps: null, partner_name: null, valid_until: null,
   image_url: null, action_url: null, action_label: null, created_at: '', source_url: null,
-  source_name: null, observed_at: null, benefit_source: 'issuer',
+  source_name: null, observed_at: null, benefit_source: 'issuer', estimated_value_brl: null,
   origins: [{ provider: 'Nubank', category: 'bank_card' }], networks: [], via: ['Nubank Ultravioleta'],
 }
 

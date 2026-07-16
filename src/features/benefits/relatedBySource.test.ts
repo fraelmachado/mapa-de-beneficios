@@ -7,7 +7,7 @@ function mk(id: string, source_url: string | null): MyBenefit {
     id, title: `B${id}`, summary: '', category: 'other', scope: 'nacional', uf: null,
     steps: null, partner_name: null, valid_until: null, image_url: null, action_url: null,
     action_label: null, created_at: '', via: [], source_url, source_name: null, observed_at: null,
-    benefit_source: null, origins: [], networks: [],
+    benefit_source: null, estimated_value_brl: null, origins: [], networks: [],
   }
 }
 
