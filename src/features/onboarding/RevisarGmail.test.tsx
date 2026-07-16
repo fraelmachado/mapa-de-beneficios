@@ -10,8 +10,8 @@ vi.mock('./useUserSources', () => ({ useUserSources: () => existing }))
 
 import { RevisarGmail } from './RevisarGmail'
 const findings = [
-  { itemId: 'i1', provider: 'Nubank', variant: 'Ultravioleta' },
-  { itemId: 'i2', provider: 'Itaú', variant: 'Black' },
+  { itemId: 'i1', provider: 'Nubank', variant: 'Ultravioleta', logo: null },
+  { itemId: 'i2', provider: 'Itaú', variant: 'Black', logo: null },
 ]
 beforeEach(() => {
   saveMutate.mockReset(); saveMutate.mockResolvedValue(undefined)

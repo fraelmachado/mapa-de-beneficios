@@ -19,14 +19,14 @@ describe('demoFindings', () => {
       src('s4', 'XP', [{ id: 'i4', label: 'One' }]),
     ] })]
     expect(demoFindings(groups)).toEqual([
-      { itemId: 'i1', provider: 'Nubank', variant: 'Ultravioleta' },
-      { itemId: 'i2', provider: 'Itaú', variant: 'Black' },
-      { itemId: 'i3', provider: 'Inter', variant: 'Prime' },
+      { itemId: 'i1', provider: 'Nubank', variant: 'Ultravioleta', logo: null },
+      { itemId: 'i2', provider: 'Itaú', variant: 'Black', logo: null },
+      { itemId: 'i3', provider: 'Inter', variant: 'Prime', logo: null },
     ])
   })
   it('pula fontes sem item', () => {
     const groups = [g({ sources: [src('s1', 'SemItem', []), src('s2', 'Itaú', [{ id: 'i2', label: 'Black' }])] })]
-    expect(demoFindings(groups)).toEqual([{ itemId: 'i2', provider: 'Itaú', variant: 'Black' }])
+    expect(demoFindings(groups)).toEqual([{ itemId: 'i2', provider: 'Itaú', variant: 'Black', logo: null }])
   })
   it('retorna [] sem categorias', () => { expect(demoFindings([])).toEqual([]) })
 })

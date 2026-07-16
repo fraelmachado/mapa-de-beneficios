@@ -53,7 +53,7 @@ export function RevisarGmail({ findings, onDone, onBack }: { findings: Finding[]
               const on = included.has(f.itemId)
               return (
                 <button key={f.itemId} type="button" className={'review-item' + (on ? '' : ' off')} aria-pressed={on} onClick={() => toggle(f.itemId)}>
-                  <span className="review-item-mark" aria-hidden="true">{f.provider.charAt(0).toUpperCase()}</span>
+                  <span className="review-item-mark" aria-hidden="true">{f.logo ? <img src={f.logo} alt="" /> : f.provider.charAt(0).toUpperCase()}</span>
                   <span className="review-item-body"><strong>{f.provider} {f.variant}</strong><span>via {f.provider}</span></span>
                   <span className={'review-check' + (on ? ' on' : '')} aria-hidden="true">{on ? '✓' : '+'}</span>
                 </button>
