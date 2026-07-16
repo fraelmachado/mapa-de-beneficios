@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { useSession } from '../auth/AuthProvider'
 import { useBenefit } from '../benefits/useBenefit'
+import { useFavorites, useToggleFavorite } from '../benefits/useFavorites'
 import { Checklist } from '../../ui/Checklist'
 import { Alert } from '../../ui/Alert'
 import { PageState } from '../../ui/PageState'
@@ -40,6 +41,8 @@ export function BenefitDetail() {
   const { id } = useParams()
   const { session } = useSession()
   const { benefit, related, isLoading, error, refetch } = useBenefit(session?.user.id, id)
+  const { data: favIds } = useFavorites(session?.user.id)
+  const toggleFav = useToggleFavorite(session?.user.id)
 
   if (isLoading) return <div className="detail-loading" role="status" aria-label="Carregando benefício" aria-busy="true"><Skeleton height="24px" width="90px" /><Skeleton height="38px" /><Skeleton variant="pass" /></div>
   if (error) return <div className="detail-notfound"><PageState title="Não foi possível carregar este benefício" action={{ label: 'Tentar novamente', onClick: () => void refetch() }} /></div>
@@ -50,6 +53,7 @@ export function BenefitDetail() {
   const sourceUrl = safeHttpUrl(benefit.source_url)
   const collectedAt = formatDate(benefit.observed_at)
 
+  const isFav = !!favIds?.includes(benefit.id)
   const dsCat = categoryToDsCat(benefit.category)
   const catLabel = CATEGORIES.find((c) => c.key === benefit.category)?.label ?? 'Benefício'
   const heroStyle = { '--cat': `var(--c-${dsCat})` } as CSSProperties
@@ -62,6 +66,16 @@ export function BenefitDetail() {
             <Link to="/painel" className="detail-hero-btn" aria-label="Voltar">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
             </Link>
+            <button
+              type="button"
+              className={`detail-hero-btn${isFav ? ' is-on' : ''}`}
+              aria-label={isFav ? 'Remover dos salvos' : 'Salvar benefício'}
+              aria-pressed={isFav}
+              disabled={toggleFav.isPending}
+              onClick={() => toggleFav.mutate({ benefitId: benefit.id, on: !isFav })}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill={isFav ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" /></svg>
+            </button>
           </div>
           <div className="detail-hero-body">
             <span className="detail-hero-tag">{catLabel}</span>

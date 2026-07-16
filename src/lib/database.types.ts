@@ -192,6 +192,7 @@ export type Database = {
             | null
           category: Database["public"]["Enums"]["benefit_category"]
           created_at: string
+          estimated_value_brl: number | null
           id: string
           image_url: string | null
           limits_description: string | null
@@ -226,6 +227,7 @@ export type Database = {
             | null
           category: Database["public"]["Enums"]["benefit_category"]
           created_at?: string
+          estimated_value_brl?: number | null
           id?: string
           image_url?: string | null
           limits_description?: string | null
@@ -262,6 +264,7 @@ export type Database = {
             | null
           category?: Database["public"]["Enums"]["benefit_category"]
           created_at?: string
+          estimated_value_brl?: number | null
           id?: string
           image_url?: string | null
           limits_description?: string | null
@@ -385,6 +388,39 @@ export type Database = {
           status?: Database["public"]["Enums"]["discovery_job_status"]
         }
         Relationships: []
+      }
+      favorites: {
+        Row: {
+          benefit_id: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          benefit_id: string
+          created_at?: string
+          user_id?: string
+        }
+        Update: {
+          benefit_id?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_benefit_id_fkey"
+            columns: ["benefit_id"]
+            isOneToOne: false
+            referencedRelation: "benefits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_benefit_id_fkey"
+            columns: ["benefit_id"]
+            isOneToOne: false
+            referencedRelation: "my_benefits"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -590,6 +626,7 @@ export type Database = {
             | null
           category: Database["public"]["Enums"]["benefit_category"] | null
           created_at: string | null
+          estimated_value_brl: number | null
           id: string | null
           image_url: string | null
           networks: Json | null

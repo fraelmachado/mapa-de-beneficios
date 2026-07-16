@@ -1717,3 +1717,10 @@ where (b.slug, si.slug) in (
   ('tudoazul-clube',                       'tudoazul-program')
 )
 on conflict do nothing;
+
+-- ===== CATÁLOGO ESTABELECIDO (paridade mockup) =====
+-- Backdatea created_at p/ o badge "novo" ficar reservado a adições realmente
+-- recentes (evita "novo" em todo o catálogo no lançamento) e revela o badge
+-- "Assinatura" nos benefícios de assinatura/operadora.
+update benefits set created_at = coalesce(observed_at, date '2026-06-15')::timestamptz
+where slug is not null;
