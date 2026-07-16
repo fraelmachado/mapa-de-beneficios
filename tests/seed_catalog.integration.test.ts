@@ -2,15 +2,17 @@ import { describe, it, expect } from 'vitest'
 import { serviceClient } from './helpers/clients'
 
 describe('seed: catálogo real', () => {
-  it('mantém as sources reais de base e nenhuma demo', async () => {
+  it('contém o catálogo real expandido nas 5 categorias do mockup', async () => {
     const db = serviceClient()
-    const { data } = await db.from('sources').select('slug, name').not('slug', 'is', null)
-    const slugs = (data ?? []).map((r) => r.slug).sort()
-    expect(slugs).toEqual(expect.arrayContaining(['inter', 'nubank', 'xp']))
-    const names = (data ?? []).map((r) => r.name)
-    expect(names).not.toContain('Itaú')
-    expect(names).not.toContain('Claro')
-    expect(names).not.toContain('Livelo')
+    const { data } = await db.from('sources').select('slug, source_category').not('slug', 'is', null)
+    const slugs = (data ?? []).map((r) => r.slug)
+    // base (cartões) + ao menos uma marca de cada categoria do mockup
+    expect(slugs).toEqual(
+      expect.arrayContaining(['nubank', 'inter', 'xp', 'itau', 'vivo', 'spotify', 'sulamerica', 'latam-pass']),
+    )
+    // as 5 categorias de fonte que os mockups demonstram estão representadas
+    const cats = [...new Set((data ?? []).map((r) => r.source_category))].sort()
+    expect(cats).toEqual(['bank_card', 'carrier', 'health', 'loyalty', 'retail'])
   })
 
   it('source_items têm brand/level no vocabulário controlado', async () => {
