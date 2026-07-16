@@ -394,6 +394,100 @@ values
     'Visa', null, null,
     'https://private.xpi.com.br/xp-visa-infinite-privilege/', '2026-06-15',
     'official_confirmed', null
+  ),
+
+  -- ── Nubank Gold / Platinum — benefícios de rede Mastercard ────────────────
+  (
+    'nubank-gold-mastercard-surpreenda',
+    'Mastercard Surpreenda',
+    'Cadastre o cartão no Mastercard Surpreenda e troque pontos por ofertas do tipo "compre 1, leve 2" em marcas parceiras.',
+    'shopping', 'nacional', 'partner', 'app',
+    true, true, false,
+    'Mastercard', null, null,
+    'https://www.mastercard.com.br/pt-br/consumidores/encontrar-cartoes/mastercard-surpreenda.html', '2026-06-15',
+    'inferred_from_card_network', 'Benefício da rede Mastercard Gold/Platinum; confirmar elegibilidade no regulamento vigente.'
+  ),
+  (
+    'nubank-gold-nu-shopping-cashback',
+    'Cashback no Nu Shopping',
+    'Compras feitas pelo Nu Shopping geram cashback direto na conta do Nubank, disponível para os cartões da conta.',
+    'cashback', 'nacional', 'issuer', 'app',
+    false, false, false,
+    'Nubank', null, null,
+    'https://nubank.com.br/nu-shopping/', '2026-06-15',
+    'inferred_from_card_network', null
+  ),
+  (
+    'nubank-platinum-seguro-locacao-veiculos',
+    'Seguro para locação de veículos',
+    'Cobertura Mastercard Platinum para aluguel de carros ao pagar a reserva com o cartão, conforme regras do seguro.',
+    'insurance', 'nacional', 'partner', 'automatic',
+    false, true, false,
+    'Mastercard', null, null,
+    'https://www.mastercard.com.br/pt-br/consumidores/encontrar-cartoes/plataformas/platinum.html', '2026-06-15',
+    'inferred_from_card_network', 'Benefício da rede Mastercard Platinum; confirmar cobertura e franquias no regulamento vigente.'
+  ),
+  (
+    'nubank-platinum-mastercard-concierge',
+    'Mastercard Airport Concierge',
+    'Serviço de recepção e assistência em aeroportos com tarifa preferencial para portadores Mastercard Platinum.',
+    'concierge', 'nacional', 'partner', 'app',
+    true, true, false,
+    'Mastercard', null, null,
+    'https://www.mastercard.com.br/pt-br/consumidores/encontrar-cartoes/plataformas/platinum.html', '2026-06-15',
+    'inferred_from_card_network', null
+  ),
+
+  -- ── XP Digital / Exclusive — níveis de relacionamento ─────────────────────
+  (
+    'xp-digital-research-recomendacoes',
+    'Research e carteiras recomendadas XP',
+    'Acesso a relatórios, carteiras recomendadas e conteúdo de análise da XP para clientes do nível Digital.',
+    'experience', 'nacional', 'issuer', 'app',
+    false, false, false,
+    'XP', null, null,
+    'https://www.xpi.com.br/research/', '2026-06-15',
+    'needs_manual_validation', null
+  ),
+  (
+    'xp-digital-pontos-cartao-visa',
+    'Pontos InvestBack no cartão XP',
+    'Compras no cartão XP Visa acumulam pontos InvestBack, resgatáveis em investimentos na plataforma.',
+    'investback', 'nacional', 'issuer', 'points_exchange',
+    true, true, false,
+    'XP', null, null,
+    'https://www.xpi.com.br/produtos/cartao-de-credito/', '2026-06-15',
+    'needs_manual_validation', null
+  ),
+  (
+    'xp-exclusive-assessoria-dedicada',
+    'Assessoria de investimentos dedicada',
+    'Atendimento com assessor dedicado e acompanhamento de carteira para clientes do nível Exclusive.',
+    'account_service', 'nacional', 'issuer', 'app',
+    false, false, false,
+    'XP', null, null,
+    'https://www.xpi.com.br/', '2026-06-15',
+    'needs_manual_validation', null
+  ),
+  (
+    'xp-exclusive-salas-vip-loungekey',
+    'Salas VIP com LoungeKey',
+    'Acesso a salas VIP em aeroportos pela rede LoungeKey, conforme o nível de relacionamento e o cartão elegível.',
+    'airport', 'nacional', 'partner', 'physical_access',
+    true, true, false,
+    'LoungeKey', null, null,
+    'https://www.xpi.com.br/produtos/cartao-de-credito/', '2026-06-15',
+    'needs_manual_validation', null
+  ),
+  (
+    'xp-exclusive-eventos-experiencias',
+    'Eventos e experiências XP',
+    'Convites para eventos, imersões e experiências exclusivas oferecidas pela XP a clientes Exclusive.',
+    'experience', 'nacional', 'issuer', 'app',
+    false, false, false,
+    'XP', null, null,
+    'https://www.xpi.com.br/', '2026-06-15',
+    'needs_manual_validation', null
   )
 
 on conflict (slug) do update set
@@ -449,7 +543,20 @@ where (b.slug, si.slug) in (
   ('xp-legacy-concierge',                        'xp-legacy'),
   ('xp-experience-signature-assessoria',        'xp-signature'),
   ('xp-experience-unique-wealth-planning',      'xp-unique'),
-  ('xp-private-visa-infinite-privilege-lounge', 'xp-legacy')
+  ('xp-private-visa-infinite-privilege-lounge', 'xp-legacy'),
+  -- Nubank Gold/Platinum (rede Mastercard)
+  ('nubank-gold-mastercard-surpreenda',          'nubank-gold'),
+  ('nubank-gold-mastercard-surpreenda',          'nubank-platinum'),
+  ('nubank-gold-nu-shopping-cashback',           'nubank-gold'),
+  ('nubank-gold-nu-shopping-cashback',           'nubank-platinum'),
+  ('nubank-platinum-seguro-locacao-veiculos',    'nubank-platinum'),
+  ('nubank-platinum-mastercard-concierge',       'nubank-platinum'),
+  -- XP Digital / Exclusive
+  ('xp-digital-research-recomendacoes',          'xp-digital'),
+  ('xp-digital-pontos-cartao-visa',              'xp-digital'),
+  ('xp-exclusive-assessoria-dedicada',           'xp-exclusive'),
+  ('xp-exclusive-salas-vip-loungekey',           'xp-exclusive'),
+  ('xp-exclusive-eventos-experiencias',          'xp-exclusive')
 )
 on conflict do nothing;
 
