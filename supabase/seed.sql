@@ -16,14 +16,15 @@ delete from sources where id in (
 --  benefit_card_tiers e benefit_locations abaixo desta linha.)
 
 -- ===== SOURCES =====
-insert into sources (slug, kind, name, sort_order, institution_url, country, source_category) values
-  ('nubank', 'card', 'Nubank',      1, 'https://nubank.com.br', 'BR', 'bank_card'),
-  ('inter',  'card', 'Banco Inter', 2, 'https://inter.co',      'BR', 'bank_card'),
-  ('xp',     'card', 'XP',          3, 'https://www.xpi.com.br','BR', 'bank_card')
+insert into sources (slug, kind, name, sort_order, institution_url, country, source_category, logo_url, primary_color) values
+  ('nubank', 'card', 'Nubank',      1, 'https://nubank.com.br', 'BR', 'bank_card', '/logos/nubank.svg', '#820AD1'),
+  ('inter',  'card', 'Banco Inter', 2, 'https://inter.co',      'BR', 'bank_card', '/logos/inter.svg',  '#FF7A00'),
+  ('xp',     'card', 'XP',          3, 'https://www.xpi.com.br','BR', 'bank_card', '/logos/xp.svg',     '#0B0B0B')
 on conflict (slug) do update set
   kind = excluded.kind, name = excluded.name, sort_order = excluded.sort_order,
   institution_url = excluded.institution_url, country = excluded.country,
-  source_category = excluded.source_category;
+  source_category = excluded.source_category, logo_url = excluded.logo_url,
+  primary_color = excluded.primary_color;
 
 -- ===== SOURCE_ITEMS =====
 insert into source_items (slug, source_id, label, display_name, sort_order, card_brand, card_level, product_type, source_url, verification_status) values
@@ -733,3 +734,25 @@ join (values
   ('visa-infinite-protecao-compra', 'Portal de Benefícios Visa', 'online', 'BR', null, null, null, null, null, null::float8, null::float8, 'not_applicable')
 ) as t(slug, name, scope, country, region, uf, city, airport_code, terminal, lat, lng, geolocation_status)
   on t.slug = b.slug;
+
+-- ===== VALOR ESTIMADO (paridade mockup) =====
+-- Estimativa R$/ano por categoria — placeholder curado até haver valor real por
+-- benefício. Só toca linhas do catálogo (com slug) ainda sem valor (idempotente).
+update benefits set estimated_value_brl = case category
+  when 'airport'                then 600
+  when 'concierge'              then 250
+  when 'travel'                 then 400
+  when 'miles'                  then 350
+  when 'insurance'              then 300
+  when 'security'               then 250
+  when 'cashback'               then 240
+  when 'investback'             then 300
+  when 'points'                 then 200
+  when 'shopping'               then 180
+  when 'restaurant'             then 220
+  when 'international_purchase'  then 150
+  when 'experience'             then 200
+  when 'investment'             then 300
+  when 'account_service'        then 120
+  else 150 end
+where slug is not null and estimated_value_brl is null;
