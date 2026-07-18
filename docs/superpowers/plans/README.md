@@ -57,7 +57,12 @@ de produto:
 1. **Smoke funcional em produção** (opcional, para fechar `produção verificada`):
    drivar o app num browser e confirmar que catálogo, wizard por-marca e o fluxo
    admin/Discovery renderizam no ar — a única lacuna de verificação que sobra.
-2. **Decisão de produto:** com 12/12 telas + catálogo completo publicados, o escopo
-   mock/cosmético acabou. O próximo marco é a bifurcação: continuar cosmético ou
-   iniciar **ingestão real** (Open Finance/Pluggy, scan de Gmail de verdade). Ainda
-   não há plano escrito para isso — é o próximo a nascer se o caminho for esse.
+2. **Ingestão real — decidido (2026-07-18):** o escopo mock/cosmético acabou e o
+   próximo marco é ler o Gmail de verdade. **Pluggy/Open Finance foi descartado do
+   projeto.** Escopo travado: scan client-side one-shot com `gmail.readonly` (GIS no
+   browser, sem backend), OAuth em modo Testing, detecção por marca, evidência
+   (remetente/assunto/data) gravada por programa, scan anônimo com retenção de 30
+   dias (pg_cron). Spec em
+   `docs/superpowers/specs/2026-07-18-ingestao-gmail-real-design.md` (rev 3);
+   plano em `docs/superpowers/plans/2026-07-18-ingestao-gmail-real.md` (14 tasks,
+   pronto p/ execução).

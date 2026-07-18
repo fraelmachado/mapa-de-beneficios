@@ -6,68 +6,70 @@ import { Vasculhando } from './Vasculhando'
 import { RevisarGmail } from './RevisarGmail'
 import { RadarMontado, type SummaryGroup } from './RadarMontado'
 import { useSources } from './useSources'
-import { demoFindings, type Finding } from './demoFindings'
-import { PageState, Skeleton } from '../../ui'
+import { GmailConsent } from './gmail/GmailConsent'
+import { useGmailAuth } from './gmail/useGmailAuth'
+import { gmailScan } from './gmail/gmailScan'
+import type { Finding, ScanResult } from './gmail/types'
 
-type Screen = 'welcome' | 'method' | 'manual' | 'gmail-scan' | 'gmail-review' | 'gmail-done'
+type Screen = 'welcome' | 'method' | 'manual' | 'gmail-consent' | 'gmail-scan' | 'gmail-review' | 'gmail-done'
 
 export function OnboardingPage() {
   const [params] = useSearchParams()
   const navigate = useNavigate()
   const editing = params.get('mode') === 'edit'
   const [screen, setScreen] = useState<Screen>(editing ? 'manual' : 'welcome')
-  const [gmailFindings, setGmailFindings] = useState<Finding[]>([]) // snapshot congelado do fluxo Gmail
   const [saved, setSaved] = useState<Finding[]>([])
   const sourcesQuery = useSources()
-  const groups = sourcesQuery.data ?? []
-  const findings = demoFindings(groups)
+  const gmail = useGmailAuth()
+  const [connecting, setConnecting] = useState(false)
+  const [connectError, setConnectError] = useState(false)
+  const [scan, setScan] = useState<ScanResult | null>(null)
+
+  const flatSources = (sourcesQuery.data ?? []).flatMap((g) => g.sources)
 
   useEffect(() => { setScreen(editing ? 'manual' : 'welcome') }, [editing])
 
-  // Catálogo vazio no caminho Gmail → wizard manual (D4). Via efeito, nunca setState no render.
-  useEffect(() => {
-    if (screen === 'gmail-scan' && !sourcesQuery.isLoading && !sourcesQuery.error && findings.length === 0) {
-      setScreen('manual')
-    }
-  }, [screen, sourcesQuery.isLoading, sourcesQuery.error, findings.length])
-
+  // startGmail: sem catálogo/domínios → cai no manual; senão vai pro consent
   function startGmail() {
-    // sempre entra no scan; loading/erro/vazio são tratados no próprio estado 'gmail-scan'
-    if (!sourcesQuery.isLoading && !sourcesQuery.error && findings.length === 0) { setScreen('manual'); return } // D4 (atalho no clique)
-    setScreen('gmail-scan')
+    if (!gmail.available) { setScreen('manual'); return } // sem client id → manual
+    setScreen('gmail-consent')
+  }
+
+  async function connectAndScan() {
+    setConnecting(true); setConnectError(false)
+    let token: string | undefined
+    try {
+      const connected = await gmail.connect()
+      token = connected.token
+      const result = await gmailScan({ gmailAccount: connected.account, sources: flatSources, fetchJson: gmail.makeFetchJson(token) })
+      setScan(result)
+      if (result.findings.length === 0) { setScreen('manual'); return } // nada encontrado → manual
+      setScreen('gmail-scan')
+    } catch {
+      setConnectError(true)
+    } finally {
+      if (token) gmail.revoke(token) // one-shot: revoga mesmo se o scan falhar
+      setConnecting(false)
+    }
   }
 
   if (screen === 'manual') return <ManualWizard />
 
-  if (screen === 'gmail-scan') {
-    if (sourcesQuery.isLoading) {
-      return <div className="ob-state" role="status" aria-label="Preparando sua prévia" aria-busy="true"><Skeleton height="200px" radius="18px" /><Skeleton height="52px" radius="13px" /></div>
-    }
-    if (sourcesQuery.error) {
-      return (
-        <div className="ob-state">
-          <PageState title="Não foi possível preparar sua prévia" action={{ label: 'Tentar novamente', onClick: () => void sourcesQuery.refetch() }} />
-          <button className="btn ghost" type="button" onClick={() => setScreen('method')}>Voltar</button>
-        </div>
-      )
-    }
-    if (findings.length === 0) return null // efeito acima redireciona para 'manual'
-    return (
-      <Vasculhando
-        count={findings.length}
-        onDone={() => { setGmailFindings(findings); setScreen('gmail-review') }} // congela o snapshot
-        onBack={() => setScreen('method')}
-      />
-    )
+  if (screen === 'gmail-consent') {
+    return <GmailConsent onConnect={connectAndScan} onBack={() => setScreen('method')} connecting={connecting} error={connectError} />
   }
 
-  if (screen === 'gmail-review') {
-    return <RevisarGmail findings={gmailFindings} onDone={(inc) => { setSaved(inc); setScreen('gmail-done') }} onBack={() => setScreen('method')} />
+  if (screen === 'gmail-scan' && scan) {
+    return <Vasculhando count={scan.findings.length} onDone={() => setScreen('gmail-review')} onBack={() => setScreen('method')} />
+  }
+
+  if (screen === 'gmail-review' && scan) {
+    return <RevisarGmail findings={scan.findings} partial={scan.partial} onDone={(inc) => { setSaved(inc); setScreen('gmail-done') }} onBack={() => setScreen('method')} />
   }
 
   if (screen === 'gmail-done') {
     const groupsSummary: SummaryGroup[] = saved.length
-      ? [{ label: groups[0]?.meta.label ?? 'Seus programas', items: saved.map((f) => ({ provider: f.provider, variant: f.variant })) }]
+      ? [{ label: 'Seus programas', items: saved.map((f) => ({ provider: f.provider, variant: f.items.length === 1 ? f.items[0].label : '' })) }]
       : []
     return <RadarMontado groups={groupsSummary} onView={() => navigate('/alertas?from=onboarding')} />
   }

@@ -17,6 +17,7 @@ export interface Source {
   kind: SourceKind
   name: string
   logo_url: string | null
+  match_domains?: string[]
   sort_order: number
   source_items: SourceItem[]
   source_category?: SourceCategory

@@ -1831,3 +1831,33 @@ on conflict do nothing;
 -- "Assinatura" nos benefícios de assinatura/operadora.
 update benefits set created_at = coalesce(observed_at, date '2026-06-15')::timestamptz
 where slug is not null;
+
+-- ===== MATCH_DOMAINS (Ingestão real via Gmail) =====
+-- Domínio(s) registráveis oficiais do remetente de cada marca, usados para
+-- casar o sender domain do e-mail escaneado com a fonte do catálogo.
+-- ponytail: UPDATE por slug ao fim do seed mantém os inserts existentes intactos.
+update sources set match_domains = '{nubank.com.br}'                          where slug = 'nubank';
+update sources set match_domains = '{bancointer.com.br}'                      where slug = 'inter';
+update sources set match_domains = '{xpi.com.br,xpinvestimentos.com.br}'      where slug = 'xp';
+update sources set match_domains = '{itau.com.br}'                           where slug = 'itau';
+update sources set match_domains = '{bradesco.com.br}'                       where slug = 'bradesco';
+update sources set match_domains = '{c6bank.com.br}'                         where slug = 'c6';
+update sources set match_domains = '{bb.com.br}'                             where slug = 'bb';
+update sources set match_domains = '{santander.com.br}'                      where slug = 'santander';
+update sources set match_domains = '{btgpactual.com}'                        where slug = 'btg';
+update sources set match_domains = '{mercadopago.com.br,mail.mercadolivre.com.br}' where slug = 'mercado-pago';
+update sources set match_domains = '{picpay.com}'                            where slug = 'picpay';
+update sources set match_domains = '{vivo.com.br}'                           where slug = 'vivo';
+update sources set match_domains = '{claro.com.br}'                          where slug = 'claro';
+update sources set match_domains = '{tim.com.br}'                            where slug = 'tim';
+update sources set match_domains = '{spotify.com}'                           where slug = 'spotify';
+update sources set match_domains = '{disneyplus.com}'                        where slug = 'disney-plus';
+update sources set match_domains = '{amazon.com.br}'                         where slug = 'amazon-prime';
+update sources set match_domains = '{sulamericaseguros.com.br}'              where slug = 'sulamerica';
+update sources set match_domains = '{amil.com.br}'                           where slug = 'amil';
+update sources set match_domains = '{bradescosaude.com.br}'                  where slug = 'bradesco-saude';
+update sources set match_domains = '{hapvida.com.br}'                        where slug = 'hapvida';
+update sources set match_domains = '{gndi.com.br}'                           where slug = 'notredame';
+update sources set match_domains = '{latam.com}'                             where slug = 'latam-pass';
+update sources set match_domains = '{smiles.com.br}'                        where slug = 'smiles';
+update sources set match_domains = '{voeazul.com.br}'                        where slug = 'tudoazul';

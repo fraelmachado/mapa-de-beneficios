@@ -443,6 +443,50 @@ export type Database = {
         }
         Relationships: []
       }
+      source_evidence: {
+        Row: {
+          created_at: string
+          email_date: string | null
+          email_from: string
+          email_subject: string | null
+          gmail_account: string
+          gmail_message_id: string
+          id: string
+          source_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_date?: string | null
+          email_from: string
+          email_subject?: string | null
+          gmail_account: string
+          gmail_message_id: string
+          id?: string
+          source_id: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          email_date?: string | null
+          email_from?: string
+          email_subject?: string | null
+          gmail_account?: string
+          gmail_message_id?: string
+          id?: string
+          source_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "source_evidence_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       source_items: {
         Row: {
           card_brand: string | null
@@ -553,6 +597,7 @@ export type Database = {
           institution_url: string | null
           kind: Database["public"]["Enums"]["source_kind"]
           logo_url: string | null
+          match_domains: string[]
           name: string
           pluggy_connector_id: number | null
           primary_color: string | null
@@ -568,6 +613,7 @@ export type Database = {
           institution_url?: string | null
           kind: Database["public"]["Enums"]["source_kind"]
           logo_url?: string | null
+          match_domains?: string[]
           name: string
           pluggy_connector_id?: number | null
           primary_color?: string | null
@@ -583,6 +629,7 @@ export type Database = {
           institution_url?: string | null
           kind?: Database["public"]["Enums"]["source_kind"]
           logo_url?: string | null
+          match_domains?: string[]
           name?: string
           pluggy_connector_id?: number | null
           primary_color?: string | null
@@ -647,6 +694,7 @@ export type Database = {
       }
     }
     Functions: {
+      add_gmail_sources: { Args: { payload: Json }; Returns: undefined }
       claim_discovery_job: {
         Args: { worker: string }
         Returns: {
