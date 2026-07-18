@@ -7,7 +7,7 @@ import type { Source } from './types'
 // Traz os tiers (source_items) com os benefícios ativos ligados a cada um,
 // para a sheet do wizard mostrar "N benefícios · ≈R$X/ano" por tier.
 const SELECT =
-  'id, kind, name, logo_url, sort_order, source_category, ' +
+  'id, kind, name, logo_url, sort_order, source_category, match_domains, ' +
   'source_items(id, label, sort_order, benefit_sources(benefits(estimated_value_brl, active)))'
 
 interface RawBenefit {

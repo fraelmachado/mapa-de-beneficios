@@ -694,6 +694,7 @@ export type Database = {
       }
     }
     Functions: {
+      add_gmail_sources: { Args: { payload: Json }; Returns: undefined }
       claim_discovery_job: {
         Args: { worker: string }
         Returns: {
