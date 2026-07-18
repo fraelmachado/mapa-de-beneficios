@@ -61,6 +61,8 @@ de produto:
    próximo marco é ler o Gmail de verdade. **Pluggy/Open Finance foi descartado do
    projeto.** Escopo travado: scan client-side one-shot com `gmail.readonly` (GIS no
    browser, sem backend), OAuth em modo Testing, detecção por marca, evidência
-   (remetente/assunto/data) gravada por programa. Spec em
-   `docs/superpowers/specs/2026-07-18-ingestao-gmail-real-design.md`; plano de
-   implementação a seguir.
+   (remetente/assunto/data) gravada por programa, scan anônimo com retenção de 30
+   dias (pg_cron). Spec em
+   `docs/superpowers/specs/2026-07-18-ingestao-gmail-real-design.md` (rev 3);
+   plano em `docs/superpowers/plans/2026-07-18-ingestao-gmail-real.md` (14 tasks,
+   pronto p/ execução).
