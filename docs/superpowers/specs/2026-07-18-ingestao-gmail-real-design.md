@@ -49,7 +49,7 @@
   | `email_date` | timestamptz | `internalDate` da mensagem |
   | `created_at` | timestamptz default `now()` | quando atribuído |
 
-  **`unique(user_id, gmail_account, source_id, gmail_message_id)`** (idempotência). RLS **own-rows** `select`/`insert`/**`delete`** com `user_id = auth.uid()`; grants a `authenticated`. Gravada **só para programas confirmados** e **só com sessão não-anônima**.
+  **`unique(user_id, gmail_account, source_id, gmail_message_id)`** (idempotência). RLS **own-rows** `select`/`insert`/**`delete`** com `user_id = auth.uid()`; grants a `authenticated`. Gravada **só para programas confirmados** (rev 3: sessão anônima é permitida; a evidência de usuário anônimo expira em 30 dias via `pg_cron`).
 - **RPC `add_gmail_sources(payload jsonb)`** — contrato atômico aditivo descrito acima. `payload` = array de `{ item_id, source_id, gmail_account, gmail_message_id, email_from, email_subject, email_date }`.
 - **Retenção (`pg_cron`):** job diário `delete from source_evidence e using auth.users u where e.user_id = u.id and u.is_anonymous and e.created_at < now() - interval '30 days'`. Requer a extensão `pg_cron` (confirmar no Supabase self-hosted; fallback = task agendada no Dokploy rodando o mesmo SQL via pg-meta). Roda como owner do job → bypassa RLS. `user_sources` não é tocado.
 
