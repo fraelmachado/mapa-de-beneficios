@@ -10,7 +10,6 @@ import type { Finding } from './gmail/types'
 
 const rpc = vi.fn(async (..._args: any[]) => ({ error: null }))
 vi.mock('../../lib/supabase', () => ({ supabase: { rpc: (...a: any[]) => rpc(...a) } }))
-vi.mock('../auth/AuthProvider', () => ({ useSession: () => ({ session: { user: { id: 'u1' } } }) }))
 
 const single: Finding = {
   sourceId: 's1', provider: 'Spotify', logo: null,

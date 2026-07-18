@@ -86,7 +86,7 @@ describe('OnboardingPage flow', () => {
     fireEvent.click(screen.getByRole('button', { name: /mapear meus benefícios/i }))
 
     expect(screen.getByRole('heading', { name: /como quer encontrar seus benefícios/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /conectar gmail.*prévia/i })).toBeEnabled()
+    expect(screen.getByRole('button', { name: /conectar gmail.*beta/i })).toBeEnabled()
 
     fireEvent.click(screen.getByRole('button', { name: /adicionar manualmente/i }))
 
@@ -120,10 +120,10 @@ describe('OnboardingPage flow', () => {
     expect(screen.getByRole('heading', { name: /benefícios esperando por você/i })).toBeInTheDocument()
   })
 
-  it('MethodStep: card Gmail Prévia dispara onGmail', () => {
+  it('MethodStep: card Gmail Beta dispara onGmail', () => {
     const onGmail = vi.fn()
     renderWithProviders(<MethodStep onManual={() => {}} onGmail={onGmail} />, { route: '/onboarding' })
-    const gmail = screen.getByRole('button', { name: /conectar gmail.*prévia/i })
+    const gmail = screen.getByRole('button', { name: /conectar gmail.*beta/i })
     expect(gmail).toBeEnabled()
     fireEvent.click(gmail)
     expect(onGmail).toHaveBeenCalledTimes(1)
@@ -132,7 +132,7 @@ describe('OnboardingPage flow', () => {
   it('caminho Gmail: método → consent → scan real → revisar → radar montado → alertas', async () => {
     renderWithProviders(<><LocationProbe /><OnboardingPage /></>, { route: '/onboarding' })
     fireEvent.click(screen.getByRole('button', { name: /mapear meus benefícios/i }))
-    fireEvent.click(screen.getByRole('button', { name: /conectar gmail.*prévia/i }))
+    fireEvent.click(screen.getByRole('button', { name: /conectar gmail.*beta/i }))
 
     expect(screen.getByRole('heading', { name: /conectar seu gmail/i })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /^conectar gmail$/i }))
@@ -143,11 +143,20 @@ describe('OnboardingPage flow', () => {
     expect(screen.getByTestId('loc')).toHaveTextContent('/alertas?from=onboarding')
   })
 
+  it('revoga o token do Gmail após um scan bem-sucedido', async () => {
+    renderWithProviders(<OnboardingPage />, { route: '/onboarding' })
+    fireEvent.click(screen.getByRole('button', { name: /mapear meus benefícios/i }))
+    fireEvent.click(screen.getByRole('button', { name: /conectar gmail.*beta/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^conectar gmail$/i }))
+    await screen.findByRole('button', { name: /ver meus benefícios/i })
+    expect(gmailAuth.revoke).toHaveBeenCalledWith('t')
+  })
+
   it('scan sem programas encontrados cai no wizard manual', async () => {
     scanResult = { findings: [], partial: false }
     renderWithProviders(<OnboardingPage />, { route: '/onboarding' })
     fireEvent.click(screen.getByRole('button', { name: /mapear meus benefícios/i }))
-    fireEvent.click(screen.getByRole('button', { name: /conectar gmail.*prévia/i }))
+    fireEvent.click(screen.getByRole('button', { name: /conectar gmail.*beta/i }))
     fireEvent.click(screen.getByRole('button', { name: /^conectar gmail$/i }))
     expect(await screen.findByText('Wizard manual real')).toBeInTheDocument()
   })
@@ -156,7 +165,7 @@ describe('OnboardingPage flow', () => {
     gmailAuth = { ...gmailAuth, available: false }
     renderWithProviders(<OnboardingPage />, { route: '/onboarding' })
     fireEvent.click(screen.getByRole('button', { name: /mapear meus benefícios/i }))
-    fireEvent.click(screen.getByRole('button', { name: /conectar gmail.*prévia/i }))
+    fireEvent.click(screen.getByRole('button', { name: /conectar gmail.*beta/i }))
     expect(screen.getByText('Wizard manual real')).toBeInTheDocument()
   })
 
@@ -164,7 +173,7 @@ describe('OnboardingPage flow', () => {
     gmailAuth = { ...gmailAuth, connect: async () => { throw new Error('popup_closed') } }
     renderWithProviders(<OnboardingPage />, { route: '/onboarding' })
     fireEvent.click(screen.getByRole('button', { name: /mapear meus benefícios/i }))
-    fireEvent.click(screen.getByRole('button', { name: /conectar gmail.*prévia/i }))
+    fireEvent.click(screen.getByRole('button', { name: /conectar gmail.*beta/i }))
     fireEvent.click(screen.getByRole('button', { name: /^conectar gmail$/i }))
     expect(await screen.findByRole('alert')).toHaveTextContent(/não foi possível conectar ao google/i)
   })

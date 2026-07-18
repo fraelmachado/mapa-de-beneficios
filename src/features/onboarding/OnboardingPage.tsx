@@ -37,16 +37,18 @@ export function OnboardingPage() {
 
   async function connectAndScan() {
     setConnecting(true); setConnectError(false)
+    let token: string | undefined
     try {
-      const { token, account } = await gmail.connect()
-      const result = await gmailScan({ gmailAccount: account, sources: flatSources, fetchJson: gmail.makeFetchJson(token) })
-      gmail.revoke(token) // one-shot: não precisamos mais do token
+      const connected = await gmail.connect()
+      token = connected.token
+      const result = await gmailScan({ gmailAccount: connected.account, sources: flatSources, fetchJson: gmail.makeFetchJson(token) })
       setScan(result)
       if (result.findings.length === 0) { setScreen('manual'); return } // nada encontrado → manual
       setScreen('gmail-scan')
     } catch {
       setConnectError(true)
     } finally {
+      if (token) gmail.revoke(token) // one-shot: revoga mesmo se o scan falhar
       setConnecting(false)
     }
   }
