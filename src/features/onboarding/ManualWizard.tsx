@@ -14,6 +14,7 @@ import { formatBRL } from '../benefits/estimatedValue'
 import { Button } from '../../ui/Button'
 import { Input } from '../../ui/Input'
 import { PageState, Skeleton } from '../../ui'
+import { TierSheet } from './gmail/TierSheet'
 
 // Copy curado por categoria (mockup Tela 06): eyebrow motivacional + pergunta natural.
 const WIZ_COPY: Record<string, { eyebrow: string; question: string }> = {
@@ -32,20 +33,6 @@ const SearchIcon = (
     <line x1="21" y1="21" x2="16.5" y2="16.5" />
   </svg>
 )
-
-// tier "Mais completo": mais benefícios, desempate por maior valor estimado.
-function recommendedItemId(items: Source['source_items']): string {
-  let bestId = ''
-  let bestScore = -1
-  for (const it of items) {
-    const score = (it.benefitCount ?? 0) * 1e6 + (it.estValueBrl ?? 0)
-    if (score > bestScore) {
-      bestScore = score
-      bestId = it.id
-    }
-  }
-  return bestId
-}
 
 export function ManualWizard() {
   const navigate = useNavigate()
@@ -318,60 +305,12 @@ export function ManualWizard() {
       </div>
 
       {sheetBrand ? (
-        <div className="ob-sheet" role="dialog" aria-modal="true" aria-label={`Qual o seu ${sheetBrand.name}?`}>
-          <div className="ob-sheet-scrim" onClick={() => setSheetSourceId(null)} aria-hidden="true" />
-          <div className="ob-sheet-panel">
-            <div className="ob-sheet-grip" aria-hidden="true" />
-            <h3 className="ob-sheet-title">Qual o seu {sheetBrand.name}?</h3>
-            <p className="ob-sheet-sub">Os benefícios mudam conforme a versão. Escolha a sua para o radar acertar.</p>
-            <div className="ob-sheet-list">
-              {sheetBrand.source_items.map((it) => {
-                const isRec = it.id === recommendedItemId(sheetBrand.source_items)
-                const picked = selected.has(it.id) && !unsure.has(sheetBrand.id)
-                return (
-                  <button
-                    key={it.id}
-                    type="button"
-                    className={'ob-sheet-item' + (picked ? ' on' : '')}
-                    aria-pressed={picked}
-                    onClick={() => pickTier(sheetBrand, it.id)}
-                  >
-                    <span className="ob-sheet-item-main">
-                      <span className="ob-sheet-item-head">
-                        <span className="ob-sheet-item-name">{it.label}</span>
-                        {isRec && (it.benefitCount ?? 0) > 0 ? <span className="ob-sheet-badge">Mais completo</span> : null}
-                      </span>
-                      <span className="ob-sheet-item-meta">
-                        {it.benefitCount ? `${it.benefitCount} benefício${it.benefitCount > 1 ? 's' : ''}` : 'Benefícios em breve'}
-                      </span>
-                    </span>
-                    <span className="ob-sheet-item-side">
-                      {it.estValueBrl ? (
-                        <span className="ob-sheet-item-est"><span className="ob-sheet-approx">≈</span>{formatBRL(it.estValueBrl)}<span className="ob-sheet-year">/ano</span></span>
-                      ) : null}
-                      <span className="ob-sheet-radio" aria-hidden="true" />
-                    </span>
-                  </button>
-                )
-              })}
-              <button
-                type="button"
-                className="ob-sheet-unsure"
-                onClick={() => pickTier(sheetBrand, recommendedItemId(sheetBrand.source_items), true)}
-              >
-                <span>
-                  <span className="ob-sheet-unsure-title">Não tenho certeza</span>
-                  <span className="ob-sheet-unsure-sub">Mostramos o potencial e você confirma depois</span>
-                </span>
-                <span className="ob-sheet-chevron" aria-hidden="true">›</span>
-              </button>
-            </div>
-            <div className="ob-sheet-hint">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c1 8 4 11 12 12-8 1-11 4-12 12-1-8-4-11-12-12 8-1 11-4 12-12Z" /></svg>
-              <p>Conectando o Gmail, descobrimos sua versão exata automaticamente — sem precisar escolher.</p>
-            </div>
-          </div>
-        </div>
+        <TierSheet
+          brand={sheetBrand}
+          selectedId={unsure.has(sheetBrand.id) ? null : (sheetBrand.source_items.find((it) => selected.has(it.id))?.id ?? null)}
+          onPick={(itemId, markUnsure) => pickTier(sheetBrand, itemId, markUnsure)}
+          onClose={() => setSheetSourceId(null)}
+        />
       ) : null}
     </div>
   )
