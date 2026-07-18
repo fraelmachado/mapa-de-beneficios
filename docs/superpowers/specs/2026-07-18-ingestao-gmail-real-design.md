@@ -1,6 +1,6 @@
 # Ingestão real via Gmail — design (rev 2)
 
-**Data:** 2026-07-18 · **rev 2** incorpora a review adversarial do Codex (ver changelog no fim).
+**Data:** 2026-07-18 · **rev 3** — rev 2 incorpora a review adversarial do Codex; rev 3 troca o gate de login por **scan anônimo com retenção curta** (decisão do usuário). Ver changelog no fim.
 **Objetivo (do usuário):** sair do mock e ler o Gmail de verdade para detectar quais programas de benefícios o usuário tem, atribuindo-os ao radar. Guardar o e-mail (remetente, assunto, data) que atribuiu cada programa, para aprimoramento futuro.
 
 ## Decisões de escopo (travadas)
@@ -9,7 +9,7 @@
 2. **Arquitetura A — scan client-side, one-shot.** Google Identity Services (GIS) no browser → consent `gmail.readonly` → access token curto (~1h) → o browser chama a Gmail API direto. **Sem backend, sem token guardado, sem refresh token, sem worker/cron.**
 3. **Alcance OAuth = modo Testing.** App OAuth não-verificado, limitado aos test users cadastrados (~100). Roda hoje, sem revisão do Google. **Ressalva de conformidade (Codex):** `gmail.readonly` é *restricted scope*; publicar para terceiros exige verificação + security assessment + Limited Use + política de privacidade — não é só "virar a chave". Como já **persistimos metadados no Supabase**, o design abaixo já respeita minimização/retção/deleção para não travar essa promoção depois.
 4. **Detecção em nível de marca; tier sempre escolhido pelo usuário.** O e-mail identifica a **marca** (`spotify.com` → Spotify), **nunca** o produto/tier. Todo finding nasce com `itemId = null` (marca não-resolvida) e **não pode ser confirmado** enquanto o usuário não escolher um `source_item` — inclusive marcas de "tier único", que no catálogo são produtos específicos (Itaú→Personnalité, Bradesco→Aeternum, Amil→Amil One, Disney+→Premium): um e-mail da marca **não prova** posse do produto. Resolve-se no bottom-sheet existente. Sem default de tier, sem auto-tier.
-5. **Persistência atômica, sob identidade durável.** Seleção + evidência gravadas numa **única transação** (RPC). O caminho Gmail **exige sessão com conta vinculada** (não-anônima): metadado sensível de e-mail não é persistido sob a sessão anônima descartável (perde-se ao trocar de device). Se anônimo, o fluxo pede o login por magic link (reusa o upgrade do Perfil) **antes** de salvar.
+5. **Persistência atômica; scan anônimo permitido com retenção curta.** Seleção + evidência gravadas numa **única transação** (RPC). **Sem gate de login** — a sessão anônima pode escanear e salvar. Para não deixar metadado sensível órfão sob sessão descartável, a evidência de usuário **ainda anônimo** expira em **30 dias** (limpeza diária via `pg_cron`); os *programas* no radar (`user_sources`) **não** expiram, só a proveniência (remetente/assunto/data). **Vincular conta** (magic link, quando quiser) torna a evidência durável (deixa de ser anônimo → retenção não se aplica).
 6. **Idempotência e ingestão aditiva.** Rescan não duplica (`unique(user_id, gmail_account, source_id, gmail_message_id)` + upsert). O scan **soma** programas; nunca remove os já marcados. Reconciliação de assinatura cancelada é fora de escopo (append-only).
 7. **Sem monitor em background.** Re-escanear é ação manual. Alertas contínuos = eventual passo B (server-side), fora deste escopo.
 
@@ -22,7 +22,7 @@
 
 ## Fluxo de dados (end-to-end)
 
-1. Usuário escolhe o caminho Gmail em `MethodStep`. **Gate de conta:** se a sessão é anônima, pede o login (magic link, Perfil) antes de continuar. **Pré-consent:** um aviso curto (escopo lido, janela de tempo, o que é guardado no servidor, retenção, revogação) **antes** de abrir o popup do Google.
+1. Usuário escolhe o caminho Gmail em `MethodStep`. **Pré-consent:** aviso curto (escopo lido, janela de tempo, o que é guardado no servidor, **retenção de 30 dias p/ anônimo**, revogação) **antes** de abrir o popup do Google. Sem gate de login.
 2. `useGmailAuth`: carrega GIS, `initTokenClient({ client_id: VITE_GOOGLE_CLIENT_ID, scope: gmail.readonly })`, `requestAccessToken()`. Callback trata **cancelamento/erro** do popup (fechar sem consentir não trava a UI). Após o token, `GET users/me/profile` → `emailAddress` da conta Gmail; a UI **mostra qual conta** será escaneada e pede confirmação antes de qualquer persistência.
 3. `gmailScan(accessToken, catálogo, fetcher)` — **por domínio, não busca global** (corrige viés de cobertura/quota/ordenação):
    - Para cada domínio de `match_domains`: `messages.list?q=from:{domínio} newer_than:2y&maxResults=3` (concorrência limitada ~6). `// ponytail: por-domínio evita 1 remetente ruidoso mascarar os demais; ~25 lists baratos`.
@@ -51,6 +51,7 @@
 
   **`unique(user_id, gmail_account, source_id, gmail_message_id)`** (idempotência). RLS **own-rows** `select`/`insert`/**`delete`** com `user_id = auth.uid()`; grants a `authenticated`. Gravada **só para programas confirmados** e **só com sessão não-anônima**.
 - **RPC `add_gmail_sources(payload jsonb)`** — contrato atômico aditivo descrito acima. `payload` = array de `{ item_id, source_id, gmail_account, gmail_message_id, email_from, email_subject, email_date }`.
+- **Retenção (`pg_cron`):** job diário `delete from source_evidence e using auth.users u where e.user_id = u.id and u.is_anonymous and e.created_at < now() - interval '30 days'`. Requer a extensão `pg_cron` (confirmar no Supabase self-hosted; fallback = task agendada no Dokploy rodando o mesmo SQL via pg-meta). Roda como owner do job → bypassa RLS. `user_sources` não é tocado.
 
 ## Privacidade
 
@@ -58,6 +59,7 @@
 - **Minimização de dados** (`format=metadata`, só headers) — mas o **escopo autoriza a caixa toda** (`gmail.metadata` não aceita `q`): a cópia de consent diz isso honestamente.
 - Persistimos **metadados de e-mail (remetente, assunto, data)** dos programas confirmados. Cópia **não** afirma "nada foi lido / nenhum conteúdo" — assunto é conteúdo. Diz o que foi lido e o que foi guardado.
 - **Deleção:** ação "Desconectar Gmail e apagar dados" no Perfil → revoga o token via GIS (`google.accounts.oauth2.revoke`) + `delete from source_evidence` (own-rows). Explica que desconectar não desfaz programas já adicionados ao radar.
+- **Retenção:** evidência de usuário anônimo é apagada após 30 dias (só a proveniência; o programa fica). Vincular conta torna durável.
 - Findings rejeitados nunca são persistidos; os headers em memória são descartados no reject/back/erro/unmount.
 
 ## Telas / código
@@ -80,7 +82,7 @@
 ## Pré-requisitos manuais (usuário)
 
 - **Google Cloud (~5 min):** OAuth 2.0 Client (Web); consent em Testing + test users; habilitar Gmail API; authorized JS origins (`http://localhost:5173` + domínio prod). Client ID → `VITE_GOOGLE_CLIENT_ID`. Sem secret.
-- **SMTP (magic link):** o gate de conta usa magic link. Hoje o Resend não tem domínio verificado (entrega só ao endereço dono). Para testadores além do dono, **verificar um domínio no Resend** — senão o login deles não chega. Passo-a-passo dos dois entra no plano.
+- **pg_cron:** confirmar que a extensão está disponível no Supabase self-hosted (para a retenção de 30 dias); senão, agendar a limpeza via Dokploy. **Sem dependência de SMTP** — o scan não exige login (magic link segue opcional, no upgrade do Perfil).
 
 ## Fora de escopo (deferidos, com motivo)
 
@@ -90,10 +92,9 @@
 - **Reconciliação de assinatura cancelada** — ingestão é append-only por ora.
 - **Admin UI para `match_domains`** — seed é a autoridade; source criada no admin fica invisível ao scan até entrar no seed. Aceito conscientemente.
 - **Multi-conta Gmail simultânea** — `gmail_account` já é gravado (proveniência/chave), mas UX de várias contas fica para depois.
-- **Retenção automática/limpeza de órfãos** — mitigado pelo gate de conta não-anônima + deleção manual; job de expiração é passo B.
 
 ## Changelog rev 2 (o que a review adversarial mudou)
 
-**Incorporado:** brand→tier vira `itemId=null` que bloqueia confirmação (fim do default de tier); RPC atômica única `add_gmail_sources` (fim do best-effort e do read-modify-write no cliente); unique+upsert (idempotência); `gmail_account` gravado; match por boundary de label (fim do `endsWith` inseguro); `internalDate` no lugar do header `Date`; cópia de privacidade honesta ("metadados", não "nada do conteúdo"); gate de conta não-anônima antes de persistir; deleção (RLS delete + botão no Perfil + revoke GIS); scan por-domínio (fim do viés do cap global) + estado "parcial" + tratamento de 401/403/404/429/5xx + cancelamento do popup; teste de RLS cross-user e de atomicidade/idempotência.
+**Incorporado:** brand→tier vira `itemId=null` que bloqueia confirmação (fim do default de tier); RPC atômica única `add_gmail_sources` (fim do best-effort e do read-modify-write no cliente); unique+upsert (idempotência); `gmail_account` gravado; match por boundary de label (fim do `endsWith` inseguro); `internalDate` no lugar do header `Date`; cópia de privacidade honesta ("metadados", não "nada do conteúdo"); scan anônimo permitido com retenção de 30 dias p/ evidência anônima via `pg_cron` (rev 3, sem dependência de SMTP); deleção (RLS delete + botão no Perfil + revoke GIS); scan por-domínio (fim do viés do cap global) + estado "parcial" + tratamento de 401/403/404/429/5xx + cancelamento do popup; teste de RLS cross-user e de atomicidade/idempotência.
 
 **Deliberadamente deferido** (ver seção acima): backoff/quota como estratégia formal, admin de `match_domains`, multi-conta, reconciliação de cancelamento, job de retenção. Motivo comum: não travam o "uau" em modo Testing e cabem melhor no passo B / quando abrir para terceiros.
