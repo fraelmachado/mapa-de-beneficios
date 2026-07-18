@@ -1,69 +1,42 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { it, expect, vi } from 'vitest'
 import { screen, fireEvent, waitFor } from '@testing-library/react'
-import { renderWithProviders } from '../../test/renderWithProviders'
-
-vi.mock('../auth/AuthProvider', () => ({ useSession: () => ({ session: { user: { id: 'u1' } }, loading: false }) }))
-const saveMutate = vi.fn()
-vi.mock('./useSaveUserSources', () => ({ useSaveUserSources: () => ({ mutateAsync: saveMutate, isPending: false }) }))
-let existing: { data: string[] | undefined; isLoading: boolean; error: unknown; refetch: () => void }
-vi.mock('./useUserSources', () => ({ useUserSources: () => existing }))
-
+// ponytail: brief used bare `render`, but RevisarGmail's useAddGmailSources() calls
+// useMutation() which needs a QueryClientProvider in the tree or it throws synchronously.
+// renderWithProviders already wraps that (same fix ManualWizard.test.tsx uses for
+// useSaveUserSources's useMutation) — reuse it instead of inventing a local wrapper.
+import { renderWithProviders as render } from '../../test/renderWithProviders'
 import { RevisarGmail } from './RevisarGmail'
-const findings = [
-  { itemId: 'i1', provider: 'Nubank', variant: 'Ultravioleta', logo: null },
-  { itemId: 'i2', provider: 'Itaú', variant: 'Black', logo: null },
-]
-beforeEach(() => {
-  saveMutate.mockReset(); saveMutate.mockResolvedValue(undefined)
-  existing = { data: [], isLoading: false, error: null, refetch: vi.fn() }
+import type { Finding } from './gmail/types'
+
+const rpc = vi.fn(async (..._args: any[]) => ({ error: null }))
+vi.mock('../../lib/supabase', () => ({ supabase: { rpc: (...a: any[]) => rpc(...a) } }))
+vi.mock('../auth/AuthProvider', () => ({ useSession: () => ({ session: { user: { id: 'u1' } } }) }))
+
+const single: Finding = {
+  sourceId: 's1', provider: 'Spotify', logo: null,
+  items: [{ id: 'i1', label: 'Premium', sort_order: 1 }],
+  evidence: { gmailAccount: 'me@gmail.com', gmailMessageId: 'm1', emailFrom: 'a@spotify.com', emailSubject: 'x', emailDate: '2026-01-01T00:00:00Z' },
+}
+const multi: Finding = {
+  sourceId: 's2', provider: 'Nubank', logo: null,
+  items: [{ id: 'a', label: 'Gold', sort_order: 1 }, { id: 'b', label: 'Platinum', sort_order: 2 }],
+  evidence: { gmailAccount: 'me@gmail.com', gmailMessageId: 'm2', emailFrom: 'a@nubank.com.br', emailSubject: 'y', emailDate: '2026-01-01T00:00:00Z' },
+}
+
+it('marca de item único salva direto via add_gmail_sources', async () => {
+  const onDone = vi.fn()
+  render(<RevisarGmail findings={[single]} partial={false} onDone={onDone} />)
+  fireEvent.click(screen.getByRole('button', { name: /adicionar ao radar/i }))
+  await waitFor(() => expect(rpc).toHaveBeenCalledWith('add_gmail_sources', expect.anything()))
+  const payload = rpc.mock.calls.at(-1)![1].payload
+  expect(payload[0].item_id).toBe('i1')
+  expect(onDone).toHaveBeenCalled()
 })
 
-describe('RevisarGmail', () => {
-  it('salva a união de existentes + incluídos e chama onDone com os incluídos', async () => {
-    existing = { ...existing, data: ['x9'] }
-    const onDone = vi.fn()
-    renderWithProviders(<RevisarGmail findings={findings} onDone={onDone} />)
-    fireEvent.click(screen.getByRole('button', { name: /adicionar ao radar/i }))
-    await waitFor(() => expect(saveMutate).toHaveBeenCalledTimes(1))
-    expect([...saveMutate.mock.calls[0][0]].sort()).toEqual(['i1', 'i2', 'x9'])
-    await waitFor(() => expect(onDone).toHaveBeenCalledWith(findings))
-  })
-  it('descartar um achado o remove do save e do onDone', async () => {
-    const onDone = vi.fn()
-    renderWithProviders(<RevisarGmail findings={findings} onDone={onDone} />)
-    fireEvent.click(screen.getByRole('button', { name: /itaú black/i }))
-    fireEvent.click(screen.getByRole('button', { name: /adicionar ao radar/i }))
-    await waitFor(() => expect(saveMutate).toHaveBeenCalled())
-    expect(saveMutate.mock.calls[0][0]).not.toContain('i2')
-    expect(onDone).toHaveBeenCalledWith([findings[0]])
-  })
-  it('CTA desabilitada com 0 incluídos', () => {
-    renderWithProviders(<RevisarGmail findings={findings} onDone={vi.fn()} />)
-    fireEvent.click(screen.getByRole('button', { name: /nubank ultravioleta/i }))
-    fireEvent.click(screen.getByRole('button', { name: /itaú black/i }))
-    expect(screen.getByRole('button', { name: /adicionar ao radar/i })).toBeDisabled()
-  })
-  it('CTA desabilitada enquanto existentes carregam', () => {
-    existing = { ...existing, data: undefined, isLoading: true }
-    renderWithProviders(<RevisarGmail findings={findings} onDone={vi.fn()} />)
-    expect(screen.getByRole('button', { name: /adicionar ao radar/i })).toBeDisabled()
-  })
-  it('erro ao carregar existentes: alerta inline + retry, mantém as escolhas e não salva', () => {
-    const refetch = vi.fn()
-    existing = { data: undefined, isLoading: false, error: new Error('down'), refetch }
-    renderWithProviders(<RevisarGmail findings={findings} onDone={vi.fn()} />)
-    expect(screen.getByRole('button', { name: /nubank ultravioleta/i })).toBeInTheDocument() // lista preservada
-    expect(screen.getByRole('alert')).toHaveTextContent(/não foi possível preparar/i)
-    expect(screen.getByRole('button', { name: /adicionar ao radar/i })).toBeDisabled()
-    fireEvent.click(screen.getByRole('button', { name: /tentar novamente/i }))
-    expect(refetch).toHaveBeenCalledTimes(1)
-    expect(saveMutate).not.toHaveBeenCalled()
-  })
-  it('mantém a seleção após falha no save', async () => {
-    saveMutate.mockRejectedValueOnce(new Error('write'))
-    renderWithProviders(<RevisarGmail findings={findings} onDone={vi.fn()} />)
-    fireEvent.click(screen.getByRole('button', { name: /adicionar ao radar/i }))
-    expect(await screen.findByRole('alert')).toHaveTextContent(/não foi possível salvar/i)
-    expect(screen.getByRole('button', { name: /nubank ultravioleta/i })).toHaveAttribute('aria-pressed', 'true')
-  })
+it('marca multi-tier bloqueia a CTA até escolher o tier', async () => {
+  render(<RevisarGmail findings={[multi]} partial={false} onDone={vi.fn()} />)
+  expect(screen.getByRole('button', { name: /adicionar ao radar/i })).toBeDisabled()
+  fireEvent.click(screen.getByRole('button', { name: /Nubank/i })) // abre a sheet
+  fireEvent.click(screen.getByRole('button', { name: /Platinum/i }))
+  await waitFor(() => expect(screen.getByRole('button', { name: /adicionar ao radar/i })).not.toBeDisabled())
 })
