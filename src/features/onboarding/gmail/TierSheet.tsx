@@ -13,12 +13,13 @@ export function recommendedItemId(items: Source['source_items']): string {
 }
 
 export function TierSheet({
-  brand, selectedId, onPick, onClose,
+  brand, selectedId, onPick, onClose, onRemove,
 }: {
   brand: Source
   selectedId: string | null
   onPick: (itemId: string, markUnsure?: boolean) => void
   onClose: () => void
+  onRemove?: () => void
 }) {
   const recId = recommendedItemId(brand.source_items)
   return (
@@ -60,6 +61,15 @@ export function TierSheet({
             </span>
             <span className="ob-sheet-chevron" aria-hidden="true">›</span>
           </button>
+          {onRemove ? (
+            <button type="button" className="ob-sheet-unsure" onClick={onRemove}>
+              <span>
+                <span className="ob-sheet-unsure-title">Não tenho o {brand.name}</span>
+                <span className="ob-sheet-unsure-sub">Remover do radar</span>
+              </span>
+              <span className="ob-sheet-chevron" aria-hidden="true">›</span>
+            </button>
+          ) : null}
         </div>
         <div className="ob-sheet-hint">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c1 8 4 11 12 12-8 1-11 4-12 12-1-8-4-11-12-12 8-1 11-4 12-12Z" /></svg>

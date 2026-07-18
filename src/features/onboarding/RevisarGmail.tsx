@@ -66,7 +66,7 @@ export function RevisarGmail({
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
             </button>
           ) : null}
-          <p className="lbl" style={{ color: 'var(--ok)' }}>Descoberta concluída</p>
+          <p className="lbl" style={{ color: 'var(--ok)' }}>{partial ? 'Descoberta parcial' : 'Descoberta concluída'}</p>
           <h1 className="ob-title">Revise o que encontramos</h1>
           <p className="review-count">incluídos <b>{formatBRL(estValue)}</b>/ano estimado</p>
           <div className="review-list">
@@ -89,7 +89,7 @@ export function RevisarGmail({
             })}
           </div>
           <p className="review-note">
-            Lemos os <b>metadados</b> (remetente, assunto e data) de e-mails das marcas do catálogo — nunca o conteúdo. Guardamos só o que você confirmar aqui.
+            Lemos os <b>metadados</b> (remetente, assunto e data) de e-mails das marcas do catálogo — nunca o corpo do e-mail. Guardamos só o que você confirmar aqui.
           </p>
           {partial ? <p className="review-note" role="status">Alguns programas não puderam ser verificados agora; você pode adicionar manualmente depois.</p> : null}
           {blocked ? <p className="review-note" role="status">Escolha a versão das marcas com “Escolher versão” para continuar.</p> : null}
@@ -115,6 +115,11 @@ export function RevisarGmail({
             setSheetId(null)
           }}
           onClose={() => setSheetId(null)}
+          onRemove={() => {
+            setExcluded((prev) => new Set(prev).add(sheetBrand.sourceId))
+            setChosen((prev) => { const n = new Map(prev); n.delete(sheetBrand.sourceId); return n })
+            setSheetId(null)
+          }}
         />
       ) : null}
     </div>

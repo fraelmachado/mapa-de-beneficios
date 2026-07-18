@@ -138,7 +138,7 @@ export function MethodStep({ onManual, onBack, onGmail }: { onManual: () => void
                   <strong>Conectar Gmail</strong>
                   <span className="ob-badge-magic">Beta</span>
                 </span>
-                <p>Conectamos ao seu Gmail e lemos só remetente, assunto e data dos e-mails das marcas do catálogo — nunca o conteúdo. Você revisa antes de qualquer coisa ser salva.</p>
+                <p>Conectamos ao seu Gmail e lemos só remetente, assunto e data dos e-mails das marcas do catálogo — nunca o corpo do e-mail. Você revisa antes de qualquer coisa ser salva.</p>
                 <span className="ob-tags">
                   <span className="ob-tag">Mais rápido</span>
                   <span className="ob-tag">Você revisa antes de salvar</span>
@@ -166,7 +166,7 @@ export function MethodStep({ onManual, onBack, onGmail }: { onManual: () => void
         </div>
         <div className="ob-trust">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5" /><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" /></svg>
-          <p><b>Só metadados.</b> Lemos remetente, assunto e data dos e-mails — nunca o conteúdo. Você revoga o acesso quando quiser.</p>
+          <p><b>Só metadados.</b> Lemos remetente, assunto e data dos e-mails — nunca o corpo do e-mail. Você revoga o acesso quando quiser.</p>
         </div>
         <div className="ob-method-actions">
           <Button onClick={onManual}>Adicionar cartões →</Button>

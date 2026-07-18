@@ -39,3 +39,26 @@ it('marca multi-tier bloqueia a CTA até escolher o tier', async () => {
   fireEvent.click(screen.getByRole('button', { name: /Platinum/i }))
   await waitFor(() => expect(screen.getByRole('button', { name: /adicionar ao radar/i })).not.toBeDisabled())
 })
+
+it('marca multi-tier: "Não tenho / remover" no sheet exclui a marca e libera a CTA', async () => {
+  render(<RevisarGmail findings={[single, multi]} partial={false} onDone={vi.fn()} />)
+  // com o multi ainda sem tier escolhido, a CTA fica bloqueada
+  expect(screen.getByRole('button', { name: /adicionar ao radar/i })).toBeDisabled()
+
+  fireEvent.click(screen.getByRole('button', { name: /Nubank/i })) // abre a sheet
+  fireEvent.click(screen.getByRole('button', { name: /Não tenho o Nubank/i }))
+
+  // sheet fechou, linha do Nubank fica "off" (excluída)
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /Nubank/i })).toHaveAttribute('aria-pressed', 'false')
+
+  // CTA desbloqueada (Nubank excluído não conta mais como pendente)
+  const cta = screen.getByRole('button', { name: /adicionar ao radar/i })
+  expect(cta).not.toBeDisabled()
+
+  fireEvent.click(cta)
+  await waitFor(() => expect(rpc).toHaveBeenCalledWith('add_gmail_sources', expect.anything()))
+  const payload = rpc.mock.calls.at(-1)![1].payload
+  expect(payload).toHaveLength(1)
+  expect(payload[0].source_id).toBe('s1') // Nubank (s2) não entra no payload
+})
