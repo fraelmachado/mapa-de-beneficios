@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import './perfil.css'
 import { useSession } from '../auth/AuthProvider'
 import { useLinkEmail } from './useLinkEmail'
+import { useDisconnectGmail } from '../onboarding/useDisconnectGmail'
 import { Button } from '../../ui/Button'
 import { toggleTheme } from '../../ui/theme'
 import { supabase } from '../../lib/supabase'
@@ -31,6 +32,7 @@ export function Perfil() {
     document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light',
   )
   const link = useLinkEmail()
+  const disconnect = useDisconnectGmail(user?.id)
 
   async function submit(event: FormEvent) {
     event.preventDefault()
@@ -146,6 +148,13 @@ export function Perfil() {
             </button>
           ) : null}
 
+          <button className="profile-row" type="button" disabled={disconnect.isPending} onClick={() => disconnect.mutate()}>
+            <span className="profile-row-icon" aria-hidden="true">
+              <svg {...stroke}><path d="M3 6h18" /><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /></svg>
+            </span>
+            <span className="profile-row-label">{disconnect.isPending ? 'Apagando…' : 'Desconectar Gmail e apagar dados'}</span>
+          </button>
+
           <a className="profile-row" href="#">
             <span className="profile-row-icon" aria-hidden="true">
               <svg {...stroke}><circle cx="12" cy="12" r="9" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
@@ -155,6 +164,7 @@ export function Perfil() {
           </a>
         </div>
         {signOutError ? <p className="profile-error" role="alert">Não foi possível encerrar a sessão. Tente de novo.</p> : null}
+        {disconnect.isSuccess ? <p className="muted" style={{ fontSize: 14 }}>Metadados do Gmail apagados. Seus programas seguem no radar. ✓</p> : null}
       </section>
 
       <p className="profile-version">Mapa de Benefícios · v1.0</p>
