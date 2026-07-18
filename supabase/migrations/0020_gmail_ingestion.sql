@@ -60,3 +60,22 @@ end;
 $$;
 
 grant execute on function add_gmail_sources(jsonb) to authenticated;
+
+-- 4. Retenção: evidência de usuário AINDA anônimo expira em 30 dias.
+-- Só a proveniência some; user_sources (os programas) permanecem.
+-- Requer pg_cron no Supabase self-hosted. Se indisponível em produção, agendar
+-- o mesmo DELETE via task do Dokploy chamando pg-meta /pg/query (service_role).
+-- Ver spec: seção "Modelo de dados" e memória mapa-de-beneficios-prod-supabase-ops.
+create extension if not exists pg_cron;
+
+select cron.schedule(
+  'source_evidence_anon_retention',
+  '17 4 * * *',
+  $$
+    delete from public.source_evidence e
+    using auth.users u
+    where e.user_id = u.id
+      and u.is_anonymous
+      and e.created_at < now() - interval '30 days'
+  $$
+);
