@@ -30,3 +30,33 @@ grant select, insert, update, delete on source_evidence to service_role;
 -- usuário autenticado (inclusive anônimo) gerencia só as próprias evidências
 create policy "source_evidence_own" on source_evidence for all to authenticated
   using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+-- 3. Grava seleção + evidência numa única transação (atômico, aditivo, idempotente).
+-- security invoker: RLS de user_sources/source_evidence se aplica; user_id = auth.uid().
+create function add_gmail_sources(payload jsonb)
+returns void
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+declare rec jsonb;
+begin
+  for rec in select value from jsonb_array_elements(payload) as value loop
+    -- aditivo: não remove seleções anteriores, não duplica
+    insert into public.user_sources (user_id, source_item_id)
+    values (auth.uid(), (rec->>'item_id')::uuid)
+    on conflict (user_id, source_item_id) do nothing;
+
+    -- idempotente: rescan da mesma mensagem não duplica evidência
+    insert into public.source_evidence
+      (user_id, source_id, gmail_account, gmail_message_id, email_from, email_subject, email_date)
+    values (
+      auth.uid(), (rec->>'source_id')::uuid, rec->>'gmail_account', rec->>'gmail_message_id',
+      rec->>'email_from', rec->>'email_subject', (rec->>'email_date')::timestamptz
+    )
+    on conflict (user_id, gmail_account, source_id, gmail_message_id) do nothing;
+  end loop;
+end;
+$$;
+
+grant execute on function add_gmail_sources(jsonb) to authenticated;
