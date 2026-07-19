@@ -146,7 +146,7 @@ export function RevisarGmail({
           <div className="ob-cta">
             <Button onClick={submit} disabled={blocked || saving}>
               {saving ? 'Salvando…'
-                : blocked ? `Falta ${pendingCount}`
+                : blocked ? `Falta${pendingCount > 1 ? 'm' : ''} ${pendingCount}`
                 : haveList.length > 0 ? `Adicionar ${haveList.length} ao radar`
                 : 'Concluir'}
             </Button>

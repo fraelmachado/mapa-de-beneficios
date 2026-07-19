@@ -26,7 +26,7 @@ const cta = () => screen.getByRole('button', { name: /Falta|Adicionar \d|Conclui
 it('toda entrada começa pendente: CTA bloqueada e progresso 0 de N', () => {
   render(<RevisarGmail findings={[single, multi]} partial={false} onDone={vi.fn()} />)
   expect(cta()).toBeDisabled()
-  expect(cta()).toHaveTextContent(/Falta 2/)
+  expect(cta()).toHaveTextContent('Faltam 2') // plural
   expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
 })
 
@@ -56,6 +56,7 @@ it('single "Não" descarta → CTA "Concluir" sem chamar a RPC', async () => {
 it('multi "Tenho ›" abre o sheet, escolher tier confirma e salva o tier certo', async () => {
   render(<RevisarGmail findings={[multi]} partial={false} onDone={vi.fn()} />)
   expect(cta()).toBeDisabled()
+  expect(cta()).toHaveTextContent('Falta 1') // singular
   fireEvent.click(screen.getByRole('button', { name: /Tenho ›/ }))
   fireEvent.click(screen.getByRole('button', { name: /Platinum/ }))
   const btn = screen.getByRole('button', { name: /Adicionar 1 ao radar/ })
