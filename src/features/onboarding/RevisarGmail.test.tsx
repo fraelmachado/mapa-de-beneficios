@@ -1,15 +1,14 @@
-import { it, expect, vi } from 'vitest'
+import { it, expect, vi, beforeEach } from 'vitest'
 import { screen, fireEvent, waitFor } from '@testing-library/react'
-// ponytail: brief used bare `render`, but RevisarGmail's useAddGmailSources() calls
-// useMutation() which needs a QueryClientProvider in the tree or it throws synchronously.
-// renderWithProviders already wraps that (same fix ManualWizard.test.tsx uses for
-// useSaveUserSources's useMutation) — reuse it instead of inventing a local wrapper.
+// renderWithProviders envolve o QueryClientProvider que useAddGmailSources (useMutation) exige.
 import { renderWithProviders as render } from '../../test/renderWithProviders'
 import { RevisarGmail } from './RevisarGmail'
 import type { Finding } from './gmail/types'
 
 const rpc = vi.fn(async (..._args: any[]) => ({ error: null }))
 vi.mock('../../lib/supabase', () => ({ supabase: { rpc: (...a: any[]) => rpc(...a) } }))
+
+beforeEach(() => rpc.mockClear())
 
 const single: Finding = {
   sourceId: 's1', provider: 'Spotify', logo: null,
@@ -22,43 +21,68 @@ const multi: Finding = {
   evidence: { gmailAccount: 'me@gmail.com', gmailMessageId: 'm2', emailFrom: 'a@nubank.com.br', emailSubject: 'y', emailDate: '2026-01-01T00:00:00Z' },
 }
 
-it('marca de item único salva direto via add_gmail_sources', async () => {
+const cta = () => screen.getByRole('button', { name: /Falta|Adicionar \d|Concluir|Salvando/ })
+
+it('toda entrada começa pendente: CTA bloqueada e progresso 0 de N', () => {
+  render(<RevisarGmail findings={[single, multi]} partial={false} onDone={vi.fn()} />)
+  expect(cta()).toBeDisabled()
+  expect(cta()).toHaveTextContent('Faltam 2') // plural
+  expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
+})
+
+it('single "Tenho" confirma → CTA libera e salva o item único', async () => {
   const onDone = vi.fn()
   render(<RevisarGmail findings={[single]} partial={false} onDone={onDone} />)
-  fireEvent.click(screen.getByRole('button', { name: /adicionar ao radar/i }))
+  fireEvent.click(screen.getByRole('button', { name: /^Tenho$/ }))
+  const btn = screen.getByRole('button', { name: /Adicionar 1 ao radar/ })
+  expect(btn).not.toBeDisabled()
+  fireEvent.click(btn)
   await waitFor(() => expect(rpc).toHaveBeenCalledWith('add_gmail_sources', expect.anything()))
-  const payload = rpc.mock.calls.at(-1)![1].payload
-  expect(payload[0].item_id).toBe('i1')
-  expect(onDone).toHaveBeenCalled()
+  expect(rpc.mock.calls.at(-1)![1].payload[0].item_id).toBe('i1')
+  await waitFor(() => expect(onDone).toHaveBeenCalled())
 })
 
-it('marca multi-tier bloqueia a CTA até escolher o tier', async () => {
+it('single "Não" descarta → CTA "Concluir" sem chamar a RPC', async () => {
+  const onDone = vi.fn()
+  render(<RevisarGmail findings={[single]} partial={false} onDone={onDone} />)
+  fireEvent.click(screen.getByRole('button', { name: /^Não$/ }))
+  const btn = screen.getByRole('button', { name: /Concluir/ })
+  expect(btn).not.toBeDisabled()
+  fireEvent.click(btn)
+  await waitFor(() => expect(onDone).toHaveBeenCalledWith([]))
+  expect(rpc).not.toHaveBeenCalled()
+})
+
+it('multi "Tenho ›" abre o sheet, escolher tier confirma e salva o tier certo', async () => {
   render(<RevisarGmail findings={[multi]} partial={false} onDone={vi.fn()} />)
-  expect(screen.getByRole('button', { name: /adicionar ao radar/i })).toBeDisabled()
-  fireEvent.click(screen.getByRole('button', { name: /Nubank/i })) // abre a sheet
-  fireEvent.click(screen.getByRole('button', { name: /Platinum/i }))
-  await waitFor(() => expect(screen.getByRole('button', { name: /adicionar ao radar/i })).not.toBeDisabled())
+  expect(cta()).toBeDisabled()
+  expect(cta()).toHaveTextContent('Falta 1') // singular
+  fireEvent.click(screen.getByRole('button', { name: /Tenho ›/ }))
+  fireEvent.click(screen.getByRole('button', { name: /Platinum/ }))
+  const btn = screen.getByRole('button', { name: /Adicionar 1 ao radar/ })
+  expect(btn).not.toBeDisabled()
+  fireEvent.click(btn)
+  await waitFor(() => expect(rpc).toHaveBeenCalled())
+  expect(rpc.mock.calls.at(-1)![1].payload[0].item_id).toBe('b')
 })
 
-it('marca multi-tier: "Não tenho / remover" no sheet exclui a marca e libera a CTA', async () => {
-  render(<RevisarGmail findings={[single, multi]} partial={false} onDone={vi.fn()} />)
-  // com o multi ainda sem tier escolhido, a CTA fica bloqueada
-  expect(screen.getByRole('button', { name: /adicionar ao radar/i })).toBeDisabled()
-
-  fireEvent.click(screen.getByRole('button', { name: /Nubank/i })) // abre a sheet
+it('multi "Não tenho" no sheet descarta a marca', async () => {
+  render(<RevisarGmail findings={[multi]} partial={false} onDone={vi.fn()} />)
+  fireEvent.click(screen.getByRole('button', { name: /Tenho ›/ }))
   fireEvent.click(screen.getByRole('button', { name: /Não tenho o Nubank/i }))
-
-  // sheet fechou, linha do Nubank fica "off" (excluída)
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
-  expect(screen.getByRole('button', { name: /Nubank/i })).toHaveAttribute('aria-pressed', 'false')
+  // decidido (não tenho) → CTA "Concluir" liberada
+  expect(screen.getByRole('button', { name: /Concluir/ })).not.toBeDisabled()
+})
 
-  // CTA desbloqueada (Nubank excluído não conta mais como pendente)
-  const cta = screen.getByRole('button', { name: /adicionar ao radar/i })
-  expect(cta).not.toBeDisabled()
-
-  fireEvent.click(cta)
-  await waitFor(() => expect(rpc).toHaveBeenCalledWith('add_gmail_sources', expect.anything()))
+it('payload leva só os "tenho": single tenho + multi não → 1 item', async () => {
+  render(<RevisarGmail findings={[single, multi]} partial={false} onDone={vi.fn()} />)
+  fireEvent.click(screen.getByRole('button', { name: /^Tenho$/ }))          // single → have
+  fireEvent.click(screen.getAllByRole('button', { name: /^Não$/ })[0])       // multi → no
+  const btn = screen.getByRole('button', { name: /Adicionar 1 ao radar/ })
+  fireEvent.click(btn)
+  await waitFor(() => expect(rpc).toHaveBeenCalled())
   const payload = rpc.mock.calls.at(-1)![1].payload
   expect(payload).toHaveLength(1)
-  expect(payload[0].source_id).toBe('s1') // Nubank (s2) não entra no payload
+  expect(payload[0].source_id).toBe('s1')
 })
