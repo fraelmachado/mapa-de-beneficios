@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Revisar — implementado</title>
+<style>
+/* tokens reais (tema escuro) */
+:root{--bg:#0E0F13;--surface:#17181E;--surface-2:#1D1E25;--muted:#82838B;--line:#2A2B33;--line-2:#23242B;
+--accent:#6E80FF;--accent-soft:#20233A;--accent-ink:#fff;--ink:#F4F4F2;--ink-2:#BFC0C6;--ok:#0E9F6E;--warn:#E7A95B;
+--shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -18px rgba(0,0,0,.7);--ease:cubic-bezier(.2,.7,.3,1);
+--s2:8px;--s3:12px;--s4:16px;--s5:20px;--s6:24px;--font:'Onest',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#08090c;color:var(--ink);font-family:var(--font);display:flex;justify-content:center;padding:34px 20px}
+.phone{width:392px;background:var(--bg);border:1px solid var(--line);border-radius:38px;overflow:hidden;box-shadow:0 30px 80px -40px #000}
+.ob-card{padding:26px 20px 12px}
+.ob-back-btn{width:38px;height:38px;border-radius:11px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);display:grid;place-items:center;margin-bottom:var(--s3)}
+.lbl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:0 0 6px}
+.ob-title{font-size:25px;font-weight:700;letter-spacing:-.03em;line-height:1.16;margin:8px 0}
+/* --- CSS REAL que escrevi --- */
+.review-prog{display:flex;align-items:center;justify-content:space-between;margin:0 0 var(--s2);font-size:12.5px;font-weight:700;color:var(--ink-2)}
+.review-prog b{color:var(--ink)}
+.review-bar{height:6px;border-radius:999px;background:var(--line);overflow:hidden;margin:0 0 var(--s3)}
+.review-bar>i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--ok));transition:width .25s var(--ease)}
+.review-progval{margin:0 0 var(--s4);font-size:12.5px;color:var(--ink-2)}
+.review-progval b{color:var(--ink);font-weight:800}
+.review-list{display:flex;flex-direction:column;gap:8px}
+.review-item{position:relative;display:flex;align-items:center;gap:12px;width:100%;padding:12px 13px;border-radius:14px;border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow);text-align:left;color:var(--ink)}
+.review-item.review-pend{box-shadow:var(--shadow),inset 3px 0 0 var(--warn)}
+.review-item.review-done{border-color:transparent}
+.review-item.review-done::after{content:"";position:absolute;inset:-1px;border:2px solid var(--accent);border-radius:14px;box-shadow:0 0 0 4px var(--accent-soft);pointer-events:none}
+.review-item.review-no{opacity:.5}
+.review-item-mark{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:11px;background:var(--accent-soft);color:var(--accent);font-weight:800}
+.review-item-body{flex:1;min-width:0;display:grid;gap:2px}
+.review-item-body strong{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.review-item-body span{font-size:11.5px;color:var(--muted)}
+.review-item-body span.pend{color:var(--warn);font-weight:600}
+.review-item-body span.ok{color:var(--ok);font-weight:600}
+.review-actions{flex:none;display:flex;align-items:center;gap:6px}
+.review-yes{border:0;background:var(--accent);color:var(--accent-ink);font:inherit;font-weight:700;font-size:12px;padding:7px 11px;border-radius:9px;cursor:pointer;white-space:nowrap}
+.review-no-btn{background:transparent;color:var(--muted);border:1px solid var(--line);font:inherit;font-weight:700;font-size:12px;padding:7px 11px;border-radius:9px;cursor:pointer}
+.review-undo{border:0;background:none;color:var(--muted);font:inherit;font-size:11.5px;font-weight:700;text-decoration:underline;cursor:pointer;padding:6px 4px}
+.review-check{flex:none;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);color:var(--muted);font-weight:800}
+.review-check.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.review-note{margin:var(--s4) 0 0;font-size:12px;line-height:1.45;color:var(--ink-2)}
+.foot{padding:14px 20px 20px;border-top:1px solid var(--line-2)}
+.cta{width:100%;border:0;border-radius:13px;padding:15px;font:inherit;font-weight:800;font-size:15px;cursor:pointer}
+.cta[disabled]{background:var(--surface-2);color:var(--muted);border:1px solid var(--line);cursor:default}
+.cta:not([disabled]){background:var(--accent);color:#fff}
+</style></head>
+<body>
+<div class="phone">
+  <div class="ob-card">
+    <div class="ob-back-btn">‹</div>
+    <p class="lbl" style="color:var(--ok)">Descoberta concluída</p>
+    <h1 class="ob-title">Revise o que encontramos</h1>
+    <div class="review-prog"><span>confirme cada um</span><span><b>3</b> de 5</span></div>
+    <div class="review-bar"><i style="width:60%"></i></div>
+    <p class="review-progval">≈ <b>R$ 1.390</b>/ano em benefícios</p>
+    <div class="review-list">
+      <div class="review-item review-pend">
+        <span class="review-item-mark">S</span>
+        <span class="review-item-body"><strong>Spotify</strong><span class="pend">confirme • via Spotify</span></span>
+        <span class="review-actions"><button class="review-yes">Tenho</button><button class="review-no-btn">Não</button></span>
+      </div>
+      <div class="review-item review-pend">
+        <span class="review-item-mark">N</span>
+        <span class="review-item-body"><strong>Nubank</strong><span class="pend">escolher versão • via Nubank</span></span>
+        <span class="review-actions"><button class="review-yes">Tenho ›</button><button class="review-no-btn">Não</button></span>
+      </div>
+      <div class="review-item review-done">
+        <span class="review-item-mark">D</span>
+        <span class="review-item-body"><strong>Disney+ Premium</strong><span class="ok">tenho • via Disney+</span></span>
+        <span class="review-actions"><span class="review-check ok">✓</span><button class="review-undo">desfazer</button></span>
+      </div>
+      <div class="review-item review-done">
+        <span class="review-item-mark">I</span>
+        <span class="review-item-body"><strong>Itaú Personnalité</strong><span class="ok">tenho • via Itaú</span></span>
+        <span class="review-actions"><span class="review-check ok">✓</span><button class="review-undo">trocar</button></span>
+      </div>
+      <div class="review-item review-no">
+        <span class="review-item-mark">A</span>
+        <span class="review-item-body"><strong>Amil</strong><span>não tenho</span></span>
+        <span class="review-actions"><button class="review-undo">desfazer</button></span>
+      </div>
+    </div>
+    <p class="review-note">Lemos os <b>metadados</b> (remetente, assunto e data) de e-mails das marcas do catálogo — nunca o corpo do e-mail. Guardamos só o que você confirmar aqui.</p>
+  </div>
+  <div class="foot"><button class="cta" disabled>Falta 2</button></div>
+</div>
+</body></html>

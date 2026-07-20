@@ -31,7 +31,7 @@ test('gmail method: card leads to the real consent gate (no OAuth driven here)',
   await page.screenshot({ path: `test-results/${testInfo.project.name}-gmail-consent.png`, fullPage: true })
 })
 
-for (const route of ['/painel', '/buscar', '/perfil', '/beneficio/inexistente']) {
+for (const route of ['/painel', '/buscar', '/programas', '/perfil', '/beneficio/inexistente']) {
   test(`${route} renders without overflow`, async ({ page }, testInfo) => {
     await page.goto(route)
     await page.waitForLoadState('networkidle')
@@ -54,6 +54,16 @@ for (const route of ['/painel', '/buscar', '/perfil', '/beneficio/inexistente'])
     await page.screenshot({ path: `test-results/${testInfo.project.name}${slug}.png`, fullPage: true })
   })
 }
+
+test('nav "Programas" leads to /programas', async ({ page }, testInfo) => {
+  await page.goto('/painel')
+  await page.waitForLoadState('networkidle')
+  const desktop = testInfo.project.name.startsWith('desktop')
+  const nav = desktop ? page.locator('.side') : page.locator('.tabbar')
+  await nav.getByRole('link', { name: /programas/i }).click()
+  await expect(page).toHaveURL(/\/programas$/)
+  await expect(page.getByRole('heading', { name: 'Programas' })).toBeVisible()
+})
 
 test('manual setup produces a populated radar and navigable detail', async ({ page }, testInfo) => {
   await page.goto('/onboarding?mode=edit')

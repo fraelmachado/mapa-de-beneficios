@@ -4,7 +4,7 @@ import { PainelIcon, SearchIcon, ProgramasIcon, PerfilIcon } from './navIcons'
 const items = [
   { to: '/painel', label: 'Painel', Icon: PainelIcon },
   { to: '/buscar', label: 'Buscar', Icon: SearchIcon },
-  { to: '/onboarding?mode=edit', label: 'Programas', Icon: ProgramasIcon },
+  { to: '/programas', label: 'Programas', Icon: ProgramasIcon },
   { to: '/perfil', label: 'Perfil', Icon: PerfilIcon },
 ]
 

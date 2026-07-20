@@ -1,0 +1,28 @@
+.programas-page { display: grid; gap: var(--s5); }
+.programas-page header h1 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -.03em; }
+.programas-page .lbl { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.prg-summary { display: grid; gap: 9px; padding: 15px 16px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
+.prg-count { font-size: 15px; font-weight: 800; color: var(--ink); }
+.prg-prov { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+.prg-chip { font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); }
+.prg-chip.g { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); background: var(--accent-soft); }
+.prg-chip.m { color: var(--ink-2); }
+.prg-sub { font-size: 12px; color: var(--muted); }
+.prg-actions { display: flex; gap: 8px; }
+.prg-act { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 12px; border-radius: 12px; font: inherit; font-weight: 700; font-size: 13.5px; cursor: pointer; border: 1px solid transparent; }
+.prg-act.p { background: var(--accent); color: var(--accent-ink); }
+.prg-act.g { background: transparent; color: var(--ink); border-color: var(--line); }
+.prg-act:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.prg-error { margin: 0; font-size: 13px; color: var(--warn); font-weight: 600; }
+.prg-meta { display: flex; align-items: center; gap: 6px; }
+.prg-tag { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 999px; }
+.prg-tag.g { color: var(--accent); background: var(--accent-soft); }
+.prg-tag.m { color: var(--ink-2); background: var(--surface-2); border: 1px solid var(--line); }
+.prg-when { font-size: 11px; color: var(--muted); }
+.prg-more { flex: none; width: 30px; height: 30px; border-radius: 9px; border: 1px solid var(--line); background: transparent; color: var(--muted); font-size: 16px; font-weight: 800; cursor: pointer; line-height: 1; }
+.prg-more:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.prg-empty { padding: 26px 16px; text-align: center; color: var(--ink-2); font-size: 13.5px; border: 1px dashed var(--line); border-radius: 14px; }
+.prg-sheet-div { height: 1px; background: var(--line); margin: 4px 2px 10px; }
+.prg-remove { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 13px 14px; border-radius: 15px; border: 1px solid var(--line); background: transparent; color: var(--warn); font: inherit; font-weight: 700; cursor: pointer; }
+.prg-remove:disabled { opacity: .6; cursor: not-allowed; }
+.prg-remove:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

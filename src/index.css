@@ -2,6 +2,7 @@
 @import './ui/layout.css';
 @import './features/onboarding/onboarding.css';
 @import './features/painel/painel.css';
+@import './features/programas/programas.css';
 @import './features/busca/search.css';
 @import './features/detalhe/benefit-detail.css';
 @import './features/perfil/perfil.css';

@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisar — opções 1 e 3</title>
+<style>
+  :root{
+    --bg:#0E0F13; --surface:#17181E; --surface-2:#1D1E25; --muted:#82838B;
+    --line:#2A2B33; --line-2:#23242B; --accent:#6E80FF; --accent-soft:#20233A;
+    --ink:#F4F4F2; --ink-2:#BFC0C6; --ok:#0E9F6E; --ok-soft:#12241C;
+    --warn:#E7A95B; --warn-soft:#2A2113;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 30px -18px rgba(0,0,0,.7);
+    --ease:cubic-bezier(.2,.7,.3,1);
+    --font:'Onest',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#08090c;color:var(--ink);font-family:var(--font);
+    display:flex;gap:40px;justify-content:center;align-items:flex-start;
+    padding:36px 24px 48px;flex-wrap:wrap}
+  .col{display:flex;flex-direction:column;align-items:center;gap:14px}
+  .cap{font-size:13px;color:var(--muted);font-weight:700;letter-spacing:.02em}
+  .cap b{color:var(--ink)}
+  .phone{width:390px;height:760px;background:var(--bg);border-radius:38px;
+    border:1px solid var(--line);overflow:hidden;display:flex;flex-direction:column;
+    box-shadow:0 30px 80px -40px #000}
+  .scroll{flex:1;overflow:auto;padding:26px 20px 10px}
+  .foot{padding:14px 20px calc(18px);border-top:1px solid var(--line-2);background:var(--bg)}
+  .lbl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ok);margin:0 0 6px}
+  .h1{font-size:24px;font-weight:800;letter-spacing:-.03em;margin:0 0 10px}
+  .back{width:38px;height:38px;border-radius:11px;border:1px solid var(--line);background:var(--surface);
+    display:grid;place-items:center;color:var(--ink-2);margin-bottom:14px}
+  /* progress */
+  .prog{display:flex;align-items:center;justify-content:space-between;margin:0 0 6px;font-size:12.5px;color:var(--ink-2);font-weight:700}
+  .prog b{color:var(--ink)}
+  .bar{height:6px;border-radius:999px;background:var(--line);overflow:hidden;margin:0 0 18px}
+  .bar>i{display:block;height:100%;width:40%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--ok))}
+  /* list rows */
+  .list{display:flex;flex-direction:column;gap:9px}
+  .row{display:flex;align-items:center;gap:12px;padding:12px 13px;border-radius:14px;
+    border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow);position:relative}
+  .row.pend{border-left:3px solid var(--warn)}
+  .row.done{border-color:transparent}
+  .row.done::after{content:"";position:absolute;inset:-1px;border:2px solid var(--accent);border-radius:14px;box-shadow:0 0 0 4px var(--accent-soft);pointer-events:none}
+  .row.no{opacity:.5}
+  .mk{flex:none;width:40px;height:40px;border-radius:11px;background:var(--accent-soft);
+    color:var(--accent);display:grid;place-items:center;font-weight:800;font-size:15px}
+  .mk.g{background:var(--ok-soft);color:var(--ok)}
+  .bd{flex:1;min-width:0;display:grid;gap:2px}
+  .bd strong{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bd span{font-size:11.5px;color:var(--muted)}
+  .bd span.warn{color:var(--warn);font-weight:600}
+  .bd span.ok{color:var(--ok);font-weight:600}
+  /* inline actions */
+  .acts{flex:none;display:flex;gap:6px;align-items:center}
+  .pill{border:0;font:inherit;font-weight:700;font-size:12px;padding:7px 11px;border-radius:9px;cursor:pointer}
+  .pill.yes{background:var(--accent);color:#fff}
+  .pill.no{background:transparent;color:var(--muted);border:1px solid var(--line)}
+  .chk{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-weight:800}
+  .chk.on{background:var(--accent);color:#fff}
+  .undo{border:0;background:none;color:var(--muted);font:inherit;font-size:11.5px;font-weight:700;text-decoration:underline;cursor:pointer;padding:6px}
+  .note{margin:16px 0 0;font-size:12px;line-height:1.45;color:var(--ink-2)}
+  /* CTA */
+  .cta{width:100%;border:0;border-radius:13px;padding:15px;font:inherit;font-weight:800;font-size:15px;cursor:pointer}
+  .cta.off{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+  .cta.on{background:var(--accent);color:#fff}
+  /* ---- Option 3: card triage ---- */
+  .dots{display:flex;gap:6px;justify-content:center;margin:6px 0 20px}
+  .dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+  .dots i.on{background:var(--accent)}
+  .dots i.cur{background:var(--ink);transform:scale(1.25)}
+  .stagewrap{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 6px}
+  .peek{height:14px;margin:0 22px;border-radius:16px 16px 0 0;background:var(--surface-2);border:1px solid var(--line);border-bottom:0;opacity:.6}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:26px 22px 24px;box-shadow:var(--shadow);text-align:center}
+  .card .mk{margin:0 auto 14px;width:56px;height:56px;border-radius:16px;font-size:20px}
+  .card h2{margin:0 0 4px;font-size:22px;font-weight:800;letter-spacing:-.02em}
+  .card .from{font-size:12.5px;color:var(--muted)}
+  .card .from b{color:var(--ink-2)}
+  .tiers{display:flex;flex-direction:column;gap:8px;margin:18px 0 4px;text-align:left}
+  .tier{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:13px;border:1px solid var(--line);background:var(--surface-2);font-size:14px;font-weight:700}
+  .tier b{font-size:12px;font-weight:800;color:var(--accent)}
+  .tier .rec{font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:linear-gradient(100deg,var(--accent),#E5447E);padding:3px 6px;border-radius:6px;margin-left:8px}
+  .cardfoot{display:flex;gap:10px;padding:14px 20px 4px}
+  .cardfoot button{flex:1;border-radius:13px;padding:15px;font:inherit;font-weight:800;font-size:15px;cursor:pointer;border:0}
+  .cardfoot .no{background:var(--surface);color:var(--ink-2);border:1px solid var(--line)}
+  .cardfoot .yes{background:var(--accent);color:#fff}
+</style>
+</head>
+<body>
+
+<!-- ===================== OPÇÃO 1 ===================== -->
+<div class="col">
+  <div class="cap">Opção 1 · <b>lista com Tenho / Não por linha</b></div>
+  <div class="phone">
+    <div class="scroll">
+      <div class="back">‹</div>
+      <p class="lbl">Descoberta concluída</p>
+      <h1 class="h1">Revise o que encontramos</h1>
+      <div class="prog"><span>confirme cada um</span><span><b>2</b> de 5</span></div>
+      <div class="bar"><i></i></div>
+
+      <div class="list">
+        <!-- pendente single -->
+        <div class="row pend">
+          <div class="mk">S</div>
+          <div class="bd"><strong>Spotify</strong><span class="warn">confirme • via Spotify</span></div>
+          <div class="acts"><button class="pill yes">Tenho</button><button class="pill no">Não</button></div>
+        </div>
+        <!-- pendente multi -->
+        <div class="row pend">
+          <div class="mk">N</div>
+          <div class="bd"><strong>Nubank</strong><span class="warn">escolher versão • via Nubank</span></div>
+          <div class="acts"><button class="pill yes">Tenho ›</button><button class="pill no">Não</button></div>
+        </div>
+        <!-- confirmado single -->
+        <div class="row done">
+          <div class="mk g">D</div>
+          <div class="bd"><strong>Disney+ Premium</strong><span class="ok">tenho • via Disney+</span></div>
+          <div class="acts"><span class="chk on">✓</span></div>
+        </div>
+        <!-- confirmado multi (tier escolhido) -->
+        <div class="row done">
+          <div class="mk g">I</div>
+          <div class="bd"><strong>Itaú Personnalité</strong><span class="ok">tenho • trocar versão</span></div>
+          <div class="acts"><span class="chk on">✓</span></div>
+        </div>
+        <!-- não tenho -->
+        <div class="row no">
+          <div class="mk">A</div>
+          <div class="bd"><strong>Amil</strong><span>não tenho</span></div>
+          <div class="acts"><button class="undo">desfazer</button></div>
+        </div>
+      </div>
+
+      <p class="note">Lemos só os metadados (remetente, assunto, data) — nunca o corpo do e-mail. Guardamos só o que você confirmar.</p>
+    </div>
+    <div class="foot"><button class="cta off">Adicionar ao radar · falta 3</button></div>
+  </div>
+</div>
+
+<!-- ===================== OPÇÃO 3 ===================== -->
+<div class="col">
+  <div class="cap">Opção 3 · <b>triagem card-a-card</b></div>
+  <div class="phone">
+    <div class="scroll" style="display:flex;flex-direction:column;padding-bottom:0">
+      <div class="back">‹</div>
+      <div class="dots"><i class="on"></i><i class="on"></i><i class="cur"></i><i></i><i></i></div>
+      <div class="stagewrap">
+        <div class="peek"></div>
+        <div class="card">
+          <div class="mk">N</div>
+          <h2>Nubank</h2>
+          <p class="from">achamos no seu Gmail<br><b>billing@nubank.com.br</b> · há 3 dias</p>
+          <div class="tiers">
+            <div class="tier"><span>Gold <span class="rec">mais completo</span></span><b>≈ R$ 420/ano</b></div>
+            <div class="tier"><span>Platinum</span><b>≈ R$ 970/ano</b></div>
+          </div>
+          <p class="note" style="text-align:center">Qual é o seu? Toque no tipo, ou "Não tenho".</p>
+        </div>
+      </div>
+    </div>
+    <div class="cardfoot"><button class="no">Não tenho</button><button class="yes">Tenho ›</button></div>
+  </div>
+</div>
+
+</body>
+</html>

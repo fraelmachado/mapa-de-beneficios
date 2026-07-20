@@ -44,17 +44,31 @@ describe('add_gmail_sources RPC', () => {
     await db.from('sources').delete().eq('id', srcId)
   })
 
-  it('é aditivo: não apaga seleção anterior', async () => {
+  it('é aditivo entre marcas diferentes', async () => {
     const { srcId, itemId, db } = await oneItem()
+    // segunda MARCA
+    const stamp = `${Date.now()}-${Math.floor(performance.now() * 1000)}`
+    const { data: src2 } = await db.from('sources').insert({ kind: 'card', name: `AGS2-${stamp}`, sort_order: 1, slug: `ags2-${stamp}` }).select().single()
+    const { data: item2 } = await db.from('source_items').insert({ source_id: src2!.id, label: 'L1', sort_order: 1, slug: `ags2-i-${stamp}` }).select().single()
     const { client, id } = await userClient()
-    // seleção prévia via replace (outro item)
-    const { data: item2 } = await db.from('source_items')
-      .insert({ source_id: srcId, label: 'L2', sort_order: 2, slug: `ags-i2-${Date.now()}` })
-      .select().single()
     await client.rpc('replace_user_sources', { item_ids: [item2!.id] })
     await client.rpc('add_gmail_sources', { payload: payload(srcId, itemId, 'm2') })
     const us = await db.from('user_sources').select('source_item_id').eq('user_id', id)
     expect(us.data!.map((r) => r.source_item_id).sort()).toEqual([itemId, item2!.id].sort())
+    await db.from('sources').delete().in('id', [srcId, src2!.id])
+  })
+
+  it('exclusividade por marca: adicionar um tier substitui o irmão da mesma marca', async () => {
+    const { srcId, itemId, db } = await oneItem()
+    const { data: item2 } = await db.from('source_items')
+      .insert({ source_id: srcId, label: 'L2', sort_order: 2, slug: `ags-i2-${Date.now()}` }).select().single()
+    const { client, id } = await userClient()
+    // usuário já tem o tier "irmão" (item2, mesma marca) manualmente
+    await client.rpc('replace_user_sources', { item_ids: [item2!.id] })
+    // Gmail adiciona o tier itemId da MESMA marca → deve remover item2
+    await client.rpc('add_gmail_sources', { payload: payload(srcId, itemId, 'm3') })
+    const us = await db.from('user_sources').select('source_item_id').eq('user_id', id)
+    expect(us.data!.map((r) => r.source_item_id)).toEqual([itemId]) // só o novo, sem o irmão
     await db.from('sources').delete().eq('id', srcId)
   })
 })

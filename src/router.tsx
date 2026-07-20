@@ -1,9 +1,10 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, type RouteObject } from 'react-router-dom'
 import { BootstrapRoute } from './features/bootstrap/BootstrapRoute'
 import { OnboardingPage } from './features/onboarding/OnboardingPage'
 import { AppLayout } from './features/layout/AppLayout'
 import { Painel } from './features/painel/Painel'
 import { Search } from './features/busca/Search'
+import { MeusProgramas } from './features/programas/MeusProgramas'
 import { BenefitDetail } from './features/detalhe/BenefitDetail'
 import { Perfil } from './features/perfil/Perfil'
 import { Alertas } from './features/alertas/Alertas'
@@ -15,7 +16,7 @@ import { AdminSources } from './features/admin/sources/AdminSources'
 import { AdminBenefits } from './features/admin/benefits/AdminBenefits'
 import { AdminDiscovery } from './features/admin/discovery/AdminDiscovery'
 
-export const router = createBrowserRouter([
+export const routes: RouteObject[] = [
   { path: '/', element: <BootstrapRoute /> },
   { path: '/onboarding', element: <OnboardingPage /> },
   {
@@ -23,6 +24,7 @@ export const router = createBrowserRouter([
     children: [
       { path: '/painel', element: <Painel /> },
       { path: '/buscar', element: <Search /> },
+      { path: '/programas', element: <MeusProgramas /> },
       { path: '/perfil', element: <Perfil /> },
     ],
   },
@@ -43,4 +45,6 @@ export const router = createBrowserRouter([
       },
     ],
   },
-])
+]
+
+export const router = createBrowserRouter(routes)

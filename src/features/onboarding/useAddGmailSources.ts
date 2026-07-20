@@ -19,6 +19,7 @@ export function useAddGmailSources() {
       queryClient.invalidateQueries({ queryKey: ['my_benefits'] })
       queryClient.invalidateQueries({ queryKey: ['has_onboarded'] })
       queryClient.invalidateQueries({ queryKey: ['user_sources'] })
+      queryClient.invalidateQueries({ queryKey: ['source_evidence'] })
     },
   })
 }

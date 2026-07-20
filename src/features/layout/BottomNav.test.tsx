@@ -8,7 +8,7 @@ describe('BottomNav', () => {
     renderWithProviders(<BottomNav />, { route: '/painel' })
     expect(screen.getByRole('link', { name: /painel/i })).toHaveAttribute('href', '/painel')
     expect(screen.getByRole('link', { name: /buscar/i })).toHaveAttribute('href', '/buscar')
-    expect(screen.getByRole('link', { name: /programas/i })).toHaveAttribute('href', '/onboarding?mode=edit')
+    expect(screen.getByRole('link', { name: /programas/i })).toHaveAttribute('href', '/programas')
     expect(screen.getByRole('link', { name: /perfil/i })).toHaveAttribute('href', '/perfil')
   })
 })
