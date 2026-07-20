@@ -19,8 +19,9 @@ export function ProgramSheet({
   const recId = multi ? recommendedItemId(program.items) : ''
   const panel = useRef<HTMLDivElement>(null)
 
+  // foco no painel só ao montar — deps [] p/ um onClose inline do caller não re-focar a cada render
+  useEffect(() => { panel.current?.focus() }, [])
   useEffect(() => {
-    panel.current?.focus()
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
@@ -57,7 +58,7 @@ export function ProgramSheet({
           }) : null}
           {multi ? <div className="prg-sheet-div" /> : null}
           <button type="button" className="prg-remove" disabled={busy} onClick={onRemove}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /></svg>
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /></svg>
             Remover do radar
           </button>
         </div>
