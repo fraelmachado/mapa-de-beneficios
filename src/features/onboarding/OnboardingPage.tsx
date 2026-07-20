@@ -10,24 +10,28 @@ import { GmailConsent } from './gmail/GmailConsent'
 import { useGmailAuth } from './gmail/useGmailAuth'
 import { gmailScan } from './gmail/gmailScan'
 import type { Finding, ScanResult } from './gmail/types'
+import { PageState } from '../../ui'
 
-type Screen = 'welcome' | 'method' | 'manual' | 'gmail-consent' | 'gmail-scan' | 'gmail-review' | 'gmail-done'
+type Screen = 'welcome' | 'method' | 'manual' | 'gmail-consent' | 'gmail-scan' | 'gmail-review' | 'gmail-done' | 'gmail-none'
 
 export function OnboardingPage() {
   const [params] = useSearchParams()
   const navigate = useNavigate()
   const editing = params.get('mode') === 'edit'
-  const [screen, setScreen] = useState<Screen>(editing ? 'manual' : 'welcome')
+  const rescan = params.get('method') === 'gmail'
+  const gmail = useGmailAuth()
+  const initialScreen = (): Screen =>
+    editing ? 'manual' : rescan ? (gmail.available ? 'gmail-consent' : 'gmail-none') : 'welcome'
+  const [screen, setScreen] = useState<Screen>(initialScreen)
   const [saved, setSaved] = useState<Finding[]>([])
   const sourcesQuery = useSources()
-  const gmail = useGmailAuth()
   const [connecting, setConnecting] = useState(false)
   const [connectError, setConnectError] = useState(false)
   const [scan, setScan] = useState<ScanResult | null>(null)
 
   const flatSources = (sourcesQuery.data ?? []).flatMap((g) => g.sources)
 
-  useEffect(() => { setScreen(editing ? 'manual' : 'welcome') }, [editing])
+  useEffect(() => { setScreen(initialScreen()) }, [editing, rescan, gmail.available])
 
   // startGmail: sem catálogo/domínios → cai no manual; senão vai pro consent
   function startGmail() {
@@ -43,7 +47,7 @@ export function OnboardingPage() {
       token = connected.token
       const result = await gmailScan({ gmailAccount: connected.account, sources: flatSources, fetchJson: gmail.makeFetchJson(token) })
       setScan(result)
-      if (result.findings.length === 0) { setScreen('manual'); return } // nada encontrado → manual
+      if (result.findings.length === 0) { setScreen(rescan ? 'gmail-none' : 'manual'); return } // nada encontrado
       setScreen('gmail-scan')
     } catch {
       setConnectError(true)
@@ -55,23 +59,53 @@ export function OnboardingPage() {
 
   if (screen === 'manual') return <ManualWizard />
 
+  if (screen === 'gmail-none') {
+    const msg = gmail.available ? 'Nada novo no seu Gmail desta vez.' : 'Conexão com o Gmail indisponível.'
+    return (
+      <div className="ob-state">
+        <PageState title={msg} action={gmail.available ? { label: 'Procurar de novo', onClick: () => setScreen('gmail-consent') } : undefined} />
+        <button className="btn ghost" type="button" onClick={() => navigate('/programas')}>Voltar aos meus programas</button>
+      </div>
+    )
+  }
+
   if (screen === 'gmail-consent') {
-    return <GmailConsent onConnect={connectAndScan} onBack={() => setScreen('method')} connecting={connecting} error={connectError} />
+    return (
+      <GmailConsent
+        onConnect={connectAndScan}
+        onBack={rescan ? () => navigate('/programas') : () => setScreen('method')}
+        connecting={connecting}
+        error={connectError}
+      />
+    )
   }
 
   if (screen === 'gmail-scan' && scan) {
-    return <Vasculhando count={scan.findings.length} onDone={() => setScreen('gmail-review')} onBack={() => setScreen('method')} />
+    return (
+      <Vasculhando
+        count={scan.findings.length}
+        onDone={() => setScreen('gmail-review')}
+        onBack={rescan ? () => setScreen('gmail-consent') : () => setScreen('method')}
+      />
+    )
   }
 
   if (screen === 'gmail-review' && scan) {
-    return <RevisarGmail findings={scan.findings} partial={scan.partial} onDone={(inc) => { setSaved(inc); setScreen('gmail-done') }} onBack={() => setScreen('method')} />
+    return (
+      <RevisarGmail
+        findings={scan.findings}
+        partial={scan.partial}
+        onDone={(inc) => { setSaved(inc); setScreen('gmail-done') }}
+        onBack={rescan ? () => setScreen('gmail-consent') : () => setScreen('method')}
+      />
+    )
   }
 
   if (screen === 'gmail-done') {
     const groupsSummary: SummaryGroup[] = saved.length
       ? [{ label: 'Seus programas', items: saved.map((f) => ({ provider: f.provider, variant: f.items.length === 1 ? f.items[0].label : '' })) }]
       : []
-    return <RadarMontado groups={groupsSummary} onView={() => navigate('/alertas?from=onboarding')} />
+    return <RadarMontado groups={groupsSummary} onView={() => navigate(rescan ? '/programas' : '/alertas?from=onboarding')} />
   }
 
   if (screen === 'method') {

@@ -186,3 +186,45 @@ describe('OnboardingPage flow', () => {
     expect(screen.getByText('Wizard manual real')).toBeInTheDocument()
   })
 })
+
+describe('OnboardingPage re-scan (?method=gmail)', () => {
+  it('começa direto no consent quando o Gmail está disponível', () => {
+    renderWithProviders(<OnboardingPage />, { route: '/onboarding?method=gmail' })
+    expect(screen.getByRole('heading', { name: /conectar seu gmail/i })).toBeInTheDocument()
+  })
+
+  it('zero achados no re-scan cai em gmail-none com botão de volta pra /programas', async () => {
+    scanResult = { findings: [], partial: false }
+    renderWithProviders(<><LocationProbe /><OnboardingPage /></>, { route: '/onboarding?method=gmail' })
+    fireEvent.click(screen.getByRole('button', { name: /^conectar gmail$/i }))
+
+    expect(await screen.findByText(/nada novo no seu gmail/i)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /voltar aos meus programas/i }))
+    expect(screen.getByTestId('loc')).toHaveTextContent('/programas')
+  })
+
+  it('gmail indisponível + re-scan cai em gmail-none (indisponível) com botão de volta pra /programas', () => {
+    gmailAuth = { ...gmailAuth, available: false }
+    renderWithProviders(<><LocationProbe /><OnboardingPage /></>, { route: '/onboarding?method=gmail' })
+
+    expect(screen.getByText(/conexão com o gmail indisponível/i)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /voltar aos meus programas/i }))
+    expect(screen.getByTestId('loc')).toHaveTextContent('/programas')
+  })
+
+  it('re-scan: gmail-done navega pra /programas (não /alertas)', async () => {
+    renderWithProviders(<><LocationProbe /><OnboardingPage /></>, { route: '/onboarding?method=gmail' })
+    fireEvent.click(screen.getByRole('button', { name: /^conectar gmail$/i }))
+
+    fireEvent.click(await screen.findByRole('button', { name: /ver meus benefícios/i }))
+    fireEvent.click(screen.getByRole('button', { name: /adicionar ao radar/i }))
+    fireEvent.click(screen.getByRole('button', { name: /ver meu radar/i }))
+    expect(screen.getByTestId('loc')).toHaveTextContent('/programas')
+  })
+
+  it('re-scan: onBack do consent volta pra /programas', () => {
+    renderWithProviders(<><LocationProbe /><OnboardingPage /></>, { route: '/onboarding?method=gmail' })
+    fireEvent.click(screen.getByRole('button', { name: 'Voltar' }))
+    expect(screen.getByTestId('loc')).toHaveTextContent('/programas')
+  })
+})
