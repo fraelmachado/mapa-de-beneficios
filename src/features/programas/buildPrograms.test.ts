@@ -35,4 +35,31 @@ describe('buildPrograms', () => {
     const { programs } = buildPrograms(['v'], s, [])
     expect(programs[0].tier).toBe('')
   })
+
+  it.each([
+    [0, 'hoje'],
+    [1, 'ontem'],
+    [6, 'há 6 dias'],
+    [7, 'há 1 semana'],
+    [14, 'há 2 semanas'],
+    [30, 'há 1 mês'],
+    [60, 'há 2 meses'],
+    [365, 'há 1 ano'],
+    [730, 'há 2 anos'],
+  ])('relTime: %i dias atrás -> %s', (daysAgo, expected) => {
+    const createdAt = new Date(Date.parse('2026-07-19T00:00:00Z') - daysAgo * 86400000).toISOString()
+    const evidence: EvidenceRow[] = [{ source_id: 's1', email_from: 'a@nubank.com.br', email_date: null, created_at: createdAt, gmail_account: 'me@gmail.com' }]
+    const { programs, summary } = buildPrograms(['plat'], sources, evidence)
+    expect(programs[0].when).toBe(expected)
+    expect(summary.lastFound).toBe(expected)
+  })
+
+  it('desempate de ordenação por marca (mesmo sort_order)', () => {
+    const s: Source[] = [
+      { id: 'z1', kind: 'card', name: 'Zara', logo_url: null, sort_order: 5, source_items: [{ id: 'zi', label: 'Item', sort_order: 1 }] },
+      { id: 'a1', kind: 'card', name: 'Amazon', logo_url: null, sort_order: 5, source_items: [{ id: 'ai', label: 'Item', sort_order: 1 }] },
+    ]
+    const { programs } = buildPrograms(['zi', 'ai'], s, [])
+    expect(programs.map((p) => p.brand)).toEqual(['Amazon', 'Zara'])
+  })
 })
