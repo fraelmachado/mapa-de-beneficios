@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Programas — Meus programas (redesign)</title>
+<style>
+:root{
+  --bg:#0E0F13;--surface:#17181E;--surface-2:#1D1E25;--muted:#82838B;--line:#2A2B33;--line-2:#23242B;
+  --accent:#6E80FF;--accent-soft:#20233A;--accent-ink:#fff;--ink:#F4F4F2;--ink-2:#BFC0C6;--ok:#0E9F6E;--warn:#E7A95B;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -18px rgba(0,0,0,.7);
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:20px;
+  --font:'Onest',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#08090c;color:var(--ink);font-family:var(--font);display:flex;flex-direction:column;align-items:center;gap:16px;padding:34px 20px 44px}
+.cap{font-size:13px;color:var(--muted);max-width:440px;text-align:center;line-height:1.55}
+.cap b{color:var(--ink)}
+.phone{width:392px;background:var(--bg);border:1px solid var(--line);border-radius:38px;overflow:hidden;box-shadow:0 30px 80px -40px #000}
+.page{padding:26px 18px 20px;display:grid;gap:var(--s4)}
+.page h1{margin:0;font-size:26px;font-weight:800;letter-spacing:-.03em}
+/* resumo / método */
+.summary{padding:14px 16px;border-radius:16px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);display:grid;gap:10px}
+.summary .line{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.summary .big{font-size:15px;font-weight:800}
+.summary .prov{display:inline-flex;gap:6px}
+.chip{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:999px;border:1px solid var(--line)}
+.chip.g{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,var(--line));background:var(--accent-soft)}
+.chip.m{color:var(--ink-2)}
+.summary .sub{font-size:12px;color:var(--muted)}
+.actions{display:flex;gap:8px}
+.act{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px;border-radius:12px;font:inherit;font-weight:700;font-size:13.5px;cursor:pointer;border:0}
+.act.p{background:var(--accent);color:#fff}
+.act.g{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.act svg{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* lista */
+.lbl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:2px 0 0}
+.list{display:flex;flex-direction:column;gap:8px}
+.item{display:flex;align-items:center;gap:12px;padding:12px 13px;border-radius:14px;border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow)}
+.mk{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:11px;background:var(--accent-soft);color:var(--accent);font-weight:800}
+.bd{flex:1;min-width:0;display:grid;gap:3px}
+.bd strong{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bd .meta{display:flex;align-items:center;gap:6px}
+.tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px}
+.tag.g{color:var(--accent);background:var(--accent-soft)}
+.tag.m{color:var(--ink-2);background:var(--surface-2)}
+.bd .when{font-size:11px;color:var(--muted)}
+.more{flex:none;width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:17px;font-weight:800;cursor:pointer;line-height:1}
+.ver{margin:4px 0 0;text-align:center;font-size:11px;color:var(--muted)}
+</style></head>
+<body>
+<div class="phone"><div class="page">
+  <h1>Programas</h1>
+
+  <div class="summary">
+    <div class="line">
+      <span class="big">Você tem 6 programas</span>
+    </div>
+    <div class="line">
+      <span class="prov"><span class="chip g">4 via Gmail</span><span class="chip m">2 manuais</span></span>
+    </div>
+    <div class="sub">Última busca no Gmail há 3 dias · me@gmail.com</div>
+  </div>
+
+  <div class="actions">
+    <button class="act p"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M4 5h16v11a2 2 0 0 1-2 2H8l-4 3V5Z"/><circle cx="11" cy="11" r="3"/><path d="m14.5 14.5 2 2"/></svg>Procurar no Gmail</button>
+    <button class="act g"><svg width="16" height="16" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Do catálogo</button>
+  </div>
+
+  <p class="lbl">Seus programas</p>
+  <div class="list">
+    <div class="item">
+      <span class="mk">S</span>
+      <span class="bd"><strong>Spotify Premium</strong><span class="meta"><span class="tag g">Gmail</span><span class="when">há 3 dias</span></span></span>
+      <button class="more">⋯</button>
+    </div>
+    <div class="item">
+      <span class="mk">N</span>
+      <span class="bd"><strong>Nubank Platinum</strong><span class="meta"><span class="tag g">Gmail</span><span class="when">há 3 dias</span></span></span>
+      <button class="more">⋯</button>
+    </div>
+    <div class="item">
+      <span class="mk">I</span>
+      <span class="bd"><strong>Itaú Personnalité</strong><span class="meta"><span class="tag g">Gmail</span><span class="when">há 3 dias</span></span></span>
+      <button class="more">⋯</button>
+    </div>
+    <div class="item">
+      <span class="mk">D</span>
+      <span class="bd"><strong>Disney+ Premium</strong><span class="meta"><span class="tag m">Manual</span></span></span>
+      <button class="more">⋯</button>
+    </div>
+    <div class="item">
+      <span class="mk">V</span>
+      <span class="bd"><strong>Vivo</strong><span class="meta"><span class="tag m">Manual</span></span></span>
+      <button class="more">⋯</button>
+    </div>
+  </div>
+
+  <p class="ver">⋯ por item → trocar versão · remover</p>
+</div></div>
+
+<p class="cap"><b>Programas → Meus programas.</b> Header com contagem + proveniência (quantos via Gmail × manuais) + última busca. Duas ações: <b>Procurar no Gmail</b> (re-scan) e <b>Do catálogo</b> (abre o wizard atual pra adicionar). Lista dos seus programas na linguagem do Revisar, com selo Gmail/Manual e <b>⋯</b> por item (trocar tier / remover). Proveniência derivada de <code>source_evidence</code> — sem migration.</p>
+</body></html>

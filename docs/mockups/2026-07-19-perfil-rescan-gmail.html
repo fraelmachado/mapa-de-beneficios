@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Re-scan Gmail — Perfil</title>
+<style>
+:root{
+  --bg:#0E0F13;--surface:#17181E;--surface-2:#1D1E25;--muted:#82838B;--line:#2A2B33;
+  --accent:#6E80FF;--accent-soft:#20233A;--accent-ink:#fff;--ink:#F4F4F2;--ink-2:#BFC0C6;--ok:#0E9F6E;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -18px rgba(0,0,0,.7);
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:20px;
+  --font:'Onest',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#08090c;color:var(--ink);font-family:var(--font);display:flex;flex-direction:column;align-items:center;gap:18px;padding:34px 20px 44px}
+.cap{font-size:13px;color:var(--muted);max-width:420px;text-align:center;line-height:1.5}
+.cap b{color:var(--ink)}
+.phone{width:392px;background:var(--bg);border:1px solid var(--line);border-radius:38px;overflow:hidden;box-shadow:0 30px 80px -40px #000}
+.page{display:grid;gap:var(--s5);padding:26px 18px 22px}
+.page header h1{margin:0;font-size:26px;font-weight:800;letter-spacing:-.03em}
+/* identity */
+.pi{display:flex;align-items:center;gap:14px;padding:16px;border-radius:16px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)}
+.pav{flex:none;display:grid;place-items:center;width:52px;height:52px;border-radius:15px;background:var(--accent);color:var(--accent-ink);font-size:19px;font-weight:800}
+.pi-info{display:grid;gap:2px}
+.pi-info strong{font-size:15px;font-weight:800}
+.pi-info span{font-size:12px;color:var(--muted)}
+/* conta */
+.lbl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 var(--s2)}
+.rows{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;align-items:center;gap:12px;width:100%;padding:15px 16px;border-radius:14px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);color:var(--ink);text-align:left;position:relative}
+.row-ic{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--surface-2);color:var(--ink-2)}
+.row-lb{flex:1;font-size:14.5px;font-weight:600}
+.row-sub{color:var(--muted);font-weight:600}
+.row-chev{flex:none;color:var(--muted);font-size:18px}
+/* nova linha destacada */
+.row.new{border-color:transparent}
+.row.new::after{content:"";position:absolute;inset:-1px;border:2px solid var(--accent);border-radius:14px;box-shadow:0 0 0 4px var(--accent-soft);pointer-events:none}
+.row.new .row-ic{background:var(--accent-soft);color:var(--accent)}
+.pill{font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:var(--accent);padding:3px 6px;border-radius:6px;margin-left:8px;vertical-align:middle}
+.ver{margin:6px 0 0;text-align:center;font-size:11px;color:var(--muted)}
+svg{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+<div class="phone"><div class="page">
+  <header><h1>Seu perfil</h1></header>
+
+  <section class="pi">
+    <span class="pav">V</span>
+    <div class="pi-info"><strong>Visitante</strong><span>sessão anônima</span></div>
+  </section>
+
+  <section>
+    <p class="lbl">Conta</p>
+    <div class="rows">
+      <div class="row">
+        <span class="row-ic"><svg width="17" height="17" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="13" rx="2.5"/><path d="M3 9h18"/></svg></span>
+        <span class="row-lb">Editar meus programas</span>
+        <span class="row-chev">›</span>
+      </div>
+      <div class="row">
+        <span class="row-ic"><svg width="17" height="17" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span>
+        <span class="row-lb">Alertas</span>
+        <span class="row-chev">›</span>
+      </div>
+      <div class="row">
+        <span class="row-ic"><svg width="17" height="17" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c-5 0-9-4-9-9Z"/></svg></span>
+        <span class="row-lb">Tema <span class="row-sub">escuro</span></span>
+        <span class="row-chev">◑</span>
+      </div>
+
+      <!-- NOVA LINHA: re-scan -->
+      <div class="row new">
+        <span class="row-ic">
+          <svg width="17" height="17" viewBox="0 0 24 24"><path d="M4 5h16v11a2 2 0 0 1-2 2H8l-4 3V5Z"/><circle cx="11" cy="11" r="3"/><path d="m14.5 14.5 2 2"/></svg>
+        </span>
+        <span class="row-lb">Procurar programas no Gmail <span class="pill">novo</span></span>
+        <span class="row-chev">›</span>
+      </div>
+
+      <div class="row">
+        <span class="row-ic"><svg width="17" height="17" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></span>
+        <span class="row-lb">Desconectar Gmail e apagar dados</span>
+      </div>
+
+      <div class="row">
+        <span class="row-ic"><svg width="17" height="17" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
+        <span class="row-lb">Ajuda e privacidade</span>
+        <span class="row-chev">›</span>
+      </div>
+    </div>
+  </section>
+
+  <p class="ver">Mapa de Benefícios · v1.0</p>
+</div></div>
+
+<p class="cap"><b>Perfil → Conta.</b> A nova linha <b>"Procurar programas no Gmail"</b> abre o fluxo de consent + scan (mesmo do onboarding), agrupada com o "Desconectar Gmail". Toca → tela de consent → scan → Revisar. Re-scan é <b>aditivo/idempotente</b> (só soma programas novos, não duplica).</p>
+</body></html>
