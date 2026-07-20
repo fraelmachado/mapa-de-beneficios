@@ -1,8 +1,9 @@
-# Programas → Meus programas — Implementation Plan (rev 2)
+# Programas → Meus programas — Implementation Plan (rev 3)
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**rev 2** incorpora a review adversarial do Codex (2026-07-19): (a) exclusividade de tier por marca na RPC (1 migration), correção do "última busca" (rename honesto), bugs de código nas tasks, robustez (erro/pending/concorrência/ordenação/a11y), invalidação de cache e cobertura de rotas/E2E.
+**rev 2** incorpora a 1ª review adversarial do Codex: exclusividade de tier na RPC (0021), "última busca" renomeada, bugs de código, robustez, invalidação de cache, cobertura de rotas/E2E.
+**rev 3** fecha a 2ª review (follow-up): `tierLabel` mostra label significativo de single-item (Spotify "Premium"); `source_id` da evidência derivado do item (não confia no payload) + **limpeza retroativa** de tiers duplicados na 0021; concorrência via set autoritativo local (`workingIds`, não ressuscita item removido); `AppLayout.test` usa `getAllByRole` (2 links); teste de rota `/programas` obrigatório; casos de saída do re-scan (zero/indisponível/done → `/programas`) obrigatórios; E2E ramifica por viewport (sidebar × bottom nav).
 
 **Goal:** Tela **"Meus programas"** (lista + proveniência + gestão + re-scan) no lugar do wizard como "Programas"; e garantir **um tier por marca** ao adicionar via Gmail.
 
@@ -62,15 +63,31 @@ begin
     values (auth.uid(), (rec->>'item_id')::uuid)
     on conflict (user_id, source_item_id) do nothing;
 
+    -- source_id da evidência DERIVADO do item (não confia no payload)
     insert into public.source_evidence
       (user_id, source_id, gmail_account, gmail_message_id, email_from, email_subject, email_date)
-    values (auth.uid(), (rec->>'source_id')::uuid, rec->>'gmail_account', rec->>'gmail_message_id',
+    values (auth.uid(),
+            (select si.source_id from public.source_items si where si.id = (rec->>'item_id')::uuid),
+            rec->>'gmail_account', rec->>'gmail_message_id',
             rec->>'email_from', rec->>'email_subject', (rec->>'email_date')::timestamptz)
     on conflict (user_id, gmail_account, source_id, gmail_message_id) do nothing;
   end loop;
 end;
 $fn$;
 grant execute on function add_gmail_sources(jsonb) to authenticated;
+
+-- limpeza única (retroativa): colapsa tiers duplicados por (user, marca),
+-- mantendo o de maior sort_order (desempate por id). Impõe o invariante "1 tier/marca".
+delete from public.user_sources us
+using public.source_items si
+where us.source_item_id = si.id
+  and exists (
+    select 1 from public.user_sources us2
+    join public.source_items si2 on si2.id = us2.source_item_id
+    where us2.user_id = us.user_id and si2.source_id = si.source_id
+      and (si2.sort_order > si.sort_order
+           or (si2.sort_order = si.sort_order and us2.source_item_id > us.source_item_id))
+  );
 ```
 
 - [ ] **Step 2: Aplicar** — `npx -y supabase@2.95.0 db reset`.
@@ -232,7 +249,9 @@ describe('buildPrograms', () => {
     const nu = programs.find((p) => p.sourceId === 's1')!
     expect(nu.provenance).toBe('gmail'); expect(nu.tier).toBe('Platinum'); expect(nu.items).toHaveLength(2)
     expect(nu.when).toBe('há 3 dias')
-    expect(programs.find((p) => p.sourceId === 's2')!.provenance).toBe('manual')
+    const sp = programs.find((p) => p.sourceId === 's2')!
+    expect(sp.provenance).toBe('manual')
+    expect(sp.tier).toBe('Premium') // single-item com label significativo aparece
     expect(summary).toMatchObject({ total: 2, gmailCount: 1, manualCount: 1, account: 'me@gmail.com', lastFound: 'há 3 dias' })
   })
   it('dedup por item + ignora item inexistente', () => {
@@ -272,10 +291,11 @@ function relTime(ms: number): string {
   if (days < 365) { const m = Math.floor(days / 30); return `há ${m} ${m > 1 ? 'meses' : 'mês'}` }
   const y = Math.floor(days / 365); return `há ${y} ano${y > 1 ? 's' : ''}`
 }
-function tierLabel(item: SourceItem, multi: boolean): string {
+// mostra o rótulo do item quando é significativo (não placeholder) — single OU multi.
+// Ex.: Spotify "Premium" (single) aparece; Vivo "—" (placeholder) não.
+function tierLabel(item: SourceItem): string {
   const l = item.label?.trim()
-  if (!multi || !l || l === '—') return ''
-  return l
+  return !l || l === '—' ? '' : l
 }
 
 export function buildPrograms(itemIds: string[], sources: Source[], evidence: EvidenceRow[]): { programs: Program[]; summary: ProgramsSummary } {
@@ -299,7 +319,7 @@ export function buildPrograms(itemIds: string[], sources: Source[], evidence: Ev
     const ev = bySource.get(source.id)
     programs.push({
       itemId, sourceId: source.id, brand: source.name,
-      tier: tierLabel(item, source.source_items.length > 1),
+      tier: tierLabel(item),
       items: source.source_items, logo: source.logo_url,
       provenance: ev ? 'gmail' : 'manual',
       when: ev ? relTime(ev.at) : '', from: ev?.from ?? '',
@@ -540,7 +560,9 @@ export function MeusProgramas() {
   const { session } = useSession()
   const uid = session?.user.id
   const { programs, summary, isLoading, error, refetch } = useMyPrograms(uid)
-  const currentIds = useUserSources(uid).data ?? []
+  const savedIds = useUserSources(uid).data ?? []
+  const [workingIds, setWorkingIds] = useState<string[] | null>(null)
+  const currentIds = workingIds ?? savedIds // set autoritativo local após a 1ª op (evita snapshot velho antes do refetch)
   const save = useSaveUserSources()
   const navigate = useNavigate()
   const [sheetId, setSheetId] = useState<string | null>(null)
@@ -549,9 +571,11 @@ export function MeusProgramas() {
 
   async function apply(nextIds: string[]) {
     if (busy) return
+    const deduped = [...new Set(nextIds)] // id repetido violaria a PK no replace
     setBusy(true); setOpError(false)
     try {
-      await save.mutateAsync([...new Set(nextIds)]) // dedup: id repetido violaria a PK no replace
+      await save.mutateAsync(deduped)
+      setWorkingIds(deduped) // fixa o autoritativo p/ a próxima op não ressuscitar item removido
       setSheetId(null)
     } catch {
       setOpError(true)
@@ -675,9 +699,9 @@ export function MeusProgramas() {
 - [ ] **Step 2:** em `BottomNav.tsx` e `AppLayout.tsx` trocar o item "Programas": `{ to: '/programas', label: 'Programas', Icon: ProgramasIcon },`.
 - [ ] **Step 3:** atualizar/adicionar asserções de **href**:
   - `BottomNav.test.tsx`: `expect(screen.getByRole('link', { name: /programas/i })).toHaveAttribute('href', '/programas')`.
-  - `AppLayout.test.tsx`: adicionar asserção explícita `expect(screen.getByRole('link', { name: /programas/i })).toHaveAttribute('href', '/programas')` (hoje só conta links).
+  - `AppLayout.test.tsx`: o layout renderiza "Programas" **duas vezes** (sidebar + bottom nav) — usar `getAllByRole` e validar ambos: `const ls = screen.getAllByRole('link', { name: /programas/i }); expect(ls.length).toBeGreaterThanOrEqual(2); ls.forEach((l) => expect(l).toHaveAttribute('href', '/programas'))`.
   - `Perfil.test.tsx` "editar meus programas" permanece `/onboarding?mode=edit` — NÃO mexer.
-- [ ] **Step 4:** `router.test.tsx` — adicionar um caso que renderiza `/programas` sob `AppLayout` e acha o header "Programas" (mockar hooks de dados como os outros testes de rota fazem; se `router.test.tsx` não existir/for trivial, criar teste focado `MeusProgramas` já cobre a tela — então este passo é: garantir que a rota está registrada via um teste de smoke de `router` OU pular se o arquivo não testa rotas hoje; decidir ao ler o arquivo).
+- [ ] **Step 4 (obrigatório):** `router.test.tsx` — adicionar um caso que monta as rotas de `router.tsx` em `/programas` (via `createMemoryRouter(routes, { initialEntries: ['/programas'] })` + `<RouterProvider>`, mockando os hooks de dados como os demais testes) e confirma que renderiza sob `AppLayout` (header "Programas" presente + a nav visível). Se `router.test.tsx` não existir, criar. **Não pular** — é a garantia de que a rota está registrada.
 - [ ] **Step 5:** `npm test -- BottomNav AppLayout router && npm run build`. **Commit** — `git add src/router.tsx src/router.test.tsx src/features/layout/ && git commit -m "feat(programas): rota /programas + nav aponta pra ela (+asserts de href)"`
 
 ---
@@ -697,7 +721,10 @@ it('?method=gmail começa no consent (Gmail disponível)', () => {
   expect(screen.getByRole('heading', { name: /Conectar seu Gmail/ })).toBeInTheDocument()
 })
 ```
-(Se houver mock configurável de `gmailScan` retornando `{findings:[], partial:false}`, adicionar também um caso de **zero achados → estado "nada novo"** com um botão "Voltar a Programas"; caso o mock seja fixo, cobrir zero-achados só no manual/e2e e anotar.)
+**Casos obrigatórios** (tornar o mock de `gmailScan`/`useGmailAuth` configurável por teste — via `vi.mocked(...).mockReturnValueOnce`/factory — se hoje for fixo):
+- **zero achados no re-scan** → tela `gmail-none` ("Nada novo…") com botão **"Voltar aos meus programas"** que navega `/programas` (`expect(nav).toHaveBeenCalledWith('/programas')`).
+- **Gmail indisponível** (`available:false`) com `?method=gmail` → `gmail-none` ("Conexão… indisponível") + o mesmo botão → `/programas`.
+- **onDone (gmail-done) no re-scan** → `RadarMontado` "ver" navega `/programas` (não `/alertas`).
 
 - [ ] **Step 2: rodar → falhar**.
 
@@ -742,7 +769,7 @@ it('?method=gmail começa no consent (Gmail disponível)', () => {
 
 **Files:** Modify `tests/e2e/app-layout.spec.ts`.
 
-- [ ] **Step 1:** adicionar `/programas` ao loop de telas do gate visual (mobile/desktop, claro/escuro) que verifica ausência de overflow horizontal + estrutura, seguindo o padrão das outras rotas em `app-layout.spec.ts`. Adicionar um teste que **clica "Programas"** (sidebar e bottom nav), confirma a URL `/programas` e o header "Programas".
+- [ ] **Step 1:** adicionar `/programas` ao loop de telas do gate visual (mobile/desktop, claro/escuro) — ausência de overflow horizontal + estrutura, seguindo o padrão das outras rotas. Para a **navegação**, **ramificar por viewport/projeto** como o spec já faz: no **mobile** clicar o link "Programas" da **bottom nav** (`.tabbar`), no **desktop** o da **sidebar** (`.side`) — nunca clicar num nav oculto no viewport atual. Em ambos, confirmar URL `/programas` + header "Programas".
 - [ ] **Step 2:** rodar `npx playwright test app-layout` (4 projetos) → verde. Se o ambiente não rodar e2e, deixar o spec correto por inspeção e sinalizar.
 - [ ] **Step 3: commit** — `git add tests/e2e/app-layout.spec.ts && git commit -m "test(e2e): /programas no gate visual + navegação da nav"`
 
@@ -758,7 +785,7 @@ it('?method=gmail começa no consent (Gmail disponível)', () => {
 - Saídas do re-scan (zero/indisponível) → `/programas` (T7). ✔
 - Testes: href asserts + rota (T6), casos `?method=gmail` (T7), e2e `/programas` (T8). ✔
 
-**Deixado consciente (não-bloqueante):** proveniência é por marca (não por seleção) — o rótulo "Encontrado no Gmail" reflete isso honestamente; modelar por-item ficaria pra depois. "Do catálogo" ainda conclui no Painel (o wizard não muda) — melhoria opcional (`from=programas`) fora deste escopo. Duplicatas de tier **pré-existentes** em dados antigos aparecem 2x até um re-scan/troca colapsá-las (a 0021 impede novas).
+**Deixado consciente (não-bloqueante):** proveniência é por marca (não por seleção) — o rótulo "Encontrado no Gmail" reflete isso honestamente; modelar por-item ficaria pra depois. "Do catálogo" ainda conclui no Painel (o wizard não muda) — melhoria opcional (`from=programas`) fora deste escopo. Duplicatas de tier pré-existentes são **colapsadas retroativamente** pela limpeza única na 0021 (mantém o maior sort_order); a RPC impede novas.
 
 ## Deploy (quando for pro ar)
 - Aplicar a **0021** em prod (via `psql -U supabase_admin` no container, como a 0020) **antes** do bundle novo — é `create or replace`, seguro/idempotente. Depois push `main` → deploy (auto flaky → fallback `application-deploy`). Front sem env nova.
