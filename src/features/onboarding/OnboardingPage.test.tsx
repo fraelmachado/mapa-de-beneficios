@@ -134,7 +134,7 @@ describe('OnboardingPage flow', () => {
     fireEvent.click(screen.getByRole('button', { name: /mapear meus benefícios/i }))
     fireEvent.click(screen.getByRole('button', { name: /conectar gmail.*beta/i }))
 
-    expect(screen.getByRole('heading', { name: /conectar seu gmail/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /vamos achar seus benefícios/i })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /^conectar gmail$/i }))
 
     fireEvent.click(await screen.findByRole('button', { name: /ver meus benefícios/i }))
@@ -190,7 +190,7 @@ describe('OnboardingPage flow', () => {
 describe('OnboardingPage re-scan (?method=gmail)', () => {
   it('começa direto no consent quando o Gmail está disponível', () => {
     renderWithProviders(<OnboardingPage />, { route: '/onboarding?method=gmail' })
-    expect(screen.getByRole('heading', { name: /conectar seu gmail/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /vamos achar seus benefícios/i })).toBeInTheDocument()
   })
 
   it('zero achados no re-scan cai em gmail-none com botão de volta pra /programas', async () => {
