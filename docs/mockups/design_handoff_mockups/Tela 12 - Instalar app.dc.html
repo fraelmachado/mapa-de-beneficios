@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/mapa-de-benef-cios-80471905-a90c-46a6-a492-cefadd7a0b6b/styles.css">
+  <script src="_ds/mapa-de-benef-cios-80471905-a90c-46a6-a492-cefadd7a0b6b/_ds_bundle.js"></script>
+  <style>
+    html,body{margin:0}
+    @keyframes mb-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    @media (prefers-reduced-motion: reduce){ .mb-rise{animation:none !important} }
+    .seg button.on:hover, .seg button.on:hover span{color:var(--surface) !important}
+  </style>
+</helmet>
+<div data-theme="{{ theme }}" style="position:relative;width:520px;min-height:958px;background:#e9e8e3;font-family:var(--font);display:flex;align-items:flex-start;justify-content:center;padding:46px 0 44px;box-sizing:border-box">
+<a href="Fluxo do App.dc.html" style="position:absolute;left:22px;top:20px;z-index:9;display:inline-flex;align-items:center;gap:6px;font:700 12.5px var(--font);color:var(--ink-2);text-decoration:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="11 6 5 12 11 18"/></svg> Fluxo do app</a>
+<div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:16px">
+  <div style="display:flex;align-items:center;gap:8px;font:700 12px var(--font);color:#6b6c72">
+    <span style="display:grid;place-items:center;width:22px;height:22px;border-radius:7px;background:#0c0d10;color:#fff;font-size:11px;font-weight:700">12</span>
+    Instalar como app (PWA)
+  </div>
+
+  <div style="position:relative;width:390px;height:820px;border-radius:46px;background:#0c0d10;padding:11px;box-shadow:0 40px 80px -30px rgba(12,13,16,.55),0 0 0 1px rgba(255,255,255,.04) inset">
+    <div data-screen-label="Instalar app (PWA)" style="position:relative;width:100%;height:100%;border-radius:36px;overflow:hidden;background:var(--bg);display:flex;flex-direction:column">
+
+      <!-- ambient wash -->
+      <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 60% at 50% -10%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 60%)"></div>
+
+      <!-- status bar -->
+      <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:14px 26px 0;font-size:14px;font-weight:700;color:var(--ink)">
+        <span>9:41</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <svg width="17" height="11" viewBox="0 0 17 11" fill="var(--ink)"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+          <svg width="16" height="11" viewBox="0 0 16 12" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"><path d="M1 4.2C4.8 1 11.2 1 15 4.2"/><path d="M3.4 6.7C6 4.6 10 4.6 12.6 6.7"/><path d="M6 9.2c1.2-1 3.8-1 5 0"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0.5" y="0.5" width="21" height="11" rx="3" fill="none" stroke="var(--ink)" stroke-opacity=".4"/><rect x="2" y="2" width="16" height="8" rx="1.5" fill="var(--ink)"/><rect x="23" y="4" width="1.6" height="4" rx="1" fill="var(--ink)" fill-opacity=".4"/></svg>
+        </div>
+      </div>
+
+      <!-- scrollable body -->
+      <div style="position:relative;flex:1;overflow-y:auto;padding:20px 24px 20px">
+
+        <!-- header -->
+        <div class="mb-rise" style="display:flex;flex-direction:column;align-items:center;text-align:center;animation:mb-rise .5s var(--ease) both">
+          <span style="display:grid;place-items:center;width:60px;height:60px;border-radius:17px;background:var(--accent);box-shadow:0 14px 30px -12px color-mix(in srgb,var(--accent) 80%,transparent);margin-bottom:14px">
+            <svg width="32" height="32" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.4"><circle cx="8" cy="8" r="6.4"/><circle cx="8" cy="8" r="3"/><circle cx="8" cy="8" r="1" fill="#fff" stroke="none"/></svg>
+          </span>
+          <p style="margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)">Instale na tela inicial</p>
+          <h1 style="margin:0 0 8px;font-size:24px;font-weight:800;line-height:1.15;letter-spacing:-.03em;color:var(--ink);text-wrap:balance">Tenha o Mapa como um app de verdade</h1>
+          <p style="margin:0;font-size:14px;line-height:1.5;color:var(--ink-2);text-wrap:pretty">Ícone próprio, abertura em tela cheia e alertas de benefícios — sem loja de apps, direto pelo navegador.</p>
+        </div>
+
+        <!-- platform toggle -->
+        <div style="margin:22px 0 18px" role="tablist" aria-label="Sistema">
+          <div class="seg">
+            <button class="{{ iosSegCls }}" role="tab" aria-selected="{{ isIos }}" onClick="{{ selectIos }}" style-hover="color:{{ iosHoverColor }}">
+              <span style="display:inline-flex;align-items:center;gap:8px;justify-content:center">
+                <svg width="19" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.9c-.03-2.5 2.04-3.7 2.13-3.76-1.16-1.7-2.97-1.93-3.61-1.96-1.54-.16-3 .9-3.78.9-.77 0-1.98-.88-3.25-.86-1.67.02-3.21.97-4.07 2.47-1.73 3-.44 7.45 1.24 9.88.82 1.19 1.8 2.53 3.08 2.48 1.24-.05 1.71-.8 3.21-.8 1.49 0 1.92.8 3.23.77 1.33-.02 2.18-1.21 3-2.41.94-1.38 1.33-2.72 1.35-2.79-.03-.01-2.59-1-2.61-3.93zM14.6 4.86c.68-.83 1.14-1.98 1.02-3.13-.98.04-2.17.65-2.88 1.48-.63.73-1.19 1.9-1.04 3.02 1.09.09 2.21-.55 2.9-1.37z"/></svg>
+                iPhone / iPad
+              </span>
+            </button>
+            <button class="{{ androidSegCls }}" role="tab" aria-selected="{{ isAndroid }}" onClick="{{ selectAndroid }}" style-hover="color:{{ androidHoverColor }}">
+              <span style="display:inline-flex;align-items:center;gap:8px;justify-content:center">
+                <svg width="20" height="21" viewBox="0 0 24 24" style="fill:#3DDC84"><path d="M6 18c0 .55.45 1 1 1h1v3.5a1.5 1.5 0 003 0V19h2v3.5a1.5 1.5 0 003 0V19h1c.55 0 1-.45 1-1V8H6v10zM3.5 8A1.5 1.5 0 002 9.5v6a1.5 1.5 0 003 0v-6A1.5 1.5 0 003.5 8zm17 0a1.5 1.5 0 00-1.5 1.5v6a1.5 1.5 0 003 0v-6A1.5 1.5 0 0020.5 8zM15.5 3.4l1.3-1.3a.4.4 0 10-.56-.56l-1.48 1.48A5.9 5.9 0 0012 2c-1 0-1.94.24-2.76.68L7.76 1.2a.4.4 0 10-.56.56l1.3 1.3A5.98 5.98 0 006 8h12a5.98 5.98 0 00-2.5-4.6zM9.5 6a.75.75 0 110-1.5.75.75 0 010 1.5zm5 0a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                Android
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <!-- iOS steps -->
+        <sc-if value="{{ isIos }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <p style="margin:0 0 2px;font-size:12px;font-weight:600;color:var(--muted)">Use o <b style="color:var(--ink-2)">Safari</b> (a instalação não funciona no Chrome do iPhone).</p>
+
+            <div style="display:flex;gap:13px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:14px;box-shadow:var(--shadow)">
+              <span style="flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:800">1</span>
+              <div style="flex:1">
+                <p style="margin:0 0 3px;font-size:14.5px;font-weight:700;color:var(--ink)">Toque no botão Compartilhar</p>
+                <p style="margin:0;font-size:13px;line-height:1.45;color:var(--ink-2)">Na barra do Safari, toque no ícone de compartilhamento.</p>
+              </div>
+              <span style="flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:11px;background:var(--accent-soft);color:var(--accent)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/></svg>
+              </span>
+            </div>
+
+            <div style="display:flex;gap:13px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:14px;box-shadow:var(--shadow)">
+              <span style="flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:800">2</span>
+              <div style="flex:1">
+                <p style="margin:0 0 3px;font-size:14.5px;font-weight:700;color:var(--ink)">Escolha “Adicionar à Tela de Início”</p>
+                <p style="margin:0;font-size:13px;line-height:1.45;color:var(--ink-2)">Role o menu para baixo até encontrar a opção.</p>
+              </div>
+              <span style="flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:11px;background:var(--accent-soft);color:var(--accent)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg>
+              </span>
+            </div>
+
+            <div style="display:flex;gap:13px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:14px;box-shadow:var(--shadow)">
+              <span style="flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:800">3</span>
+              <div style="flex:1">
+                <p style="margin:0 0 3px;font-size:14.5px;font-weight:700;color:var(--ink)">Toque em “Adicionar”</p>
+                <p style="margin:0;font-size:13px;line-height:1.45;color:var(--ink-2)">No canto superior direito, para confirmar.</p>
+              </div>
+              <span style="flex:none;display:grid;place-items:center;padding:0 10px;height:40px;border-radius:11px;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:800;white-space:nowrap">Adicionar</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- Android steps -->
+        <sc-if value="{{ isAndroid }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <p style="margin:0 0 2px;font-size:12px;font-weight:600;color:var(--muted)">Use o <b style="color:var(--ink-2)">Chrome</b> (ou outro navegador com suporte a PWA).</p>
+
+            <div style="display:flex;gap:13px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:14px;box-shadow:var(--shadow)">
+              <span style="flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:800">1</span>
+              <div style="flex:1">
+                <p style="margin:0 0 3px;font-size:14.5px;font-weight:700;color:var(--ink)">Abra o menu do navegador</p>
+                <p style="margin:0;font-size:13px;line-height:1.45;color:var(--ink-2)">Toque nos três pontinhos, no canto superior direito.</p>
+              </div>
+              <span style="flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:11px;background:var(--accent-soft);color:var(--accent)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+              </span>
+            </div>
+
+            <div style="display:flex;gap:13px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:14px;box-shadow:var(--shadow)">
+              <span style="flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:800">2</span>
+              <div style="flex:1">
+                <p style="margin:0 0 3px;font-size:14.5px;font-weight:700;color:var(--ink)">Toque em “Instalar app”</p>
+                <p style="margin:0;font-size:13px;line-height:1.45;color:var(--ink-2)">Também pode aparecer como “Adicionar à tela inicial”.</p>
+              </div>
+              <span style="flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:11px;background:var(--accent-soft);color:var(--accent)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+              </span>
+            </div>
+
+            <div style="display:flex;gap:13px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:14px;box-shadow:var(--shadow)">
+              <span style="flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:800">3</span>
+              <div style="flex:1">
+                <p style="margin:0 0 3px;font-size:14.5px;font-weight:700;color:var(--ink)">Confirme em “Instalar”</p>
+                <p style="margin:0;font-size:13px;line-height:1.45;color:var(--ink-2)">O ícone vai para a tela inicial e a gaveta de apps.</p>
+              </div>
+              <span style="flex:none;display:grid;place-items:center;padding:0 10px;height:40px;border-radius:11px;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:800;white-space:nowrap">Instalar</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- result -->
+        <div style="display:flex;align-items:center;gap:12px;margin-top:16px;padding:13px;border-radius:var(--r-sm);background:color-mix(in srgb,var(--ok) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--ok) 30%,var(--line))">
+          <span style="flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--accent);box-shadow:0 6px 14px -6px color-mix(in srgb,var(--accent) 80%,transparent)">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.4"><circle cx="8" cy="8" r="6.4"/><circle cx="8" cy="8" r="3"/><circle cx="8" cy="8" r="1" fill="#fff" stroke="none"/></svg>
+          </span>
+          <p style="margin:0;font-size:13px;line-height:1.4;color:var(--ink-2)"><b style="color:var(--ink)">Pronto!</b> O ícone “Mapa de Benefícios” aparece junto dos seus apps.</p>
+        </div>
+
+        <!-- note -->
+        <div class="alert" style="margin-top:12px">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+          <span>Instalar é opcional. Você continua acessando tudo pelo navegador — o app só deixa o acesso mais rápido e ativa os alertas.</span>
+        </div>
+      </div>
+
+      <!-- home indicator -->
+      <div style="position:relative;display:flex;justify-content:center;padding:8px 0 9px;background:var(--bg)">
+        <span style="width:128px;height:5px;border-radius:999px;background:var(--ink);opacity:.85"></span>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:438,&quot;height&quot;:868},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light' | 'dark'&quot;},&quot;platform&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ios&quot;,&quot;android&quot;],&quot;default&quot;:&quot;ios&quot;,&quot;tsType&quot;:&quot;'ios' | 'android'&quot;}}">
+class Component extends DCLogic {
+  state = { platform: null };
+  renderVals() {
+    if (typeof document !== 'undefined' && !document.getElementById('mb-seg-hover-fix')) {
+      const st = document.createElement('style');
+      st.id = 'mb-seg-hover-fix';
+      st.textContent = '.seg button.on:hover, .seg button.on:hover span{color:var(--surface) !important}';
+      document.head.appendChild(st);
+    }
+    const p = this.state.platform ?? this.props.platform ?? 'ios';
+    const isIos = p === 'ios';
+    return {
+      theme: this.props.theme ?? 'light',
+      isIos,
+      isAndroid: !isIos,
+      iosSegCls: isIos ? 'on' : '',
+      androidSegCls: !isIos ? 'on' : '',
+      iosHoverColor: isIos ? 'var(--surface)' : 'var(--ink)',
+      androidHoverColor: !isIos ? 'var(--surface)' : 'var(--ink)',
+      selectIos: () => this.setState({ platform: 'ios' }),
+      selectAndroid: () => this.setState({ platform: 'android' }),
+    };
+  }
+}
+</script>
+</body>
+</html>

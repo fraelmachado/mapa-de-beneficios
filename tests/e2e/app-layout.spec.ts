@@ -25,7 +25,7 @@ test('gmail method: card leads to the real consent gate (no OAuth driven here)',
   await page.getByRole('button', { name: /conectar gmail.*beta/i }).click()
   // Com VITE_GOOGLE_CLIENT_ID setado (.env.local), o card cai no consent real — não dá
   // pra seguir sem um popup de OAuth do Google, então o teste para aqui e só confere o gate.
-  await expect(page.getByRole('heading', { name: /conectar seu gmail/i })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /vamos achar seus benefícios/i })).toBeVisible()
   await expect(page.getByRole('button', { name: /^conectar gmail$/i })).toBeVisible()
   await assertNoHorizontalOverflow(page)
   await page.screenshot({ path: `test-results/${testInfo.project.name}-gmail-consent.png`, fullPage: true })
