@@ -17,9 +17,12 @@ describe('Vasculhando (reduced-motion)', () => {
     const onDone = vi.fn()
     const { container } = renderWithProviders(<Vasculhando count={3} onDone={onDone} />)
     expect(screen.getByText('3')).toBeInTheDocument()
-    // reduced-motion → estado concluído: sweep/ping não são renderizados
+    // concluído → a varredura some (ela significa "ainda procurando")…
     expect(container.querySelector('.scan-sweep')).toBeNull()
-    expect(container.querySelector('.scan-ping')).toBeNull()
+    // …mas o radar fica em repouso, não sem elemento nenhum: o @media
+    // prefers-reduced-motion zera a animação, então aqui não há movimento.
+    expect(container.querySelector('.scan-radar.rest')).not.toBeNull()
+    expect(container.querySelector('.scan-ping.rest')).not.toBeNull()
     fireEvent.click(screen.getByRole('button', { name: /ver meus benefícios/i }))
     expect(onDone).toHaveBeenCalledTimes(1)
   })
@@ -52,12 +55,16 @@ describe('Vasculhando (aba escondida durante o login)', () => {
     expect(screen.getByText('0')).toBeInTheDocument()
   })
 
-  it('conclui depois de frames pintados de verdade', () => {
-    renderWithProviders(<Vasculhando count={3} onDone={vi.fn()} />)
+  it('conclui depois de frames pintados de verdade, e o radar continua vivo', () => {
+    const { container } = renderWithProviders(<Vasculhando count={3} onDone={vi.fn()} />)
+    expect(container.querySelector('.scan-sweep')).not.toBeNull() // varrendo
     let t = performance.now()
     nextFrame(t) // 1º frame ancora o relógio
     for (let i = 0; i < 30 && finalCta() === null; i += 1) { t += 100; nextFrame(t) }
     expect(finalCta()).not.toBeNull()
     expect(screen.getByText('3')).toBeInTheDocument()
+    // no fim a varredura para, mas o radar entra em repouso animado (não congela)
+    expect(container.querySelector('.scan-sweep')).toBeNull()
+    expect(container.querySelector('.scan-radar.rest')).not.toBeNull()
   })
 })

@@ -43,9 +43,11 @@ export function Vasculhando({ count, onDone, onBack }: { count: number; onDone: 
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
           </button>
         ) : null}
-        <div className="scan-radar" aria-hidden="true">
+        {/* concluído: a varredura para (diria "ainda procurando"), mas o radar
+            continua respirando — tela sem movimento nenhum lê como travada. */}
+        <div className={'scan-radar' + (done ? ' rest' : '')} aria-hidden="true">
           {!done ? <span className="scan-sweep" /> : null}
-          {!done ? <span className="scan-ping" /> : null}
+          <span className={'scan-ping' + (done ? ' rest' : '')} />
           <span className="scan-dot scan-dot-1" />
           <span className="scan-dot scan-dot-2" />
           <span className="scan-dot scan-dot-3" />

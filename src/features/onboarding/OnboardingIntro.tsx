@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button } from '../../ui/Button'
 import { Pass } from '../../ui/Pass'
-import { ThemeIcon } from '../layout/navIcons'
+import { ThemeIcon, SunIcon } from '../layout/navIcons'
 import { toggleTheme } from '../../ui/theme'
 
 const prefersReducedMotion = () =>
@@ -56,11 +56,13 @@ export function WelcomeStep({
           <span className="ob-wordmark-icon" aria-hidden="true"><RadarIcon /></span>
           Mapa de Benefícios
         </span>
-        <button type="button" className="ob-theme-btn" aria-pressed={theme === 'dark'}
+        <button type="button" className={'ob-theme-toggle' + (theme === 'dark' ? ' on' : '')}
+          aria-pressed={theme === 'dark'}
           aria-label={`Tema ${theme === 'dark' ? 'escuro' : 'claro'}. Trocar para ${theme === 'dark' ? 'claro' : 'escuro'}`}
           onClick={() => setTheme(toggleTheme())}>
-          <ThemeIcon />
-          <span>{theme === 'dark' ? 'Escuro' : 'Claro'}</span>
+          <span className="ob-theme-knob" aria-hidden="true" />
+          <span className="ob-theme-ic" aria-hidden="true"><SunIcon /></span>
+          <span className="ob-theme-ic" aria-hidden="true"><ThemeIcon /></span>
         </button>
       </div>
       <div className="ob-welcome-inner">

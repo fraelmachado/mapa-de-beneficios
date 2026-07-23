@@ -156,6 +156,21 @@ describe('OnboardingPage flow', () => {
     expect(screen.getByTestId('loc')).toHaveTextContent('/alertas?from=onboarding')
   })
 
+  it('consentimento mostra as marcas reais do catálogo (máx. 8 + contador)', () => {
+    const mk = (i: number, logo: string | null) => ({
+      id: `s${i}`, kind: 'card', name: `Marca ${i}`, logo_url: logo, sort_order: i,
+      source_category: 'bank_card', source_items: [{ id: `i${i}`, label: 'X', sort_order: 1 }],
+    })
+    // 10 com logo + 1 sem: mostra 8 logos, "+3" (11 no total) e ignora a sem logo
+    const sources = [...Array.from({ length: 10 }, (_, i) => mk(i, `/logos/m${i}.svg`)), mk(99, null)]
+    sourcesResult = { ...sourcesResult, data: [{ category: 'bank_card', meta: {}, sources }] }
+
+    renderWithProviders(<OnboardingPage />, { route: '/onboarding?method=gmail' })
+    expect(screen.getAllByRole('img')).toHaveLength(8)
+    expect(screen.getByText('+3')).toBeInTheDocument()
+    expect(screen.getByText('11 marcas')).toBeInTheDocument()
+  })
+
   it('revoga o token do Gmail após um scan bem-sucedido', async () => {
     renderWithProviders(<OnboardingPage />, { route: '/onboarding' })
     fireEvent.click(screen.getByRole('button', { name: /mapear meus benefícios/i }))

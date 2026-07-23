@@ -80,6 +80,8 @@ export function OnboardingPage() {
         connecting={connecting}
         error={connectError}
         preparing={sourcesQuery.isLoading}
+        brands={flatSources.filter((s) => s.logo_url).slice(0, 8).map((s) => ({ id: s.id, name: s.name, logo: s.logo_url as string }))}
+        brandsTotal={flatSources.length}
       />
     )
   }

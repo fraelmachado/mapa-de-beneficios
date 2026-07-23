@@ -28,20 +28,26 @@ const svg = { width: 17, height: 17, viewBox: '0 0 24 24', fill: 'none', stroke:
 
 // Logo do Gmail (cores do Google) — decorativo; o rótulo acessível do botão continua "Conectar Gmail".
 const GmailGlyph = (
-  <svg width="18" height="15" viewBox="0 0 48 38" aria-hidden="true">
-    <rect x="3" y="6" width="42" height="27" rx="4.5" fill="#fff" stroke="#E8E8E8" strokeWidth="1.4" />
-    <path d="M5.5 9.5 L24 24 L42.5 9.5" fill="none" stroke="#EA4335" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M5.5 9.5 V31" stroke="#4285F4" strokeWidth="3.4" strokeLinecap="round" />
-    <path d="M42.5 9.5 V31" stroke="#34A853" strokeWidth="3.4" strokeLinecap="round" />
-    <path d="M5.5 9.5 L24 24" stroke="#FBBC04" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
+  <span className="gc-glyph" aria-hidden="true">
+    <svg width="26" height="21" viewBox="0 0 48 38">
+      <rect x="3" y="6" width="42" height="27" rx="4.5" fill="#fff" stroke="#E8E8E8" strokeWidth="1.4" />
+      <path d="M5.5 9.5 L24 24 L42.5 9.5" fill="none" stroke="#EA4335" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M5.5 9.5 V31" stroke="#4285F4" strokeWidth="3.4" strokeLinecap="round" />
+      <path d="M42.5 9.5 V31" stroke="#34A853" strokeWidth="3.4" strokeLinecap="round" />
+      <path d="M5.5 9.5 L24 24" stroke="#FBBC04" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  </span>
 )
 
-export function GmailConsent({ onConnect, onBack, connecting, error, preparing = false }: {
+export function GmailConsent({ onConnect, onBack, connecting, error, preparing = false, brands = [], brandsTotal = 0 }: {
   onConnect: () => void; onBack: () => void; connecting: boolean; error: boolean
   /** catálogo ainda carregando: sem ele o scan não tem domínios pra casar. */
   preparing?: boolean
+  /** marcas reais do catálogo (com logo) — mostram o que vamos procurar. */
+  brands?: { id: string; name: string; logo: string }[]
+  brandsTotal?: number
 }) {
+  const rest = Math.max(0, brandsTotal - brands.length)
   return (
     <div className="ob">
       <div className="ob-scroll">
@@ -52,6 +58,22 @@ export function GmailConsent({ onConnect, onBack, connecting, error, preparing =
 
           <h1 className="gc-title">Vamos achar seus benefícios 🔎</h1>
           <p className="gc-sub">Damos uma olhada nos e-mails das marcas do catálogo (últimos 2 anos) só para sugerir seus programas — combinado?</p>
+
+          {brands.length ? (
+            <div className="gc-brands">
+              <div className="gc-brands-row">
+                {brands.map((b) => (
+                  <span key={b.id} className="gc-brand" title={b.name}>
+                    <img src={b.logo} alt={b.name} loading="lazy" />
+                  </span>
+                ))}
+                {rest > 0 ? <span className="gc-brand gc-brand-more" aria-hidden="true">+{rest}</span> : null}
+              </div>
+              <p className="gc-brands-cap">
+                Procuramos {brandsTotal > 0 ? <b>{brandsTotal} marcas</b> : 'as marcas'} do catálogo — bancos, operadoras, saúde, assinaturas.
+              </p>
+            </div>
+          ) : null}
 
           <div className="gc-list">
             {POINTS.map((p) => (
