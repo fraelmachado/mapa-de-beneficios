@@ -133,7 +133,7 @@
 .ob-cta { flex: 1; }
 
 /* ---- animações compartilhadas (mockup _ds) ---- */
-@keyframes mb-bob { from { transform: translateY(0) } to { transform: translateY(-9px) } }
+@keyframes mb-bob { from { transform: translateY(0) } to { transform: translateY(-13px) } }
 @keyframes mb-rise { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: translateY(0) } }
 @keyframes mb-aurora { 0% { transform: translate(0, 0) scale(1); opacity: .5 } 50% { transform: translate(12px, -8px) scale(1.18); opacity: .85 } 100% { transform: translate(-8px, 6px) scale(1.06); opacity: .55 } }
 @keyframes mb-twinkle { 0%, 100% { opacity: .2; transform: scale(.6) } 50% { opacity: 1; transform: scale(1) } }
@@ -290,16 +290,19 @@
 .ob-topbar { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; padding: 18px 24px 0; width: 100%; max-width: 480px; margin: 0 auto; }
 .ob-wordmark { display: flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 700; letter-spacing: -.01em; color: var(--ink); }
 .ob-wordmark-icon { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 9px; background: var(--accent); color: #fff; box-shadow: 0 6px 14px -6px color-mix(in srgb, var(--accent) 80%, transparent); }
-.ob-skip { background: none; border: none; font: 600 13px var(--font); color: var(--muted); cursor: pointer; padding: 6px; }
+/* topbar da boas-vindas: no lugar do antigo "Pular", o seletor de tema */
+.ob-theme-btn { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 7px 12px; border-radius: var(--r-pill); border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); font: 700 12.5px var(--font); cursor: pointer; }
+.ob-theme-btn:hover { border-color: var(--ink-2); color: var(--ink); }
+.ob-theme-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .ob-welcome-inner { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; width: 100%; max-width: 480px; margin: 0 auto; }
 .ob-fan { position: relative; height: 236px; margin-top: 8px; }
 .ob-fan-card { position: absolute; }
 .ob-fan-card > div { transform-origin: bottom center; }
-.ob-fan-left { top: 46px; left: 18px; width: 236px; animation: mb-bob 4.2s var(--ease) .2s infinite alternate; }
+.ob-fan-left { top: 46px; left: 18px; width: 236px; animation: mb-bob 2.4s var(--ease) .15s infinite alternate; }
 .ob-fan-left > div { transform: rotate(-8deg) scale(.9); opacity: .92; }
-.ob-fan-right { top: 36px; right: 14px; width: 232px; animation: mb-bob 4.8s var(--ease) .9s infinite alternate; }
+.ob-fan-right { top: 36px; right: 14px; width: 232px; animation: mb-bob 2.8s var(--ease) .5s infinite alternate; }
 .ob-fan-right > div { transform: rotate(8deg) scale(.9); opacity: .92; }
-.ob-fan-center { top: 78px; left: 50%; width: 268px; margin-left: -134px; z-index: 3; animation: mb-bob 5.4s var(--ease) infinite alternate; }
+.ob-fan-center { top: 78px; left: 50%; width: 268px; margin-left: -134px; z-index: 3; animation: mb-bob 3.1s var(--ease) infinite alternate; }
 .ob-fan-center > div { transform: rotate(-2deg); box-shadow: var(--shadow-lg); border-radius: 18px; }
 .ob-welcome-copy { position: relative; padding: 0 28px; text-align: center; margin-top: 6px; }
 .ob-welcome-eyebrow { margin: 0 0 12px; font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); animation: mb-rise .5s var(--ease) both; }

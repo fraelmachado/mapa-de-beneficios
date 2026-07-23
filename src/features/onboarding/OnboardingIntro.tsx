@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Button } from '../../ui/Button'
 import { Pass } from '../../ui/Pass'
+import { ThemeIcon } from '../layout/navIcons'
+import { toggleTheme } from '../../ui/theme'
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
@@ -37,14 +39,15 @@ function RadarIcon() {
 
 export function WelcomeStep({
   onContinue,
-  onSkip,
   onLogin,
 }: {
   onContinue: () => void
-  onSkip?: () => void
   onLogin?: () => void
 }) {
   const value = useCountUp(2480)
+  const [theme, setTheme] = useState(() =>
+    (typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme')) === 'dark' ? 'dark' : 'light',
+  )
   return (
     <main className="ob-welcome">
       <div className="ob-welcome-wash" aria-hidden="true" />
@@ -53,7 +56,12 @@ export function WelcomeStep({
           <span className="ob-wordmark-icon" aria-hidden="true"><RadarIcon /></span>
           Mapa de Benefícios
         </span>
-        <button type="button" className="ob-skip" onClick={onSkip}>Pular</button>
+        <button type="button" className="ob-theme-btn" aria-pressed={theme === 'dark'}
+          aria-label={`Tema ${theme === 'dark' ? 'escuro' : 'claro'}. Trocar para ${theme === 'dark' ? 'claro' : 'escuro'}`}
+          onClick={() => setTheme(toggleTheme())}>
+          <ThemeIcon />
+          <span>{theme === 'dark' ? 'Escuro' : 'Claro'}</span>
+        </button>
       </div>
       <div className="ob-welcome-inner">
         <div className="ob-fan" aria-hidden="true">
@@ -82,6 +90,7 @@ export function WelcomeStep({
           <div className="ob-dots" aria-hidden="true"><i className="on" /><i /><i /></div>
         </div>
       </div>
+      <p className="sr-only" role="status" aria-live="polite">Tema {theme === 'dark' ? 'escuro' : 'claro'} ativado</p>
     </main>
   )
 }

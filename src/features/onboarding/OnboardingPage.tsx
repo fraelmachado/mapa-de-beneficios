@@ -119,5 +119,5 @@ export function OnboardingPage() {
     return <MethodStep onManual={() => setScreen('manual')} onBack={() => setScreen('welcome')} onGmail={startGmail} />
   }
 
-  return <WelcomeStep onContinue={() => setScreen('method')} onSkip={() => navigate('/painel')} onLogin={() => navigate('/perfil')} />
+  return <WelcomeStep onContinue={() => setScreen('method')} onLogin={() => navigate('/perfil')} />
 }

@@ -93,6 +93,19 @@ describe('OnboardingPage flow', () => {
     expect(screen.getByText('Wizard manual real')).toBeInTheDocument()
   })
 
+  it('boas-vindas: não oferece mais "Pular" e troca o tema no lugar dele', () => {
+    document.documentElement.setAttribute('data-theme', 'light')
+    renderWithProviders(<OnboardingPage />, { route: '/onboarding' })
+
+    expect(screen.queryByRole('button', { name: /^pular$/i })).not.toBeInTheDocument()
+
+    const btn = screen.getByRole('button', { name: /trocar para escuro/i })
+    expect(btn).toHaveAttribute('aria-pressed', 'false')
+    fireEvent.click(btn)
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark')
+    expect(screen.getByRole('button', { name: /trocar para claro/i })).toHaveAttribute('aria-pressed', 'true')
+  })
+
   it('opens manual wizard directly in edit mode', () => {
     renderWithProviders(<OnboardingPage />, { route: '/onboarding?mode=edit' })
 
