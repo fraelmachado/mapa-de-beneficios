@@ -3,6 +3,8 @@ import { Button } from '../../ui/Button'
 
 const LABELS = ['Procurando seus programas…', 'Cruzando com o catálogo…', 'Montando seu radar…']
 const DURATION = 2400
+// teto por frame: uma aba escondida/engasgada contribui no máximo isso, nunca o gap inteiro.
+const MAX_FRAME_MS = 100
 
 const reduced = () =>
   typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
@@ -14,10 +16,16 @@ export function Vasculhando({ count, onDone, onBack }: { count: number; onDone: 
 
   useEffect(() => {
     if (reduced() || typeof requestAnimationFrame === 'undefined') { setN(count); setDone(true); return }
-    const start = performance.now()
     let raf = 0
+    let prev = 0 // timestamp do frame anterior (0 = ainda não pintou nenhum)
+    let elapsed = 0 // só conta tempo REALMENTE pintado
     const tick = (t: number) => {
-      const p = Math.min(1, (t - start) / DURATION)
+      // rAF não dispara com a aba escondida (popup do Gmail no celular): medir pelo
+      // relógio de parede faria o 1º frame chegar "atrasado" e a animação nasceria
+      // concluída. O 1º frame só ancora; o clamp impede que uma pausa vire um salto.
+      if (prev) elapsed += Math.min(t - prev, MAX_FRAME_MS)
+      prev = t
+      const p = Math.min(1, elapsed / DURATION)
       setN(Math.round(count * p))
       setLabelIdx(Math.min(LABELS.length - 1, Math.floor(p * LABELS.length)))
       if (p < 1) raf = requestAnimationFrame(tick)
