@@ -9,6 +9,13 @@ export function parseFrom(header: string): string | null {
   return domain.includes('.') ? domain : null
 }
 
+/** Só o endereço do header From, sem o nome de exibição (que repetiria a marca no card). */
+export function fromAddress(header: string): string {
+  const first = header.split(',')[0] ?? ''
+  const angle = first.match(/<([^>]+)>/)
+  return (angle ? angle[1] : first).trim()
+}
+
 /** Casa por boundary de label: `matchDomain` ou um subdomínio dele. Rejeita colisão de sufixo. */
 export function domainMatches(emailDomain: string, matchDomain: string): boolean {
   const e = emailDomain.toLowerCase()

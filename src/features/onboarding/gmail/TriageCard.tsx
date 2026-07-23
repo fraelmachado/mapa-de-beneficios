@@ -3,6 +3,7 @@ import { formatBRL } from '../../benefits/estimatedValue'
 import { relTime } from '../../programas/buildPrograms'
 import { categoryMeta } from '../categoryMeta'
 import { recommendedItemId } from './TierSheet'
+import { fromAddress } from './parseFrom'
 import type { Finding } from './types'
 
 // Um card da triagem: uma marca, uma decisão.
@@ -57,7 +58,7 @@ export function TriageCard({
                 <i aria-hidden="true" style={{ background: cat.color }} />{cat.label}
               </p>
               <h2 className="ob-triage-name" ref={titleRef} tabIndex={-1}>{finding.provider}</h2>
-              <p className="ob-triage-from">achamos no seu Gmail<br /><b>{ev.emailFrom}</b> · {relTime(new Date(ev.emailDate).getTime())}</p>
+              <p className="ob-triage-from">achamos no seu Gmail<br /><b>{fromAddress(ev.emailFrom)}</b> · {relTime(new Date(ev.emailDate).getTime())}</p>
 
               {multi ? (
                 <>
@@ -90,11 +91,13 @@ export function TriageCard({
         </div>
       </div>
 
-      <div className="ob-triage-foot">
-        <button type="button" className="ob-triage-no" disabled={disabled} onClick={() => onDecide(null)}>Não tenho</button>
-        {!multi ? (
-          <button type="button" className="ob-triage-yes" disabled={disabled} onClick={() => onDecide(finding.items[0].id)}>Tenho ›</button>
-        ) : null}
+      <div className="ob-foot ob-triage-foot">
+        <div className="ob-foot-inner">
+          <button type="button" className="ob-triage-no" disabled={disabled} onClick={() => onDecide(null)}>Não tenho</button>
+          {!multi ? (
+            <button type="button" className="ob-triage-yes" disabled={disabled} onClick={() => onDecide(finding.items[0].id)}>Tenho ›</button>
+          ) : null}
+        </div>
       </div>
     </div>
   )

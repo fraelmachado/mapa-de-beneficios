@@ -242,12 +242,15 @@
 .ob-triage-unsure:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .ob-triage-hint { margin: 14px 0 0; font-size: 12px; line-height: 1.45; color: var(--ink-2); text-align: center; }
 
-.ob-triage-foot { flex: none; display: flex; gap: 10px; background: var(--surface); border-top: 1px solid var(--line); padding: var(--s3) var(--s5) calc(var(--s3) + env(safe-area-inset-bottom)); }
-.ob-triage-foot > button { flex: 1; border-radius: 13px; padding: 15px; font: inherit; font-weight: 800; font-size: 15px; cursor: pointer; border: 0; }
-.ob-triage-foot > button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.ob-triage-no { background: var(--surface); color: var(--ink-2); border: 1px solid var(--line) !important; }
-.ob-triage-yes { background: var(--accent); color: #fff; }
-.ob-triage-foot > button:disabled { opacity: .6; cursor: default; }
+/* rodapé reusa .ob-foot/.ob-foot-inner (largura máx. 480 centrada) → alinha com o card */
+.ob-triage-foot .ob-foot-inner > button { flex: 1; border-radius: 13px; padding: 15px; font: inherit; font-weight: 800; font-size: 15px; cursor: pointer; border: 0; }
+.ob-triage-foot .ob-foot-inner > button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ob-triage-foot .ob-foot-inner > button:disabled { opacity: .6; cursor: default; }
+.ob-triage-yes { background: var(--accent); color: var(--accent-ink); }
+/* recusa tingida: visível de longe sem virar bloco de "perigo" ao lado do Tenho */
+.ob-triage-no { background: var(--err-bg); color: var(--err); box-shadow: inset 0 0 0 1.5px var(--err-line); }
+.ob-triage-no:hover { box-shadow: inset 0 0 0 1.5px var(--err); }
+.ob-triage-no:focus-visible { outline-color: var(--err) !important; }
 
 /* ==== Radar montado / conclusão (Tela 07) ==== */
 .ob-done { min-height: 100dvh; display: flex; flex-direction: column; background: var(--bg); }

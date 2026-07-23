@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { parseFrom, domainMatches } from './parseFrom'
+import { parseFrom, domainMatches, fromAddress } from './parseFrom'
 
 describe('parseFrom', () => {
   it('extrai domínio de "Nome <local@dominio>"', () => {
@@ -32,5 +32,17 @@ describe('domainMatches', () => {
   })
   it('não casa domínio diferente', () => {
     expect(domainMatches('nubank.com.br', 'spotify.com')).toBe(false)
+  })
+})
+
+describe('fromAddress', () => {
+  it('descarta o nome de exibição (que repetiria a marca no card)', () => {
+    expect(fromAddress('Nubank <todomundo@nubank.com.br>')).toBe('todomundo@nubank.com.br')
+  })
+  it('endereço puro passa intacto', () => {
+    expect(fromAddress('no-reply@spotify.com')).toBe('no-reply@spotify.com')
+  })
+  it('usa só o primeiro de uma lista', () => {
+    expect(fromAddress('A <a@x.com>, B <b@y.com>')).toBe('a@x.com')
   })
 })
