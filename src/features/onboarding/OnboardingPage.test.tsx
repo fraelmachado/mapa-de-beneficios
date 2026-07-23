@@ -10,7 +10,7 @@ vi.mock('./useSources', () => ({ useSources: () => sourcesResult }))
 vi.mock('./Vasculhando', () => ({ Vasculhando: ({ onDone }: { onDone: () => void }) => <button onClick={onDone}>ver meus benefícios</button> }))
 vi.mock('./RevisarGmail', () => ({
   RevisarGmail: ({ onDone }: { onDone: (i: unknown[]) => void }) => (
-    <button onClick={() => onDone([{ sourceId: 's1', provider: 'Nubank', items: [{ id: 'i1', label: 'Ultravioleta', sort_order: 1 }] }])}>
+    <button onClick={() => onDone([{ finding: { sourceId: 's1', provider: 'Nubank', category: 'bank_card', items: [{ id: 'i1', label: 'Ultravioleta', sort_order: 1 }] }, itemId: 'i1' }])}>
       adicionar ao radar
     </button>
   ),
@@ -201,6 +201,17 @@ describe('OnboardingPage re-scan (?method=gmail)', () => {
     expect(await screen.findByText(/nada novo no seu gmail/i)).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /voltar aos meus programas/i }))
     expect(screen.getByTestId('loc')).toHaveTextContent('/programas')
+  })
+
+  it('catálogo ainda carregando: botão fica "Preparando…" e não vasculha (evita "nada encontrado" falso)', () => {
+    sourcesResult = { data: undefined, isLoading: true, error: null, refetch: vi.fn() }
+    renderWithProviders(<><LocationProbe /><OnboardingPage /></>, { route: '/onboarding?method=gmail' })
+    const cta = screen.getByRole('button', { name: /preparando/i })
+    expect(cta).toBeDisabled()
+    fireEvent.click(cta)
+    // não caiu em gmail-none nem navegou: continua no consentimento
+    expect(screen.getByRole('heading', { name: /vamos achar seus benefícios/i })).toBeInTheDocument()
+    expect(screen.queryByText(/nada novo no seu gmail/i)).not.toBeInTheDocument()
   })
 
   it('gmail indisponível + re-scan cai em gmail-none (indisponível) com botão de volta pra /programas', () => {

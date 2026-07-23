@@ -205,6 +205,50 @@
 .review-check.ok { background: var(--ok); border-color: var(--ok); color: #fff; }
 @media (prefers-reduced-motion: reduce) { .review-item { transition: none; } }
 
+/* ==== Triagem card-a-card (Revisar Gmail, Opção 3) ==== */
+.ob-triage { display: flex; flex-direction: column; min-height: 100%; }
+.ob-triage-prog { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 6px 0 18px; }
+.ob-triage-dots { display: flex; gap: 6px; align-items: center; }
+.ob-triage-dots > i { width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
+.ob-triage-dots > i.on { background: var(--accent); }
+.ob-triage-dots > i.cur { background: var(--ink); transform: scale(1.25); }
+.ob-triage-bar { display: block; width: 120px; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.ob-triage-bar > i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--ok)); }
+.ob-triage-count { font-size: 12.5px; font-weight: 700; color: var(--ink-2); }
+
+.ob-triage-stage { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 0 6px; }
+.ob-triage-peek { height: 14px; margin: 0 22px; border-radius: 16px 16px 0 0; background: var(--surface-2); border: 1px solid var(--line); border-bottom: 0; opacity: .6; }
+.ob-triage-cardface { background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 26px 22px 24px; box-shadow: var(--shadow); text-align: center; }
+.ob-triage-mark { display: grid; place-items: center; width: 56px; height: 56px; margin: 0 auto 14px; border-radius: 16px; background: var(--accent-soft); color: var(--accent); font-size: 22px; font-weight: 800; overflow: hidden; }
+.ob-triage-mark img { width: 40px; height: 40px; object-fit: contain; }
+.ob-triage-eyebrow { display: inline-flex; align-items: center; gap: 7px; margin: 0 0 6px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.ob-triage-eyebrow > i { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.ob-triage-name { margin: 0 0 4px; font-size: 22px; font-weight: 800; letter-spacing: -.02em; color: var(--ink); }
+.ob-triage-name:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+.ob-triage-from { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin: 0; }
+.ob-triage-from b { color: var(--ink-2); }
+
+.ob-triage-tiers { display: flex; flex-direction: column; gap: 8px; margin: 18px 0 4px; text-align: left; }
+.ob-triage-tier { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-radius: 13px; border: 1px solid var(--line); background: var(--surface-2); font: inherit; font-size: 14px; font-weight: 700; color: var(--ink); cursor: pointer; }
+.ob-triage-tier:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ob-triage-tier.on { border-color: transparent; }
+.ob-triage-tier.on::after { content: ""; position: absolute; inset: -1px; border: 2px solid var(--accent); border-radius: 13px; box-shadow: 0 0 0 4px var(--accent-soft); pointer-events: none; }
+.ob-triage-tier b { font-size: 12px; font-weight: 800; color: var(--accent); white-space: nowrap; }
+.ob-triage-tier-name { display: inline-flex; align-items: center; gap: 8px; }
+.ob-triage-rec { font-size: 9px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: #fff; background: linear-gradient(100deg, var(--accent), var(--c-pontos)); padding: 3px 6px; border-radius: 6px; }
+.ob-triage-soon { font-size: 11px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+.ob-triage-unsure { display: block; width: 100%; margin-top: 10px; padding: 11px; border-radius: 12px; border: 1px dashed var(--line); background: transparent; font: 700 12.5px var(--font); color: var(--ink-2); cursor: pointer; }
+.ob-triage-unsure:hover { border-color: var(--accent); color: var(--accent); }
+.ob-triage-unsure:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ob-triage-hint { margin: 14px 0 0; font-size: 12px; line-height: 1.45; color: var(--ink-2); text-align: center; }
+
+.ob-triage-foot { flex: none; display: flex; gap: 10px; background: var(--surface); border-top: 1px solid var(--line); padding: var(--s3) var(--s5) calc(var(--s3) + env(safe-area-inset-bottom)); }
+.ob-triage-foot > button { flex: 1; border-radius: 13px; padding: 15px; font: inherit; font-weight: 800; font-size: 15px; cursor: pointer; border: 0; }
+.ob-triage-foot > button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ob-triage-no { background: var(--surface); color: var(--ink-2); border: 1px solid var(--line) !important; }
+.ob-triage-yes { background: var(--accent); color: #fff; }
+.ob-triage-foot > button:disabled { opacity: .6; cursor: default; }
+
 /* ==== Radar montado / conclusão (Tela 07) ==== */
 .ob-done { min-height: 100dvh; display: flex; flex-direction: column; background: var(--bg); }
 .ob-done-inner { flex: 1; overflow-y: auto; width: 100%; max-width: 480px; margin: 0 auto; padding: var(--s8) var(--s5) var(--s5); text-align: center; }

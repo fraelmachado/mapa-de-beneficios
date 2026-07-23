@@ -45,4 +45,16 @@ describe('matchSources', () => {
     const f = matchSources([mail({ internalDate: 0 })], [src({})], 'me@gmail.com')
     expect(f[0].evidence.emailDate).toBe('1970-01-01T00:00:00.000Z')
   })
+
+  it('propaga a categoria da marca (default bank_card)', () => {
+    const withCat = matchSources([mail({})], [src({ source_category: 'retail' })], 'me@gmail.com')
+    expect(withCat[0].category).toBe('retail')
+    const noCat = matchSources([mail({})], [src({ source_category: undefined })], 'me@gmail.com')
+    expect(noCat[0].category).toBe('bank_card')
+  })
+
+  it('descarta marca sem nenhum tier (não há o que confirmar)', () => {
+    const f = matchSources([mail({})], [src({ source_items: [] })], 'me@gmail.com')
+    expect(f).toHaveLength(0)
+  })
 })

@@ -1,4 +1,5 @@
 import type { SourceItem } from '../types'
+import type { SourceCategory } from '../../benefits/types'
 
 export interface ScanEmail {
   domain: string
@@ -20,6 +21,7 @@ export interface Finding {
   sourceId: string
   provider: string
   logo: string | null
+  category: SourceCategory // categoria da marca (eyebrow do card)
   items: SourceItem[] // tiers da marca; length 1 = marca de item único
   evidence: EvidenceInput
 }
@@ -27,6 +29,13 @@ export interface Finding {
 export interface ScanResult {
   findings: Finding[]
   partial: boolean // algum domínio não pôde ser verificado
+}
+
+// seleção confirmada na triagem: o finding + o tier escolhido (itemId).
+// leva o tier adiante (tela final) — Finding sozinho não sabe qual versão foi escolhida.
+export interface SavedSelection {
+  finding: Finding
+  itemId: string
 }
 
 export interface GmailSourcePayload {

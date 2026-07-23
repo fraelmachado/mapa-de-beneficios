@@ -14,10 +14,14 @@ export function matchSources(emails: ScanEmail[], sources: Source[], gmailAccoun
       bySource.set(source.id, { source, email })
     }
   }
-  return [...bySource.values()].map(({ source, email }) => ({
+  return [...bySource.values()]
+    // marca sem tier não vira card: não há o que confirmar
+    .filter(({ source }) => source.source_items.length > 0)
+    .map(({ source, email }) => ({
     sourceId: source.id,
     provider: source.name,
     logo: source.logo_url,
+    category: source.source_category ?? 'bank_card',
     items: source.source_items,
     evidence: {
       gmailAccount,

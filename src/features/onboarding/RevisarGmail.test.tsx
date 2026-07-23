@@ -5,84 +5,119 @@ import { renderWithProviders as render } from '../../test/renderWithProviders'
 import { RevisarGmail } from './RevisarGmail'
 import type { Finding } from './gmail/types'
 
-const rpc = vi.fn(async (..._args: any[]) => ({ error: null }))
+const rpc = vi.fn(async (..._args: any[]): Promise<{ error: unknown }> => ({ error: null }))
 vi.mock('../../lib/supabase', () => ({ supabase: { rpc: (...a: any[]) => rpc(...a) } }))
 
-beforeEach(() => rpc.mockClear())
+beforeEach(() => rpc.mockReset().mockResolvedValue({ error: null }))
 
 const single: Finding = {
-  sourceId: 's1', provider: 'Spotify', logo: null,
+  sourceId: 's1', provider: 'Spotify', logo: null, category: 'retail',
   items: [{ id: 'i1', label: 'Premium', sort_order: 1 }],
   evidence: { gmailAccount: 'me@gmail.com', gmailMessageId: 'm1', emailFrom: 'a@spotify.com', emailSubject: 'x', emailDate: '2026-01-01T00:00:00Z' },
 }
 const multi: Finding = {
-  sourceId: 's2', provider: 'Nubank', logo: null,
+  sourceId: 's2', provider: 'Nubank', logo: null, category: 'bank_card',
   items: [{ id: 'a', label: 'Gold', sort_order: 1 }, { id: 'b', label: 'Platinum', sort_order: 2 }],
   evidence: { gmailAccount: 'me@gmail.com', gmailMessageId: 'm2', emailFrom: 'a@nubank.com.br', emailSubject: 'y', emailDate: '2026-01-01T00:00:00Z' },
 }
 
-const cta = () => screen.getByRole('button', { name: /Falta|Adicionar \d|Concluir|Salvando/ })
+const cta = () => screen.getByRole('button', { name: /Adicionar \d|Concluir|Salvando/ })
+const lastPayload = () => rpc.mock.calls.at(-1)![1].payload
 
-it('toda entrada começa pendente: CTA bloqueada e progresso 0 de N', () => {
-  render(<RevisarGmail findings={[single, multi]} partial={false} onDone={vi.fn()} />)
-  expect(cta()).toBeDisabled()
-  expect(cta()).toHaveTextContent('Faltam 2') // plural
-  expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
-})
-
-it('single "Tenho" confirma → CTA libera e salva o item único', async () => {
+it('single "Tenho ›" decide, avança pro resumo e salva o item único', async () => {
   const onDone = vi.fn()
   render(<RevisarGmail findings={[single]} partial={false} onDone={onDone} />)
-  fireEvent.click(screen.getByRole('button', { name: /^Tenho$/ }))
-  const btn = screen.getByRole('button', { name: /Adicionar 1 ao radar/ })
-  expect(btn).not.toBeDisabled()
-  fireEvent.click(btn)
+  fireEvent.click(screen.getByRole('button', { name: /Tenho ›/ }))
+  expect(cta()).toHaveTextContent('Adicionar 1 ao radar')
+  fireEvent.click(cta())
   await waitFor(() => expect(rpc).toHaveBeenCalledWith('add_gmail_sources', expect.anything()))
-  expect(rpc.mock.calls.at(-1)![1].payload[0].item_id).toBe('i1')
+  expect(lastPayload()[0].item_id).toBe('i1')
   await waitFor(() => expect(onDone).toHaveBeenCalled())
 })
 
-it('single "Não" descarta → CTA "Concluir" sem chamar a RPC', async () => {
+it('single "Não tenho" descarta → resumo "Concluir" sem chamar a RPC', async () => {
   const onDone = vi.fn()
   render(<RevisarGmail findings={[single]} partial={false} onDone={onDone} />)
-  fireEvent.click(screen.getByRole('button', { name: /^Não$/ }))
-  const btn = screen.getByRole('button', { name: /Concluir/ })
-  expect(btn).not.toBeDisabled()
-  fireEvent.click(btn)
+  fireEvent.click(screen.getByRole('button', { name: /^Não tenho$/ }))
+  expect(cta()).toHaveTextContent('Concluir')
+  fireEvent.click(cta())
   await waitFor(() => expect(onDone).toHaveBeenCalledWith([]))
   expect(rpc).not.toHaveBeenCalled()
 })
 
-it('multi "Tenho ›" abre o sheet, escolher tier confirma e salva o tier certo', async () => {
+it('multi: toque no tier decide, avança e salva o tier certo', async () => {
   render(<RevisarGmail findings={[multi]} partial={false} onDone={vi.fn()} />)
-  expect(cta()).toBeDisabled()
-  expect(cta()).toHaveTextContent('Falta 1') // singular
-  fireEvent.click(screen.getByRole('button', { name: /Tenho ›/ }))
+  expect(screen.queryByRole('button', { name: /Tenho ›/ })).not.toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: /Platinum/ }))
-  const btn = screen.getByRole('button', { name: /Adicionar 1 ao radar/ })
-  expect(btn).not.toBeDisabled()
-  fireEvent.click(btn)
+  expect(cta()).toHaveTextContent('Adicionar 1 ao radar')
+  fireEvent.click(cta())
   await waitFor(() => expect(rpc).toHaveBeenCalled())
-  expect(rpc.mock.calls.at(-1)![1].payload[0].item_id).toBe('b')
+  expect(lastPayload()[0].item_id).toBe('b')
 })
 
-it('multi "Não tenho" no sheet descarta a marca', async () => {
-  render(<RevisarGmail findings={[multi]} partial={false} onDone={vi.fn()} />)
-  fireEvent.click(screen.getByRole('button', { name: /Tenho ›/ }))
-  fireEvent.click(screen.getByRole('button', { name: /Não tenho o Nubank/i }))
-  expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
-  // decidido (não tenho) → CTA "Concluir" liberada
-  expect(screen.getByRole('button', { name: /Concluir/ })).not.toBeDisabled()
+it('cada decisão avança exatamente um card', () => {
+  render(<RevisarGmail findings={[single, multi]} partial={false} onDone={vi.fn()} />)
+  expect(screen.getByText('1 de 2')).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: /Tenho ›/ })) // decide Spotify
+  expect(screen.getByRole('heading', { name: 'Nubank' })).toBeInTheDocument()
+  expect(screen.getByText('2 de 2')).toBeInTheDocument() // avançou 1, não pulou pro resumo
+})
+
+it('"‹" volta ao card anterior', () => {
+  render(<RevisarGmail findings={[single, multi]} partial={false} onDone={vi.fn()} />)
+  fireEvent.click(screen.getByRole('button', { name: /Tenho ›/ }))       // Spotify → Nubank
+  expect(screen.getByRole('heading', { name: 'Nubank' })).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'Voltar' }))         // Nubank → Spotify
+  expect(screen.getByRole('heading', { name: 'Spotify' })).toBeInTheDocument()
+  expect(screen.getByText('1 de 2')).toBeInTheDocument()
+})
+
+it('"‹" no primeiro card sai da tela (onBack)', () => {
+  const onBack = vi.fn()
+  render(<RevisarGmail findings={[single]} partial={false} onDone={vi.fn()} onBack={onBack} />)
+  fireEvent.click(screen.getByRole('button', { name: 'Voltar' }))
+  expect(onBack).toHaveBeenCalled()
+})
+
+it('resumo lista confirmados E descartados', () => {
+  render(<RevisarGmail findings={[single, multi]} partial={false} onDone={vi.fn()} />)
+  fireEvent.click(screen.getByRole('button', { name: /Tenho ›/ }))   // Spotify → tenho
+  fireEvent.click(screen.getByRole('button', { name: /^Não tenho$/ })) // Nubank → não tenho
+  expect(screen.getByText('Spotify')).toBeInTheDocument()
+  expect(screen.getByText('Nubank')).toBeInTheDocument()
+  expect(screen.getAllByText('tenho')).toHaveLength(1)
+  expect(screen.getByText('não tenho')).toBeInTheDocument()
+  expect(cta()).toHaveTextContent('Adicionar 1 ao radar')
+})
+
+it('"Editar" no resumo reabre o card e devolve ao resumo ao decidir', () => {
+  render(<RevisarGmail findings={[single]} partial={false} onDone={vi.fn()} />)
+  fireEvent.click(screen.getByRole('button', { name: /Tenho ›/ }))   // → resumo (tenho)
+  fireEvent.click(screen.getByRole('button', { name: 'Editar' }))
+  expect(screen.getByRole('heading', { name: 'Spotify' })).toBeInTheDocument() // card de novo
+  fireEvent.click(screen.getByRole('button', { name: /^Não tenho$/ }))
+  expect(cta()).toHaveTextContent('Concluir')                        // voltou ao resumo, agora descartado
+  expect(screen.getByText('não tenho')).toBeInTheDocument()
 })
 
 it('payload leva só os "tenho": single tenho + multi não → 1 item', async () => {
   render(<RevisarGmail findings={[single, multi]} partial={false} onDone={vi.fn()} />)
-  fireEvent.click(screen.getByRole('button', { name: /^Tenho$/ }))          // single → have
-  fireEvent.click(screen.getAllByRole('button', { name: /^Não$/ })[0])       // multi → no
-  const btn = screen.getByRole('button', { name: /Adicionar 1 ao radar/ })
-  fireEvent.click(btn)
+  fireEvent.click(screen.getByRole('button', { name: /Tenho ›/ }))
+  fireEvent.click(screen.getByRole('button', { name: /^Não tenho$/ }))
+  fireEvent.click(cta())
   await waitFor(() => expect(rpc).toHaveBeenCalled())
-  const payload = rpc.mock.calls.at(-1)![1].payload
+  const payload = lastPayload()
   expect(payload).toHaveLength(1)
   expect(payload[0].source_id).toBe('s1')
+})
+
+it('erro de save mantém no resumo e o alerta some ao editar', async () => {
+  rpc.mockResolvedValue({ error: { message: 'boom' } })
+  render(<RevisarGmail findings={[single]} partial={false} onDone={vi.fn()} />)
+  fireEvent.click(screen.getByRole('button', { name: /Tenho ›/ }))
+  fireEvent.click(cta())
+  await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument())
+  fireEvent.click(screen.getByRole('button', { name: 'Editar' }))
+  fireEvent.click(screen.getByRole('button', { name: /Tenho ›/ }))
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument()
 })
