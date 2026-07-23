@@ -103,6 +103,7 @@ export function ManualWizard() {
     const summaryGroups: SummaryGroup[] = steps
       .map((g) => ({
         label: g.meta.label,
+        color: g.meta.color,
         items: g.sources
           .filter((s) => s.source_items.some((it) => selected.has(it.id)))
           .map((s) => {

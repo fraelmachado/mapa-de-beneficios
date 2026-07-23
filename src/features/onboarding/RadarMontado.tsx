@@ -5,6 +5,8 @@ import { Button } from '../../ui/Button'
 
 export interface SummaryGroup {
   label: string
+  /** cor da categoria (categoryMeta). Sem ela o ponto cai no acento padrão. */
+  color?: string
   items: { provider: string; variant: string }[]
 }
 
@@ -53,7 +55,7 @@ export function RadarMontado({ groups, onView }: { groups: SummaryGroup[]; onVie
             {groups.map((g) => (
               <div key={g.label} className="ob-done-group">
                 <div className="ob-done-group-head">
-                  <span className="ob-done-group-dot" aria-hidden="true" />
+                  <span className="ob-done-group-dot" aria-hidden="true" style={g.color ? { background: g.color } : undefined} />
                   <span className="ob-done-group-label">{g.label}</span>
                 </div>
                 <div className="ob-done-list">

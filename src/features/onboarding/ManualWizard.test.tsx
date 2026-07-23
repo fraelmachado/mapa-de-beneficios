@@ -111,6 +111,9 @@ describe('ManualWizard (grade de provedores)', () => {
     fireEvent.click(screen.getByRole('button', { name: /itaú/i }))
     fireEvent.click(screen.getByRole('button', { name: /concluir/i }))
     const ver = await screen.findByRole('button', { name: /ver meu radar/i }, { timeout: 2500 })
+    // o ponto do grupo usa a cor da categoria, não o acento pra todas
+    const dot = document.querySelector('.ob-done-group-dot') as HTMLElement
+    expect(dot.style.background).toBe(categoryMeta('bank_card').color)
     fireEvent.click(ver)
     expect(navigateMock).toHaveBeenCalledWith('/painel')
   })

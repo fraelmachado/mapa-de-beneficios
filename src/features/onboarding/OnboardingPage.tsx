@@ -6,6 +6,7 @@ import { Vasculhando } from './Vasculhando'
 import { RevisarGmail } from './RevisarGmail'
 import { RadarMontado, type SummaryGroup } from './RadarMontado'
 import { useSources } from './useSources'
+import { SOURCE_CATEGORY_META } from './categoryMeta'
 import { GmailConsent } from './gmail/GmailConsent'
 import { useGmailAuth } from './gmail/useGmailAuth'
 import { gmailScan } from './gmail/gmailScan'
@@ -108,12 +109,19 @@ export function OnboardingPage() {
   }
 
   if (screen === 'gmail-done') {
-    const groupsSummary: SummaryGroup[] = saved.length
-      ? [{ label: 'Seus programas', items: saved.map(({ finding, itemId }) => ({
-          provider: finding.provider,
-          variant: finding.items.find((it) => it.id === itemId)?.label ?? '',
-        })) }]
-      : []
+    // agrupa por categoria (mesma ordem e cor do wizard manual) em vez de um bloco só
+    const groupsSummary: SummaryGroup[] = SOURCE_CATEGORY_META
+      .map((m) => ({
+        label: m.label,
+        color: m.color,
+        items: saved
+          .filter(({ finding }) => finding.category === m.key)
+          .map(({ finding, itemId }) => ({
+            provider: finding.provider,
+            variant: finding.items.find((it) => it.id === itemId)?.label ?? '',
+          })),
+      }))
+      .filter((g) => g.items.length > 0)
     return <RadarMontado groups={groupsSummary} onView={() => navigate(rescan ? '/programas' : '/alertas?from=onboarding')} />
   }
 
