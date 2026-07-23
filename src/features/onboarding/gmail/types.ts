@@ -1,4 +1,5 @@
 import type { SourceItem } from '../types'
+import type { SourceCategory } from '../../benefits/types'
 
 export interface ScanEmail {
   domain: string
@@ -20,6 +21,7 @@ export interface Finding {
   sourceId: string
   provider: string
   logo: string | null
+  category: SourceCategory // categoria da marca (eyebrow do card)
   items: SourceItem[] // tiers da marca; length 1 = marca de item único
   evidence: EvidenceInput
 }

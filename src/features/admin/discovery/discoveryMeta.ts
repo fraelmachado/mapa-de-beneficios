@@ -16,16 +16,6 @@ const DSCAT_VAR: Record<DsCat, string> = {
   pontos: 'var(--c-pontos)',
 }
 
-const SOURCE_CAT_COLOR: Record<SourceCategory, string> = {
-  bank_card: 'var(--accent)',
-  carrier: 'var(--c-pontos)',
-  health: 'var(--c-seguro)',
-  corporate_benefits: 'var(--c-cashback)',
-  loyalty: 'var(--c-pontos)',
-  retail: 'var(--c-compras)',
-  mall: 'var(--c-viagem)',
-}
-
 const BENEFIT_LABEL = new Map(CATEGORIES.map((c) => [c.key, c.label]))
 
 const VERIFICATION_LABEL: Record<string, string> = {
@@ -50,9 +40,8 @@ export function benefitCategoryChip(cat: string): ChipMeta {
 }
 
 export function sourceCategoryChip(cat: string): ChipMeta {
-  const color = SOURCE_CAT_COLOR[cat as SourceCategory]
-  if (!color) return { label: cat, colorVar: 'var(--muted)' }
-  return { label: categoryMeta(cat as SourceCategory).label, colorVar: color }
+  const m = categoryMeta(cat as SourceCategory)
+  return { label: m.label, colorVar: m.color }
 }
 
 export function verificationLabel(status: string | null | undefined): string | null {

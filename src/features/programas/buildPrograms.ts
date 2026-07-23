@@ -8,7 +8,7 @@ export interface Program {
 }
 export interface ProgramsSummary { total: number; gmailCount: number; manualCount: number; lastFound: string; account: string }
 
-function relTime(ms: number): string {
+export function relTime(ms: number): string {
   const days = Math.floor((Date.now() - ms) / 86400000)
   if (days <= 0) return 'hoje'
   if (days === 1) return 'ontem'

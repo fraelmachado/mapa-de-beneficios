@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen, fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '../../test/renderWithProviders'
 import type { CategoryGroup } from './groupSourcesByCategory'
+import { categoryMeta } from './categoryMeta'
 
 const navigateMock = vi.fn()
 vi.mock('react-router-dom', async (orig) => {
@@ -43,7 +44,7 @@ vi.mock('./useUserSources', () => ({ useUserSources: () => existingResult }))
 
 const bankGroup: CategoryGroup = {
   category: 'bank_card',
-  meta: { key: 'bank_card', label: 'Bancos & cartões', icon: '🏦' },
+  meta: categoryMeta('bank_card'),
   sources: [
     { id: 's1', kind: 'card', name: 'Itaú', logo_url: null, sort_order: 1, source_category: 'bank_card',
       source_items: [{ id: 'i1', label: 'Black', sort_order: 1 }] },
@@ -51,7 +52,7 @@ const bankGroup: CategoryGroup = {
 }
 const loyaltyGroup: CategoryGroup = {
   category: 'loyalty',
-  meta: { key: 'loyalty', label: 'Fidelidade & pontos', icon: '⭐' },
+  meta: categoryMeta('loyalty'),
   sources: [
     { id: 's3', kind: 'loyalty', name: 'Livelo', logo_url: null, sort_order: 1, source_category: 'loyalty',
       source_items: [{ id: 'i3', label: 'Livelo', sort_order: 1 }] },
@@ -60,7 +61,7 @@ const loyaltyGroup: CategoryGroup = {
 // marca com múltiplos tiers → abre a bottom sheet
 const multiTierGroup: CategoryGroup = {
   category: 'bank_card',
-  meta: { key: 'bank_card', label: 'Bancos & cartões', icon: '🏦' },
+  meta: categoryMeta('bank_card'),
   sources: [
     { id: 'sN', kind: 'card', name: 'Nubank', logo_url: null, sort_order: 1, source_category: 'bank_card',
       source_items: [
