@@ -9,7 +9,7 @@ import { useSources } from './useSources'
 import { GmailConsent } from './gmail/GmailConsent'
 import { useGmailAuth } from './gmail/useGmailAuth'
 import { gmailScan } from './gmail/gmailScan'
-import type { Finding, ScanResult } from './gmail/types'
+import type { SavedSelection, ScanResult } from './gmail/types'
 import { PageState } from '../../ui'
 
 type Screen = 'welcome' | 'method' | 'manual' | 'gmail-consent' | 'gmail-scan' | 'gmail-review' | 'gmail-done' | 'gmail-none'
@@ -23,7 +23,7 @@ export function OnboardingPage() {
   const initialScreen = (): Screen =>
     editing ? 'manual' : rescan ? (gmail.available ? 'gmail-consent' : 'gmail-none') : 'welcome'
   const [screen, setScreen] = useState<Screen>(initialScreen)
-  const [saved, setSaved] = useState<Finding[]>([])
+  const [saved, setSaved] = useState<SavedSelection[]>([])
   const sourcesQuery = useSources()
   const [connecting, setConnecting] = useState(false)
   const [connectError, setConnectError] = useState(false)
@@ -40,6 +40,9 @@ export function OnboardingPage() {
   }
 
   async function connectAndScan() {
+    // catálogo ainda não carregou (ou falhou) → vasculhar contra 0 domínios daria
+    // "nada encontrado" falso. Barra aqui em vez de tratar zero achados como sucesso.
+    if (!sourcesQuery.data || flatSources.length === 0) { setConnectError(true); return }
     setConnecting(true); setConnectError(false)
     let token: string | undefined
     try {
@@ -76,6 +79,7 @@ export function OnboardingPage() {
         onBack={rescan ? () => navigate('/programas') : () => setScreen('method')}
         connecting={connecting}
         error={connectError}
+        preparing={sourcesQuery.isLoading}
       />
     )
   }
@@ -103,7 +107,10 @@ export function OnboardingPage() {
 
   if (screen === 'gmail-done') {
     const groupsSummary: SummaryGroup[] = saved.length
-      ? [{ label: 'Seus programas', items: saved.map((f) => ({ provider: f.provider, variant: f.items.length === 1 ? f.items[0].label : '' })) }]
+      ? [{ label: 'Seus programas', items: saved.map(({ finding, itemId }) => ({
+          provider: finding.provider,
+          variant: finding.items.find((it) => it.id === itemId)?.label ?? '',
+        })) }]
       : []
     return <RadarMontado groups={groupsSummary} onView={() => navigate(rescan ? '/programas' : '/alertas?from=onboarding')} />
   }

@@ -37,8 +37,10 @@ const GmailGlyph = (
   </svg>
 )
 
-export function GmailConsent({ onConnect, onBack, connecting, error }: {
+export function GmailConsent({ onConnect, onBack, connecting, error, preparing = false }: {
   onConnect: () => void; onBack: () => void; connecting: boolean; error: boolean
+  /** catálogo ainda carregando: sem ele o scan não tem domínios pra casar. */
+  preparing?: boolean
 }) {
   return (
     <div className="ob">
@@ -69,7 +71,7 @@ export function GmailConsent({ onConnect, onBack, connecting, error }: {
         </div>
       </div>
       <div className="ob-foot"><div className="ob-foot-inner"><div className="ob-cta gc-cta">
-        <Button onClick={onConnect} disabled={connecting} icon={GmailGlyph}>{connecting ? 'Conectando…' : 'Conectar Gmail'}</Button>
+        <Button onClick={onConnect} disabled={connecting || preparing} icon={GmailGlyph}>{preparing ? 'Preparando…' : connecting ? 'Conectando…' : 'Conectar Gmail'}</Button>
         <p className="gc-reassure">Leva alguns segundos · você aprova tudo antes de salvar</p>
       </div></div></div>
     </div>

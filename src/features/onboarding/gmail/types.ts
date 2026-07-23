@@ -31,6 +31,13 @@ export interface ScanResult {
   partial: boolean // algum domínio não pôde ser verificado
 }
 
+// seleção confirmada na triagem: o finding + o tier escolhido (itemId).
+// leva o tier adiante (tela final) — Finding sozinho não sabe qual versão foi escolhida.
+export interface SavedSelection {
+  finding: Finding
+  itemId: string
+}
+
 export interface GmailSourcePayload {
   item_id: string
   source_id: string

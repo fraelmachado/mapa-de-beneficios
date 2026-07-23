@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useAddGmailSources } from './useAddGmailSources'
 import { TriageCard } from './gmail/TriageCard'
 import { TriageSummary } from './gmail/TriageSummary'
-import type { Finding, GmailSourcePayload } from './gmail/types'
+import type { Finding, GmailSourcePayload, SavedSelection } from './gmail/types'
 
 // Triagem card-a-card: um card por marca, decisão por toque, depois um resumo antes de salvar.
 // decision: sourceId → itemId escolhido (tenho essa versão) | null (não tenho). ausente = pendente.
@@ -11,7 +11,7 @@ export function RevisarGmail({
 }: {
   findings: Finding[]
   partial: boolean
-  onDone: (saved: Finding[]) => void
+  onDone: (saved: SavedSelection[]) => void
   onBack?: () => void
 }) {
   const add = useAddGmailSources()
@@ -70,7 +70,7 @@ export function RevisarGmail({
         }))
         await add.mutateAsync(payload)
       }
-      onDone(haveList)
+      onDone(haveList.map((f) => ({ finding: f, itemId: decision.get(f.sourceId) as string })))
     } catch {
       setSaving(false); setSaveError(true)
     }
