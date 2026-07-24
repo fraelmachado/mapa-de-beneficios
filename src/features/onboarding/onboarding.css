@@ -397,4 +397,9 @@
   .ob-foot { background: transparent; border-top: 0; padding: 0; margin-top: var(--s5); }
   .ob-foot-inner { max-width: 520px; }
   .ob-intro-card { padding: var(--s8); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
+  /* triagem no desktop: o card pode ser mais alto que a tela (ex.: 7 tiers).
+     o rodapé genérico fica ABAIXO do card em fluxo → o CTA some pra baixo da dobra.
+     sticky pina no rodapé da viewport quando o card transborda, e fica encostado
+     no card quando ele é curto (sem vão). */
+  .ob-triage-foot { position: sticky; bottom: 0; background: var(--bg); margin-top: 0; padding: var(--s4) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom)); }
 }
