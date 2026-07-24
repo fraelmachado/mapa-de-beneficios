@@ -138,8 +138,8 @@ export const candidatesJsonSchema = {
                       source_name: { type: 'string' },
                       observed_at: { type: 'string', format: 'date' },
                       verification_status: { type: 'string', enum: [...VERIFICATION_STATUS] },
-                      action_url: { type: 'string', format: 'uri', pattern: '^https?://' },
-                      action_label: { type: 'string', minLength: 1 },
+                      action_url: { type: 'string', format: 'uri', pattern: '^https?://[^\\s/?#]+[^\\s]*$' },
+                      action_label: { type: 'string', minLength: 1, pattern: '\\S' },
                     },
                     allOf: [
                       { if: { required: ['action_url'] }, then: { required: ['action_label'] } },

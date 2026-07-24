@@ -136,3 +136,33 @@ Resultado: `3 passed`, `31 passed`. A saída mantém apenas os avisos preexisten
 - Os casos `https://`, `http:foo` e protocolo maiúsculo cobrem a divergência entre Zod e o pattern `^https?://` do JSON Schema.
 - O teste de flatten passa pela árvore parseada e confirma que URL e rótulo sem espaços são os valores transportados ao payload; não altera a persistência transacional da Task 3.
 - `git diff --check` foi executado sem apontar problemas de whitespace.
+
+## Segundo fix após revisão
+
+### RED
+
+Comando:
+
+```bash
+npm test -- scripts/discovery/candidatesSchema.test.ts
+```
+
+Resultado: `1 failed | 18 passed`. O novo teste que extrai o `pattern` de `action_url` do JSON Schema demonstrou que `https://` ainda era aceito pelo pattern `^https?://`.
+
+### GREEN
+
+Comandos:
+
+```bash
+npm test -- scripts/discovery/candidatesSchema.test.ts
+npm test -- scripts/discovery/candidatesSchema.test.ts scripts/discovery/flatten.test.ts scripts/discovery/discover.test.ts
+git diff --check
+```
+
+Resultados: schema `1 passed`, `19 passed`; suíte focada `3 passed`, `32 passed`; `git diff --check` sem problemas de whitespace. A suíte focada só exibiu os avisos preexistentes de múltiplas instâncias `GoTrueClient`.
+
+### Alteração
+
+- `action_url` agora usa `^https?://[^\\s/?#]+[^\\s]*$`: mantém apenas `http://` e `https://` minúsculos, requer authority não vazia e proíbe whitespace em toda a URL.
+- `action_label` agora inclui o pattern `\\S`, exigindo ao menos um caractere não-whitespace além de `minLength`.
+- O teste unitário extrai ambos os patterns de `candidatesJsonSchema`, cria `RegExp` e cobre URLs HTTP/HTTPS válidas, `https://`, URL com espaço e rótulo só de espaços.

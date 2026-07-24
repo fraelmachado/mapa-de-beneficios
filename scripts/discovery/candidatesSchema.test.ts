@@ -115,4 +115,21 @@ describe('candidatesTreeSchema', () => {
     expect(benefitSchema.properties).toHaveProperty('action_label')
     expect(benefitSchema).toHaveProperty('allOf')
   })
+
+  it('expõe patterns de CTA que exigem URL utilizável e rótulo com texto', () => {
+    const benefitSchema = candidatesJsonSchema.properties.sources.items.properties.items
+      .items.properties.benefits.items
+    const actionUrlPattern = benefitSchema.properties.action_url.pattern
+    const actionLabelPattern = (benefitSchema.properties.action_label as { pattern?: string }).pattern ?? ''
+    const actionUrl = new RegExp(actionUrlPattern)
+    const actionLabel = new RegExp(actionLabelPattern)
+
+    expect(actionUrl.test('http://unimed.coop.br/rede')).toBe(true)
+    expect(actionUrl.test('https://unimed.coop.br/rede')).toBe(true)
+    expect(actionUrl.test('https://')).toBe(false)
+    expect(actionUrl.test('https://unimed.coop.br/rede credenciada')).toBe(false)
+
+    expect(actionLabel.test('Ver rede')).toBe(true)
+    expect(actionLabel.test('   ')).toBe(false)
+  })
 })
