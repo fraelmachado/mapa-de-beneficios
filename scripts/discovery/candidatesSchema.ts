@@ -12,17 +12,20 @@ const VERIFICATION_STATUS = ['official_confirmed', 'official_needs_regulation_ch
 const REDEMPTION_TYPE = ['automatic', 'app', 'coupon', 'partner_portal', 'insurance_claim', 'certificate',
   'concierge', 'physical_access', 'points_exchange', 'statement_credit', 'other'] as const
 
-const url = z.string().url()
-const httpUrl = z.string().trim().refine((value) => {
-  if (!value.startsWith('http://') && !value.startsWith('https://')) return false
+const ACTION_URL_PATTERN = '^https?://[^\\s/?#]+[^\\s]*$'
+const ACTION_LABEL_NON_WHITESPACE_PATTERN = '\\S'
 
+const url = z.string().url()
+const httpUrl = z.string().trim().regex(new RegExp(ACTION_URL_PATTERN), 'URL deve usar http ou https').refine((value) => {
   try {
     new URL(value)
     return true
   } catch {
     return false
   }
-}, 'URL deve usar http ou https')
+}, 'URL deve ser válida')
+
+const actionLabel = z.string().trim().regex(new RegExp(ACTION_LABEL_NON_WHITESPACE_PATTERN), 'Rótulo deve conter texto')
 
 const benefitNode = z.object({
   title: z.string().min(1),
@@ -39,7 +42,7 @@ const benefitNode = z.object({
   observed_at: z.string().date().optional(), // ISO date (YYYY-MM-DD, casts para ::date no DB)
   verification_status: z.enum(VERIFICATION_STATUS).optional(),
   action_url: httpUrl.optional(),
-  action_label: z.string().trim().min(1).optional(),
+  action_label: actionLabel.optional(),
 }).superRefine((benefit, ctx) => {
   if (Boolean(benefit.action_url) !== Boolean(benefit.action_label)) {
     ctx.addIssue({
@@ -138,8 +141,8 @@ export const candidatesJsonSchema = {
                       source_name: { type: 'string' },
                       observed_at: { type: 'string', format: 'date' },
                       verification_status: { type: 'string', enum: [...VERIFICATION_STATUS] },
-                      action_url: { type: 'string', format: 'uri', pattern: '^https?://[^\\s/?#]+[^\\s]*$' },
-                      action_label: { type: 'string', minLength: 1, pattern: '\\S' },
+                      action_url: { type: 'string', format: 'uri', pattern: ACTION_URL_PATTERN },
+                      action_label: { type: 'string', minLength: 1, pattern: ACTION_LABEL_NON_WHITESPACE_PATTERN },
                     },
                     allOf: [
                       { if: { required: ['action_url'] }, then: { required: ['action_label'] } },

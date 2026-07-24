@@ -166,3 +166,40 @@ Resultados: schema `1 passed`, `19 passed`; suíte focada `3 passed`, `32 passed
 - `action_url` agora usa `^https?://[^\\s/?#]+[^\\s]*$`: mantém apenas `http://` e `https://` minúsculos, requer authority não vazia e proíbe whitespace em toda a URL.
 - `action_label` agora inclui o pattern `\\S`, exigindo ao menos um caractere não-whitespace além de `minLength`.
 - O teste unitário extrai ambos os patterns de `candidatesJsonSchema`, cria `RegExp` e cobre URLs HTTP/HTTPS válidas, `https://`, URL com espaço e rótulo só de espaços.
+
+## Terceiro fix após revisão
+
+### RED
+
+Comando:
+
+```bash
+npm test -- scripts/discovery/candidatesSchema.test.ts
+```
+
+Resultado: `1 failed | 19 passed`, com 6 falhas esperadas. O Zod aceitava `https:////unimed.coop.br/rede` e URLs com newline ou tab internos porque `new URL` as canonicaliza; o pattern do JSON Schema já as rejeitava.
+
+### GREEN
+
+Comando:
+
+```bash
+npm test -- scripts/discovery/candidatesSchema.test.ts scripts/discovery/flatten.test.ts scripts/discovery/discover.test.ts
+```
+
+Resultado: `3 passed`, `38 passed`. A saída mantém somente os avisos preexistentes de múltiplas instâncias `GoTrueClient` nos testes de discovery.
+
+Também executado:
+
+```bash
+git diff --check
+```
+
+Resultado: sem problemas de whitespace.
+
+### Alteração
+
+- `ACTION_URL_PATTERN` é a única fonte do pattern `^https?://[^\\s/?#]+[^\\s]*$`: o Zod o aplica com `.regex(new RegExp(...))` antes de `new URL`, e o JSON Schema o expõe diretamente.
+- A segunda validação com `new URL` continua protegida por `try/catch`; ela só é executada após a regra textual que exige prefixo minúsculo, authority não vazia e ausência de whitespace interno.
+- `ACTION_LABEL_NON_WHITESPACE_PATTERN` também é reutilizado pelo Zod e JSON Schema para manter o rótulo não vazio em ambos os contratos.
+- Os testes provam, para barra extra na authority, newline e tab internos, que tanto o parse Zod quanto o `RegExp` extraído do JSON Schema rejeitam a mesma entrada.

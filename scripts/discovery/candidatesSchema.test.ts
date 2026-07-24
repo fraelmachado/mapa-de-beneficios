@@ -99,6 +99,9 @@ describe('candidatesTreeSchema', () => {
     [{ action_url: 'https://', action_label: 'Abrir' }, 'URL sem host'],
     [{ action_url: 'http:foo', action_label: 'Abrir' }, 'URL HTTP sem //'],
     [{ action_url: 'HTTPS://unimed.coop.br/rede', action_label: 'Abrir' }, 'protocolo em maiúsculas'],
+    [{ action_url: 'https:////unimed.coop.br/rede', action_label: 'Abrir' }, 'authority iniciada com barra'],
+    [{ action_url: 'https://unimed.coop.br/rede\ncredenciada', action_label: 'Abrir' }, 'newline interno'],
+    [{ action_url: 'https://unimed.coop.br/rede\tcredenciada', action_label: 'Abrir' }, 'tab interno'],
   ])('rejeita CTA inválido: %s (%s)', (action) => {
     const bad = structuredClone(validTree) as {
       sources: Array<{ items: Array<{ benefits: Array<Record<string, unknown>> }> }>
@@ -128,8 +131,28 @@ describe('candidatesTreeSchema', () => {
     expect(actionUrl.test('https://unimed.coop.br/rede')).toBe(true)
     expect(actionUrl.test('https://')).toBe(false)
     expect(actionUrl.test('https://unimed.coop.br/rede credenciada')).toBe(false)
+    expect(actionUrl.test('https:////unimed.coop.br/rede')).toBe(false)
+    expect(actionUrl.test('https://unimed.coop.br/rede\ncredenciada')).toBe(false)
+    expect(actionUrl.test('https://unimed.coop.br/rede\tcredenciada')).toBe(false)
 
     expect(actionLabel.test('Ver rede')).toBe(true)
     expect(actionLabel.test('   ')).toBe(false)
+  })
+
+  it.each([
+    'https:////unimed.coop.br/rede',
+    'https://unimed.coop.br/rede\ncredenciada',
+    'https://unimed.coop.br/rede\tcredenciada',
+  ])('Zod e o pattern rejeitam a mesma URL não canônica: %j', (actionUrl) => {
+    const benefitSchema = candidatesJsonSchema.properties.sources.items.properties.items
+      .items.properties.benefits.items
+    const pattern = new RegExp(benefitSchema.properties.action_url.pattern)
+    const bad = structuredClone(validTree) as {
+      sources: Array<{ items: Array<{ benefits: Array<Record<string, unknown>> }> }>
+    }
+    Object.assign(bad.sources[0].items[0].benefits[0], { action_url: actionUrl, action_label: 'Abrir' })
+
+    expect(candidatesTreeSchema.safeParse(bad).success).toBe(false)
+    expect(pattern.test(actionUrl)).toBe(false)
   })
 })
