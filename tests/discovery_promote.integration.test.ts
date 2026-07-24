@@ -3,7 +3,11 @@ import { serviceClient, adminClient, userClient } from './helpers/clients'
 
 const stamp = () => `${Date.now()}-${Math.floor(performance.now() * 1000)}`
 
-async function seedTree(db: ReturnType<typeof serviceClient>, tag: string) {
+async function seedTree(
+  db: ReturnType<typeof serviceClient>,
+  tag: string,
+  action?: { action_url: string; action_label: string },
+) {
   const job = await db.from('discovery_jobs').insert({ brief: `P-${tag}`, status: 'done' }).select('id').single()
   const jobId = job.data!.id
   const srcSlug = `src-${tag}`, itemSlug = `src-${tag}-nacional`, benSlug = `src-${tag}-nacional-farmacia`
@@ -18,7 +22,7 @@ async function seedTree(db: ReturnType<typeof serviceClient>, tag: string) {
       provenance: { source_url: 'https://x.dev/n' }, match_status: 'new', review_status: 'pending' },
     { job_id: jobId, entity_type: 'benefit', fingerprint: benFp, parent_fingerprint: itemFp,
       payload: { slug: benSlug, title: 'Farmácia', summary: 'desconto', category: 'security',
-                 scope: 'nacional', card_tiers: [] },
+                 scope: 'nacional', card_tiers: [], ...action },
       provenance: { source_url: 'https://x.dev/f', source_name: 'Site', observed_at: '2026-07-01',
                     verification_status: 'official_confirmed' },
       match_status: 'new', review_status: 'pending' },
@@ -97,5 +101,89 @@ describe('promote_discovery_candidate', () => {
     const usr = await userClient()
     const res = await usr.client.rpc('promote_discovery_candidate', { candidate_id: await candId(db, s.srcFp) })
     expect(res.error).not.toBeNull()
+  })
+
+  it('grava o CTA de um benefício novo aprovado', async () => {
+    const db = serviceClient()
+    const s = await seedTree(db, stamp(), {
+      action_url: 'https://x.dev/f/rede',
+      action_label: 'Ver rede',
+    })
+    const adm = await adminClient()
+    await adm.client.rpc('promote_discovery_candidate', { candidate_id: await candId(db, s.srcFp) })
+    await adm.client.rpc('promote_discovery_candidate', { candidate_id: await candId(db, s.itemFp) })
+    const promoted = await adm.client.rpc('promote_discovery_candidate', {
+      candidate_id: await candId(db, s.benFp),
+    })
+
+    const benefit = await db.from('benefits')
+      .select('action_url, action_label')
+      .eq('id', promoted.data as string)
+      .single()
+    expect(benefit.data).toMatchObject({
+      action_url: 'https://x.dev/f/rede',
+      action_label: 'Ver rede',
+    })
+  })
+
+  it('substitui o CTA existente quando a atualização aprovada traz outro par', async () => {
+    const db = serviceClient()
+    const s = await seedTree(db, stamp(), {
+      action_url: 'https://x.dev/f/rede-nova',
+      action_label: 'Consultar rede',
+    })
+    await db.from('benefits').insert({
+      slug: s.benSlug,
+      title: 'Farmácia antiga',
+      summary: 'antigo',
+      category: 'security',
+      scope: 'nacional',
+      action_url: 'https://x.dev/f/rede-antiga',
+      action_label: 'Ver rede antiga',
+    })
+    const adm = await adminClient()
+    await adm.client.rpc('promote_discovery_candidate', { candidate_id: await candId(db, s.srcFp) })
+    await adm.client.rpc('promote_discovery_candidate', { candidate_id: await candId(db, s.itemFp) })
+    const promoted = await adm.client.rpc('promote_discovery_candidate', {
+      candidate_id: await candId(db, s.benFp),
+    })
+
+    const benefit = await db.from('benefits')
+      .select('action_url, action_label')
+      .eq('id', promoted.data as string)
+      .single()
+    expect(benefit.data).toMatchObject({
+      action_url: 'https://x.dev/f/rede-nova',
+      action_label: 'Consultar rede',
+    })
+  })
+
+  it('preserva o CTA existente quando a atualização aprovada não traz CTA', async () => {
+    const db = serviceClient()
+    const s = await seedTree(db, stamp())
+    await db.from('benefits').insert({
+      slug: s.benSlug,
+      title: 'Farmácia antiga',
+      summary: 'antigo',
+      category: 'security',
+      scope: 'nacional',
+      action_url: 'https://x.dev/f/rede-existente',
+      action_label: 'Ver rede existente',
+    })
+    const adm = await adminClient()
+    await adm.client.rpc('promote_discovery_candidate', { candidate_id: await candId(db, s.srcFp) })
+    await adm.client.rpc('promote_discovery_candidate', { candidate_id: await candId(db, s.itemFp) })
+    const promoted = await adm.client.rpc('promote_discovery_candidate', {
+      candidate_id: await candId(db, s.benFp),
+    })
+
+    const benefit = await db.from('benefits')
+      .select('action_url, action_label')
+      .eq('id', promoted.data as string)
+      .single()
+    expect(benefit.data).toMatchObject({
+      action_url: 'https://x.dev/f/rede-existente',
+      action_label: 'Ver rede existente',
+    })
   })
 })
