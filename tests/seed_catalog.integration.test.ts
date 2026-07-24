@@ -25,4 +25,18 @@ describe('seed: catálogo real', () => {
     expect(bySlug['xp-infinite']).toMatchObject({ card_brand: 'visa', card_level: 'infinite' })
     expect(bySlug['inter-duo-gourmet'].card_brand).toBeNull()
   })
+
+  it('Amil aponta diretamente para a busca avançada da rede credenciada', async () => {
+    const db = serviceClient()
+    const benefit = await db.from('benefits')
+      .select('action_url, action_label')
+      .eq('slug', 'amil-rede-hospitais')
+      .single()
+
+    expect(benefit.error).toBeNull()
+    expect(benefit.data).toEqual({
+      action_url: 'https://www.amil.com.br/institucional/#/servicos/saude/rede-credenciada/amil/busca-avancada',
+      action_label: 'Ver rede',
+    })
+  })
 })

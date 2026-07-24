@@ -1543,7 +1543,7 @@ values
     null,
     'Beneficiários Amil One têm acesso a uma rede nacional de hospitais e clínicas, com abrangência conforme o produto contratado.',
     E'Consulte a rede credenciada no app ou site Amil\nEscolha o hospital, clínica ou laboratório\nApresente a carteirinha digital no atendimento',
-    'https://www.amil.com.br',
+    'https://www.amil.com.br/institucional/#/servicos/saude/rede-credenciada/amil/busca-avancada',
     'Ver rede',
     1000, 'https://www.amil.com.br', '2026-06-15',
     'official_confirmed'
