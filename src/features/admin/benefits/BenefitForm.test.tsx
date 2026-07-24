@@ -31,4 +31,39 @@ describe('BenefitForm', () => {
       }),
     )
   })
+
+  it('normaliza e submete um CTA HTTP(S) completo', () => {
+    const onSubmit = vi.fn()
+    render(<BenefitForm initial={null} sources={sources} onSubmit={onSubmit} onCancel={() => {}} />)
+    fireEvent.change(screen.getByLabelText(/título/i), { target: { value: 'Rede Amil' } })
+    fireEvent.change(screen.getByLabelText(/resumo/i), { target: { value: 'Hospitais e clínicas' } })
+    fireEvent.change(screen.getByLabelText(/URL de ação/i), {
+      target: { value: '  https://amil.com.br/rede  ' },
+    })
+    fireEvent.change(screen.getByLabelText(/rótulo da ação/i), {
+      target: { value: '  Ver rede  ' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: /salvar/i }))
+
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({
+      input: expect.objectContaining({
+        action_url: 'https://amil.com.br/rede',
+        action_label: 'Ver rede',
+      }),
+    }))
+  })
+
+  it('bloqueia CTA incompleto com erro acessível', () => {
+    const onSubmit = vi.fn()
+    render(<BenefitForm initial={null} sources={sources} onSubmit={onSubmit} onCancel={() => {}} />)
+    fireEvent.change(screen.getByLabelText(/título/i), { target: { value: 'Rede Amil' } })
+    fireEvent.change(screen.getByLabelText(/resumo/i), { target: { value: 'Hospitais e clínicas' } })
+    fireEvent.change(screen.getByLabelText(/URL de ação/i), {
+      target: { value: 'https://amil.com.br/rede' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: /salvar/i }))
+
+    expect(onSubmit).not.toHaveBeenCalled()
+    expect(screen.getByRole('alert')).toHaveTextContent(/URL e o rótulo/i)
+  })
 })

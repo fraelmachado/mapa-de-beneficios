@@ -6,6 +6,7 @@ import { BenefitSourcesEditor } from './BenefitSourcesEditor'
 import { CATEGORIES, type BenefitCategory } from '../../benefits/types'
 import type { SourceRow } from '../sources/types'
 import type { BenefitInput, BenefitRow, BenefitScope } from './types'
+import { normalizeActionLink } from './actionLink'
 
 const SCOPES: BenefitScope[] = ['nacional', 'regional', 'pontual']
 
@@ -37,6 +38,7 @@ export function BenefitForm({
   const [imageUrl, setImageUrl] = useState<string | null>(initial?.image_url ?? null)
   const [actionUrl, setActionUrl] = useState(initial?.action_url ?? '')
   const [actionLabel, setActionLabel] = useState(initial?.action_label ?? '')
+  const [actionError, setActionError] = useState<string | null>(null)
   const [active, setActive] = useState(initial?.active ?? true)
   const [sourceItemIds, setSourceItemIds] = useState<string[]>(
     initial?.benefit_sources.map((b) => b.source_item_id) ?? [],
@@ -44,6 +46,13 @@ export function BenefitForm({
 
   function submit(e: FormEvent) {
     e.preventDefault()
+    const action = normalizeActionLink(actionUrl, actionLabel)
+    if (!action.ok) {
+      setActionError(action.error)
+      return
+    }
+    setActionError(null)
+
     onSubmit({
       input: {
         title,
@@ -55,8 +64,8 @@ export function BenefitForm({
         partner_name: partner || null,
         valid_until: validUntil || null,
         image_url: imageUrl,
-        action_url: actionUrl || null,
-        action_label: actionLabel || null,
+        action_url: action.value.action_url,
+        action_label: action.value.action_label,
         active,
       },
       sourceItemIds,
@@ -64,7 +73,7 @@ export function BenefitForm({
   }
 
   return (
-    <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column' }}>
+    <form noValidate onSubmit={submit} style={{ display: 'flex', flexDirection: 'column' }}>
       <label className="aa-fieldlbl" htmlFor="b-title">Título</label>
       <Input id="b-title" required value={title} onChange={(e) => setTitle(e.target.value)} />
 
@@ -104,10 +113,24 @@ export function BenefitForm({
         <ImageUpload folder="benefits" value={imageUrl} onChange={setImageUrl} />
 
         <label className="aa-fieldlbl" htmlFor="b-aurl">URL de ação</label>
-        <Input id="b-aurl" value={actionUrl} onChange={(e) => setActionUrl(e.target.value)} />
+        <Input
+          id="b-aurl"
+          type="url"
+          value={actionUrl}
+          aria-describedby={actionError ? 'b-action-error' : undefined}
+          aria-invalid={Boolean(actionError)}
+          onChange={(e) => setActionUrl(e.target.value)}
+        />
 
         <label className="aa-fieldlbl" htmlFor="b-alabel">Rótulo da ação</label>
-        <Input id="b-alabel" value={actionLabel} onChange={(e) => setActionLabel(e.target.value)} />
+        <Input
+          id="b-alabel"
+          value={actionLabel}
+          aria-describedby={actionError ? 'b-action-error' : undefined}
+          aria-invalid={Boolean(actionError)}
+          onChange={(e) => setActionLabel(e.target.value)}
+        />
+        {actionError ? <p id="b-action-error" role="alert">{actionError}</p> : null}
 
         {children}
       </details>
