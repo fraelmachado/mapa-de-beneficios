@@ -68,4 +68,23 @@ describe('CandidateTree', () => {
     const variantApprove = screen.getByRole('button', { name: /^aprovar$/i })
     expect((variantApprove as HTMLButtonElement).disabled).toBe(false)
   })
+
+  it('mostra o destino do botão público antes da aprovação', () => {
+    const withAction = tree.map((candidate) => candidate.id === 'b1'
+      ? {
+          ...candidate,
+          payload: {
+            ...candidate.payload,
+            action_url: 'https://wellhub.com/academias/busca',
+            action_label: 'Ver rede',
+          },
+        }
+      : candidate)
+
+    render(<CandidateTree candidates={withAction} onPromote={vi.fn()} onReject={vi.fn()} />)
+
+    expect(screen.getByText('Destino do botão')).toBeInTheDocument()
+    const action = screen.getByRole('link', { name: /ver rede/i })
+    expect(action).toHaveAttribute('href', 'https://wellhub.com/academias/busca')
+  })
 })

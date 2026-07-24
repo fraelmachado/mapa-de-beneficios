@@ -144,6 +144,8 @@ export function CandidateTree({
                         const bChip = benefitCategoryChip(str(bp.category))
                         const bProv = b.provenance as P
                         const bUrl = str(bProv.source_url)
+                        const actionUrl = str(bp.action_url)
+                        const actionLabel = str(bp.action_label)
                         const bLocked = !unlocked(b)
 
                         return (
@@ -156,6 +158,14 @@ export function CandidateTree({
                                   {str(bp.summary) ? <span className="dv-ben-sum">{str(bp.summary)}</span> : null}
                                   {bUrl ? <a className="dv-link" href={bUrl} target="_blank" rel="noreferrer">{host(bUrl)}</a> : null}
                                 </div>
+                                {actionUrl && actionLabel ? (
+                                  <div className="dv-action-preview">
+                                    <span>Destino do botão</span>
+                                    <a href={actionUrl} target="_blank" rel="noreferrer">
+                                      {actionLabel} · {host(actionUrl)}
+                                    </a>
+                                  </div>
+                                ) : null}
                               </div>
                               <div className="dv-node-act">
                                 <Actions
