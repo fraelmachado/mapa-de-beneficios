@@ -78,4 +78,37 @@ describe('candidatesTreeSchema', () => {
     bad.sources[0].items[0].benefits[0].observed_at = 'julho/2026'
     expect(candidatesTreeSchema.safeParse(bad).success).toBe(false)
   })
+
+  it('aceita CTA HTTP(S) completo e ausência de CTA', () => {
+    const withAction = structuredClone(validTree) as {
+      sources: Array<{ items: Array<{ benefits: Array<Record<string, unknown>> }> }>
+    }
+    const benefit = withAction.sources[0].items[0].benefits[0]
+    benefit.action_url = 'https://unimed.coop.br/rede-credenciada'
+    benefit.action_label = 'Ver rede'
+
+    expect(candidatesTreeSchema.safeParse(withAction).success).toBe(true)
+    expect(candidatesTreeSchema.safeParse(validTree).success).toBe(true)
+  })
+
+  it.each([
+    [{ action_url: 'https://unimed.coop.br/rede' }, 'sem rótulo'],
+    [{ action_label: 'Ver rede' }, 'sem URL'],
+    [{ action_url: 'javascript:alert(1)', action_label: 'Abrir' }, 'protocolo inseguro'],
+    [{ action_url: 'ftp://unimed.coop.br/rede', action_label: 'Abrir' }, 'protocolo não HTTP'],
+  ])('rejeita CTA inválido: %s (%s)', (action) => {
+    const bad = structuredClone(validTree) as {
+      sources: Array<{ items: Array<{ benefits: Array<Record<string, unknown>> }> }>
+    }
+    Object.assign(bad.sources[0].items[0].benefits[0], action)
+    expect(candidatesTreeSchema.safeParse(bad).success).toBe(false)
+  })
+
+  it('expõe o par de CTA no JSON Schema do benefício', () => {
+    const benefitSchema = candidatesJsonSchema.properties.sources.items.properties.items
+      .items.properties.benefits.items
+    expect(benefitSchema.properties).toHaveProperty('action_url')
+    expect(benefitSchema.properties).toHaveProperty('action_label')
+    expect(benefitSchema).toHaveProperty('allOf')
+  })
 })

@@ -56,6 +56,8 @@ export function flattenTree(tree: CandidatesTree, snap: CatalogSnapshot): FlatCa
             scope: b.scope ?? 'nacional', redemption_type: b.redemption_type ?? null,
             benefit_source: b.benefit_source ?? null, long_description: b.long_description ?? null,
             program: b.program ?? null, card_tiers: b.card_tiers ?? [],
+            action_url: b.action_url ?? null,
+            action_label: b.action_label ?? null,
           },
           provenance: {
             source_url: b.source_url, source_name: b.source_name ?? null,

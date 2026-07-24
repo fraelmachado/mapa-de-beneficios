@@ -13,7 +13,14 @@ const tree: CandidatesTree = {
         {
           label: 'Nacional', source_url: 'https://unimed.coop.br/n',
           benefits: [
-            { title: 'Farmácia', summary: 'desconto', category: 'security', source_url: 'https://unimed.coop.br/f' },
+            {
+              title: 'Farmácia',
+              summary: 'desconto',
+              category: 'security',
+              source_url: 'https://unimed.coop.br/f',
+              action_url: 'https://unimed.coop.br/rede-credenciada',
+              action_label: 'Ver rede',
+            },
           ],
         },
       ],
@@ -48,6 +55,10 @@ describe('flattenTree', () => {
     expect(ben.fingerprint).toBe('benefit|unimed-nacional|farmacia')
     expect(ben.parent_fingerprint).toBe('source_item|unimed|nacional')
     expect((ben.provenance as { source_url: string }).source_url).toBe('https://unimed.coop.br/f')
+    expect(ben.payload).toMatchObject({
+      action_url: 'https://unimed.coop.br/rede-credenciada',
+      action_label: 'Ver rede',
+    })
   })
 
   it('marca match_status=update quando o source já existe no catálogo', () => {

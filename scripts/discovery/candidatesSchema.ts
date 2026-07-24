@@ -13,6 +13,10 @@ const REDEMPTION_TYPE = ['automatic', 'app', 'coupon', 'partner_portal', 'insura
   'concierge', 'physical_access', 'points_exchange', 'statement_credit', 'other'] as const
 
 const url = z.string().url()
+const httpUrl = z.string().trim().url().refine((value) => {
+  const protocol = new URL(value).protocol
+  return protocol === 'http:' || protocol === 'https:'
+}, 'URL deve usar http ou https')
 
 const benefitNode = z.object({
   title: z.string().min(1),
@@ -28,6 +32,16 @@ const benefitNode = z.object({
   source_name: z.string().optional(),
   observed_at: z.string().date().optional(), // ISO date (YYYY-MM-DD, casts para ::date no DB)
   verification_status: z.enum(VERIFICATION_STATUS).optional(),
+  action_url: httpUrl.optional(),
+  action_label: z.string().trim().min(1).optional(),
+}).superRefine((benefit, ctx) => {
+  if (Boolean(benefit.action_url) !== Boolean(benefit.action_label)) {
+    ctx.addIssue({
+      code: 'custom',
+      path: benefit.action_url ? ['action_label'] : ['action_url'],
+      message: 'action_url e action_label devem ser informados juntos',
+    })
+  }
 })
 
 const sourceItemNode = z.object({
@@ -118,7 +132,13 @@ export const candidatesJsonSchema = {
                       source_name: { type: 'string' },
                       observed_at: { type: 'string', format: 'date' },
                       verification_status: { type: 'string', enum: [...VERIFICATION_STATUS] },
+                      action_url: { type: 'string', format: 'uri', pattern: '^https?://' },
+                      action_label: { type: 'string', minLength: 1 },
                     },
+                    allOf: [
+                      { if: { required: ['action_url'] }, then: { required: ['action_label'] } },
+                      { if: { required: ['action_label'] }, then: { required: ['action_url'] } },
+                    ],
                   },
                 },
               },

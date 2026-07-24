@@ -77,6 +77,7 @@ async function main() {
           `Pesquise na web o brief a seguir e proponha catálogo de benefícios conforme o JSON Schema abaixo.`,
           `Brief: ${job.brief}`,
           `Classifique cada fonte numa source_category da taxonomia. Cite source_url em CADA nó.`,
+          `Quando houver um destino oficial direto para usar/resgatar o benefício, informe action_url e action_label juntos; prefira o deep link à homepage.`,
           `NÃO reproponha itens já existentes (contexto abaixo).`,
           `Sua resposta final deve ser APENAS o objeto JSON válido — sem prosa, sem cercas de código (\`\`\`), nada além do JSON.`,
           `JSON Schema: ${JSON.stringify(candidatesJsonSchema)}`,
