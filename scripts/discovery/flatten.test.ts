@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { matchStatus, type CatalogSnapshot } from './matchCatalog'
 import { flattenTree } from './flatten'
-import type { CandidatesTree } from './candidatesSchema'
+import { candidatesTreeSchema, type CandidatesTree } from './candidatesSchema'
 
 const emptySnap: CatalogSnapshot = { sources: new Map(), sourceItems: new Map(), benefits: new Map() }
 
@@ -66,5 +66,19 @@ describe('flattenTree', () => {
     const flat = flattenTree(tree, snap)
     expect(flat[0].match_status).toBe('update')
     expect(flat[0].matched_id).toBe('existing-id')
+  })
+
+  it('persiste CTA normalizado após o parse', () => {
+    const candidate = structuredClone(tree)
+    candidate.sources[0].items[0].benefits[0].action_url = '  https://unimed.coop.br/rede-credenciada  '
+    candidate.sources[0].items[0].benefits[0].action_label = '  Ver rede  '
+
+    const parsed = candidatesTreeSchema.parse(candidate)
+    const benefit = flattenTree(parsed, emptySnap).find(({ entity_type }) => entity_type === 'benefit')
+
+    expect(benefit?.payload).toMatchObject({
+      action_url: 'https://unimed.coop.br/rede-credenciada',
+      action_label: 'Ver rede',
+    })
   })
 })

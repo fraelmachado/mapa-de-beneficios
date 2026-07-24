@@ -13,9 +13,15 @@ const REDEMPTION_TYPE = ['automatic', 'app', 'coupon', 'partner_portal', 'insura
   'concierge', 'physical_access', 'points_exchange', 'statement_credit', 'other'] as const
 
 const url = z.string().url()
-const httpUrl = z.string().trim().url().refine((value) => {
-  const protocol = new URL(value).protocol
-  return protocol === 'http:' || protocol === 'https:'
+const httpUrl = z.string().trim().refine((value) => {
+  if (!value.startsWith('http://') && !value.startsWith('https://')) return false
+
+  try {
+    new URL(value)
+    return true
+  } catch {
+    return false
+  }
 }, 'URL deve usar http ou https')
 
 const benefitNode = z.object({

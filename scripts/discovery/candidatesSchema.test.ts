@@ -96,11 +96,15 @@ describe('candidatesTreeSchema', () => {
     [{ action_label: 'Ver rede' }, 'sem URL'],
     [{ action_url: 'javascript:alert(1)', action_label: 'Abrir' }, 'protocolo inseguro'],
     [{ action_url: 'ftp://unimed.coop.br/rede', action_label: 'Abrir' }, 'protocolo não HTTP'],
+    [{ action_url: 'https://', action_label: 'Abrir' }, 'URL sem host'],
+    [{ action_url: 'http:foo', action_label: 'Abrir' }, 'URL HTTP sem //'],
+    [{ action_url: 'HTTPS://unimed.coop.br/rede', action_label: 'Abrir' }, 'protocolo em maiúsculas'],
   ])('rejeita CTA inválido: %s (%s)', (action) => {
     const bad = structuredClone(validTree) as {
       sources: Array<{ items: Array<{ benefits: Array<Record<string, unknown>> }> }>
     }
     Object.assign(bad.sources[0].items[0].benefits[0], action)
+    expect(() => candidatesTreeSchema.safeParse(bad)).not.toThrow()
     expect(candidatesTreeSchema.safeParse(bad).success).toBe(false)
   })
 
