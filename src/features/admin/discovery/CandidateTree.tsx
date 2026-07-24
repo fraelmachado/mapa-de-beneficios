@@ -2,6 +2,7 @@ import './discovery.css'
 import type { CSSProperties } from 'react'
 import type { DiscoveryCandidate } from './types'
 import { benefitCategoryChip, sourceCategoryChip, verificationLabel } from './discoveryMeta'
+import { normalizeHttpUrl } from '../../../lib/actionLink'
 
 type P = Record<string, unknown>
 
@@ -144,8 +145,8 @@ export function CandidateTree({
                         const bChip = benefitCategoryChip(str(bp.category))
                         const bProv = b.provenance as P
                         const bUrl = str(bProv.source_url)
-                        const actionUrl = str(bp.action_url)
-                        const actionLabel = str(bp.action_label)
+                        const actionUrl = normalizeHttpUrl(bp.action_url)
+                        const actionLabel = str(bp.action_label).trim()
                         const bLocked = !unlocked(b)
 
                         return (

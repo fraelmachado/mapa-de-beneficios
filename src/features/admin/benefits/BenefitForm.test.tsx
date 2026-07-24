@@ -65,5 +65,21 @@ describe('BenefitForm', () => {
 
     expect(onSubmit).not.toHaveBeenCalled()
     expect(screen.getByRole('alert')).toHaveTextContent(/URL e o rótulo/i)
+    expect(screen.getByLabelText(/URL de ação/i)).toHaveAttribute('aria-describedby', 'b-action-error')
+    expect(screen.getByLabelText(/URL de ação/i)).toHaveAttribute('aria-invalid', 'true')
+    expect(screen.getByLabelText(/rótulo da ação/i)).toHaveAttribute('aria-describedby', 'b-action-error')
+    expect(screen.getByLabelText(/rótulo da ação/i)).toHaveAttribute('aria-invalid', 'true')
+  })
+
+  it('não submete título e resumo vazios e associa erros aos campos', () => {
+    const onSubmit = vi.fn()
+    render(<BenefitForm initial={null} sources={sources} onSubmit={onSubmit} onCancel={() => {}} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /salvar/i }))
+
+    expect(onSubmit).not.toHaveBeenCalled()
+    expect(screen.getByLabelText(/título/i)).toHaveAttribute('aria-invalid', 'true')
+    expect(screen.getByLabelText(/resumo/i)).toHaveAttribute('aria-invalid', 'true')
+    expect(screen.getAllByRole('alert')).toHaveLength(2)
   })
 })

@@ -12,6 +12,8 @@ declare
   p            jsonb;
   prov         jsonb;
   tier         jsonb;
+  action_url   text;
+  action_label text;
 begin
   if not public.is_admin() then
     raise exception 'not authorized';
@@ -80,6 +82,27 @@ begin
     returning id into new_id;
 
   elsif c.entity_type = 'benefit' then
+    action_url := nullif(
+      regexp_replace(coalesce(p->>'action_url', ''), '^[[:space:]]+|[[:space:]]+$', '', 'g'),
+      ''
+    );
+    action_label := nullif(
+      regexp_replace(coalesce(p->>'action_label', ''), '^[[:space:]]+|[[:space:]]+$', '', 'g'),
+      ''
+    );
+
+    if (action_url is null) <> (action_label is null) then
+      raise exception 'invalid action link: action_url and action_label must be provided together'
+        using errcode = '22023';
+    end if;
+
+    if action_url is not null
+      and action_url !~ '^https?://[^[:space:]/?#]+[^[:space:]]*$'
+    then
+      raise exception 'invalid action link: action_url must be a canonical HTTP(S) URL'
+        using errcode = '22023';
+    end if;
+
     insert into public.benefits as existing (
       slug, title, summary, category, scope, active, redemption_type, benefit_source,
       long_description, program, source_url, source_name, observed_at, verification_status,
@@ -92,7 +115,7 @@ begin
       (p->>'benefit_source')::public.benefit_source_kind,
       p->>'long_description', p->>'program', prov->>'source_url', prov->>'source_name',
       (prov->>'observed_at')::date, (prov->>'verification_status')::public.verification_status,
-      nullif(btrim(p->>'action_url'), ''), nullif(btrim(p->>'action_label'), '')
+      action_url, action_label
     )
     on conflict (slug) do update set
       title = excluded.title,

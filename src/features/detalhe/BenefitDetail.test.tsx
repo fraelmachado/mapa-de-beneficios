@@ -66,6 +66,17 @@ describe('BenefitDetail', () => {
     expect(screen.queryByRole('link', { name: /clique/i })).not.toBeInTheDocument()
   })
 
+  it.each([
+    'http:foo',
+    'https:////x.test/rede',
+    'HTTPS://x.test/rede',
+    'https://x.test/rede credenciada',
+  ])('não renderiza ação com URL HTTP(S) não canônica: %s', (actionUrl) => {
+    result = { data: [{ ...b, action_url: actionUrl, action_label: 'Clique' }], isLoading: false, error: null, refetch }
+    renderWithProviders(<BenefitDetail />, { route: '/beneficio/b1' })
+    expect(screen.queryByRole('link', { name: /clique/i })).not.toBeInTheDocument()
+  })
+
   it('mostra a fonte oficial (nome) e a data de coleta', () => {
     const withSource: MyBenefit = {
       ...b, source_url: 'https://www.visa.com.br/beneficios', source_name: 'Visa Brasil',

@@ -10,16 +10,11 @@ import { categoryToDsCat } from '../benefits/toPassProps'
 import { formatBRL } from '../benefits/estimatedValue'
 import { CATEGORIES } from '../benefits/types'
 import type { CSSProperties } from 'react'
+import { normalizeHttpUrl } from '../../lib/actionLink'
 import './benefit-detail.css'
 
 function safeHttpUrl(url: string | null): string | null {
-  if (!url) return null
-  try {
-    const u = new URL(url)
-    return u.protocol === 'http:' || u.protocol === 'https:' ? url : null
-  } catch {
-    return null
-  }
+  return normalizeHttpUrl(url)
 }
 
 function sourceLabel(name: string | null, url: string): string {

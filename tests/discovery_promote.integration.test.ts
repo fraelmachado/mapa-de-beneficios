@@ -6,7 +6,7 @@ const stamp = () => `${Date.now()}-${Math.floor(performance.now() * 1000)}`
 async function seedTree(
   db: ReturnType<typeof serviceClient>,
   tag: string,
-  action?: { action_url: string; action_label: string },
+  action?: Partial<{ action_url: string; action_label: string }>,
 ) {
   const job = await db.from('discovery_jobs').insert({ brief: `P-${tag}`, status: 'done' }).select('id').single()
   const jobId = job.data!.id
@@ -185,5 +185,29 @@ describe('promote_discovery_candidate', () => {
       action_url: 'https://x.dev/f/rede-existente',
       action_label: 'Ver rede existente',
     })
+  })
+
+  it.each([
+    [{ action_url: 'https://x.dev/f/rede' }, 'par parcial sem rótulo'],
+    [{ action_label: 'Ver rede' }, 'par parcial sem URL'],
+    [{ action_url: 'javascript:alert(1)', action_label: 'Abrir' }, 'protocolo inseguro'],
+    [{ action_url: 'http:foo', action_label: 'Abrir' }, 'HTTP sem barras'],
+    [{ action_url: 'https:////x.dev/rede', action_label: 'Abrir' }, 'authority inválida'],
+    [{ action_url: 'https://x.dev/rede credenciada', action_label: 'Abrir' }, 'whitespace interno'],
+    [{ action_url: 'HTTPS://x.dev/rede', action_label: 'Abrir' }, 'protocolo não canônico'],
+  ])('rejeita CTA inválido no JSONB: %s (%s)', async (action) => {
+    const db = serviceClient()
+    const s = await seedTree(db, stamp(), action)
+    const adm = await adminClient()
+    await adm.client.rpc('promote_discovery_candidate', { candidate_id: await candId(db, s.srcFp) })
+    await adm.client.rpc('promote_discovery_candidate', { candidate_id: await candId(db, s.itemFp) })
+
+    const promoted = await adm.client.rpc('promote_discovery_candidate', {
+      candidate_id: await candId(db, s.benFp),
+    })
+
+    expect(promoted.error?.message).toMatch(/invalid action link/i)
+    const benefit = await db.from('benefits').select('id').eq('slug', s.benSlug)
+    expect(benefit.data).toEqual([])
   })
 })

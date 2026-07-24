@@ -39,6 +39,7 @@ export function BenefitForm({
   const [actionUrl, setActionUrl] = useState(initial?.action_url ?? '')
   const [actionLabel, setActionLabel] = useState(initial?.action_label ?? '')
   const [actionError, setActionError] = useState<string | null>(null)
+  const [requiredErrors, setRequiredErrors] = useState({ title: false, summary: false })
   const [active, setActive] = useState(initial?.active ?? true)
   const [sourceItemIds, setSourceItemIds] = useState<string[]>(
     initial?.benefit_sources.map((b) => b.source_item_id) ?? [],
@@ -46,6 +47,13 @@ export function BenefitForm({
 
   function submit(e: FormEvent) {
     e.preventDefault()
+    const missingRequired = {
+      title: title.trim().length === 0,
+      summary: summary.trim().length === 0,
+    }
+    setRequiredErrors(missingRequired)
+    if (missingRequired.title || missingRequired.summary) return
+
     const action = normalizeActionLink(actionUrl, actionLabel)
     if (!action.ok) {
       setActionError(action.error)
@@ -75,10 +83,26 @@ export function BenefitForm({
   return (
     <form noValidate onSubmit={submit} style={{ display: 'flex', flexDirection: 'column' }}>
       <label className="aa-fieldlbl" htmlFor="b-title">Título</label>
-      <Input id="b-title" required value={title} onChange={(e) => setTitle(e.target.value)} />
+      <Input
+        id="b-title"
+        required
+        value={title}
+        aria-describedby={requiredErrors.title ? 'b-title-error' : undefined}
+        aria-invalid={requiredErrors.title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+      {requiredErrors.title ? <p id="b-title-error" role="alert">Informe o título.</p> : null}
 
       <label className="aa-fieldlbl" htmlFor="b-summary">Resumo</label>
-      <Input id="b-summary" required value={summary} onChange={(e) => setSummary(e.target.value)} />
+      <Input
+        id="b-summary"
+        required
+        value={summary}
+        aria-describedby={requiredErrors.summary ? 'b-summary-error' : undefined}
+        aria-invalid={requiredErrors.summary}
+        onChange={(e) => setSummary(e.target.value)}
+      />
+      {requiredErrors.summary ? <p id="b-summary-error" role="alert">Informe o resumo.</p> : null}
 
       <label className="aa-fieldlbl" htmlFor="b-cat">Categoria</label>
       <select id="b-cat" className="aa-select" value={category} onChange={(e) => setCategory(e.target.value as BenefitCategory)}>

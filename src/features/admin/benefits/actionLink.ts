@@ -1,3 +1,5 @@
+import { normalizeHttpUrl } from '../../../lib/actionLink'
+
 export type ActionLinkValue = {
   action_url: string | null
   action_label: string | null
@@ -19,17 +21,13 @@ export function normalizeActionLink(actionUrl: string, actionLabel: string): Act
     return { ok: false, error: 'Informe a URL e o rótulo da ação juntos.' }
   }
 
-  try {
-    const parsed = new URL(url)
-    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-      return { ok: false, error: 'A URL da ação deve usar http ou https.' }
-    }
-  } catch {
+  const normalizedUrl = normalizeHttpUrl(url)
+  if (!normalizedUrl) {
     return { ok: false, error: 'Informe uma URL de ação completa e válida.' }
   }
 
   return {
     ok: true,
-    value: { action_url: url, action_label: label },
+    value: { action_url: normalizedUrl, action_label: label },
   }
 }

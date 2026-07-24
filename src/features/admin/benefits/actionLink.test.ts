@@ -25,6 +25,11 @@ describe('normalizeActionLink', () => {
     ['javascript:alert(1)', 'Abrir'],
     ['ftp://amil.com.br/rede', 'Abrir'],
     ['amil.com.br/rede', 'Abrir'],
+    ['http:foo', 'Abrir'],
+    ['https:////amil.com.br/rede', 'Abrir'],
+    ['HTTPS://amil.com.br/rede', 'Abrir'],
+    ['https://amil.com.br/rede credenciada', 'Abrir'],
+    ['https://amil.com.br/rede\tcredenciada', 'Abrir'],
   ])('rejeita combinação inválida %s / %s', (url, label) => {
     expect(normalizeActionLink(url, label)).toMatchObject({ ok: false })
   })

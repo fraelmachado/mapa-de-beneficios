@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ACTION_URL_PATTERN, normalizeHttpUrl } from '../../src/lib/actionLink'
 
 const SOURCE_CATEGORY = ['bank_card', 'carrier', 'health', 'corporate_benefits', 'loyalty', 'retail', 'mall'] as const
 const SOURCE_KIND = ['card', 'carrier', 'loyalty', 'cpf'] as const
@@ -12,17 +13,11 @@ const VERIFICATION_STATUS = ['official_confirmed', 'official_needs_regulation_ch
 const REDEMPTION_TYPE = ['automatic', 'app', 'coupon', 'partner_portal', 'insurance_claim', 'certificate',
   'concierge', 'physical_access', 'points_exchange', 'statement_credit', 'other'] as const
 
-const ACTION_URL_PATTERN = '^https?://[^\\s/?#]+[^\\s]*$'
 const ACTION_LABEL_NON_WHITESPACE_PATTERN = '\\S'
 
 const url = z.string().url()
 const httpUrl = z.string().trim().regex(new RegExp(ACTION_URL_PATTERN), 'URL deve usar http ou https').refine((value) => {
-  try {
-    new URL(value)
-    return true
-  } catch {
-    return false
-  }
+  return normalizeHttpUrl(value) === value
 }, 'URL deve ser válida')
 
 const actionLabel = z.string().trim().regex(new RegExp(ACTION_LABEL_NON_WHITESPACE_PATTERN), 'Rótulo deve conter texto')

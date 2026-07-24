@@ -86,5 +86,29 @@ describe('CandidateTree', () => {
     expect(screen.getByText('Destino do botão')).toBeInTheDocument()
     const action = screen.getByRole('link', { name: /ver rede/i })
     expect(action).toHaveAttribute('href', 'https://wellhub.com/academias/busca')
+    expect(action).toHaveTextContent('wellhub.com')
+  })
+
+  it.each([
+    'javascript:alert(1)',
+    'http:foo',
+    'https:////wellhub.com/academias',
+    'https://wellhub.com/academias busca',
+  ])('não renderiza preview com href inseguro vindo do JSONB: %s', (actionUrl) => {
+    const withUnsafeAction = tree.map((candidate) => candidate.id === 'b1'
+      ? {
+          ...candidate,
+          payload: {
+            ...candidate.payload,
+            action_url: actionUrl,
+            action_label: 'Ver rede',
+          },
+        }
+      : candidate)
+
+    render(<CandidateTree candidates={withUnsafeAction} onPromote={vi.fn()} onReject={vi.fn()} />)
+
+    expect(screen.queryByText('Destino do botão')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /ver rede/i })).not.toBeInTheDocument()
   })
 })
